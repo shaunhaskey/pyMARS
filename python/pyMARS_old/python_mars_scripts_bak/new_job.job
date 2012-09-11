@@ -1,0 +1,8 @@
+#!/bin/bash
+#$ -N blah
+#$ -q all.q
+#$ -o sge_output.dat
+#$ -e sge_error.dat
+#$ -cwd
+export PATH=$PATH:/f/python/linux64/bin
+/u/haskeysr/python_mars_scripts/8_new_post_proc.py /scratch/haskeysr/mars/project1_new_eq/9_project1_new_eq_COIL_upper_post_setup.pickle

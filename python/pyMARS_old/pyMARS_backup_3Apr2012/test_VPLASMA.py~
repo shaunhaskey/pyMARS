@@ -1,0 +1,8 @@
+from  results_class import *
+from RZfuncs import I0EXP_calc
+import numpy as num
+import matplotlib.pyplot as pt
+
+import PythonMARS_funcs as pyMARS
+
+'/home/srh112/code/pyMARS/test_shot/marsrun/RUNrfa_COILlower.p'

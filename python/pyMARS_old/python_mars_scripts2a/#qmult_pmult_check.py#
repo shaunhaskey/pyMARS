@@ -1,0 +1,137 @@
+#!/usr/bin/env Python
+import matplotlib
+from operator import itemgetter, attrgetter
+
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as pt
+
+def read_stab_results(file_location):
+    stab_setup_contents = open(file_location).read()
+    stab_lines = stab_setup_contents.split('\n')
+    line = 0
+
+    dictionary_list = {}
+    
+    #skip lines at the start with ;
+    while stab_lines[line][0] == ';':
+        line += 1
+
+    var_names = []
+
+    #extract variable names
+    stab_lines[line] = stab_lines[line].lstrip(' ').rstrip('\n').rstrip(' ')
+    stab_lines[line] = stab_lines[line]+ ' '
+
+    while len(stab_lines[line]) >= 1:
+        end = stab_lines[line].find(' ')
+        var_names.append(stab_lines[line][0:end])
+        stab_lines[line] = stab_lines[line].lstrip(var_names[-1]).lstrip(' ')
+
+    #extract equilibrium run values
+    line += 1
+    values = []
+    #item = 1
+    while (line< len(stab_lines)) and (len(stab_lines[line])>1):
+        current_value = []
+        stab_lines[line] = stab_lines[line].lstrip(' ').rstrip('\n').rstrip(' ')
+        stab_lines[line] = stab_lines[line] + ' ' #pad so while loop works
+        while len(stab_lines[line]) >= 1:
+            end = stab_lines[line].find(' ')
+            current_value.append(stab_lines[line][0:end])
+            stab_lines[line] = stab_lines[line].lstrip(current_value[-1]).lstrip(' ')
+        #index each eq by a tuple (pmult,qmult)
+        item = (current_value[0],current_value[1])
+
+        dictionary_list[item]={}
+        for i in range(0,len(current_value)):
+            dictionary_list[item][var_names[i]]=float(current_value[i])
+        values.append(current_value)
+        line += 1
+        #item += 1
+    return dictionary_list
+
+
+'''
+for i in range(40,76):
+    dir = '/u/lanctot/mars/shot138344/bNq95/custom-2/n=2/ml' + str(i) + '/'
+    a = read_stab_results(dir + 'stab_setup_results.dat')
+    single_p = []
+    single_q = []
+    for j in a.keys():
+        single_p.append(a[j]['PMULT'])
+        single_q.append(a[j]['QMULT'])
+    p = [min(single_p), max(single_p)]
+    q = [min(single_q), max(single_q)]
+    n_p = len(a.keys())
+    #print 'ml',i, p, q, (p[1]-p[0])/0.005,(q[1]-q[0])/0.03, len(a.keys())
+    #%print '-----------'
+    print "['ml%d', %.2f, %.2f, %d, -0.005, 0.03]"%(i, p[1], q[0],n_p)
+'''
+
+
+Bn = []
+q95 =[]
+BnLI = []
+b = {}
+q=[]
+p=[]
+tuple_list = []
+tot = 1
+
+'''
+for i in range(40,76):
+    dir = '/u/lanctot/mars/shot138344/bNq95/custom-2/n=2/ml' + str(i) + '/'
+    file_name = dir + 'stab_setup_results.dat'
+    print file_name
+    file = open(file_name,'r')
+    current_results = file.readlines()
+    file.close()
+    if tot ==1:
+        together = current_results
+    else:
+        for j in range(3,len(current_results)):
+            together.append(current_results[j])
+    tot += 1
+
+file2 = open('together.results','w')
+file2.writelines(together)
+file2.close()
+'''
+
+
+
+for i in range(40,76):
+    try:
+        dir = '/u/haskeysr/mars/eq_from_matt/corsica_test4/ml' + str(i) + '/'
+
+        #dir = '/u/lanctot/mars/shot138344/bNq95/custom-2/n=2/ml' + str(i) + '/'
+        a = read_stab_results(dir + 'stab_setup_results.dat')
+        #print 'read_stab problem'
+        for j in a.keys():
+            b[j]=a[j]
+            q.append(a[j]['QMULT'])
+            p.append(a[j]['PMULT'])
+            Bn.append(a[j]['BETAN'])
+            BnLI.append(a[j]['BETAN']/a[j]['LI'])
+            q95.append(a[j]['Q95'])
+            tuple_list.append((a[j]['PMULT'],a[j]['QMULT']))
+    except:
+        print 'some other problem'
+sorted(tuple_list,key=itemgetter(0,1))
+#for i in b.keys():
+#    if b[i]
+
+print 'figure '
+fig = pt.figure()
+ax = fig.add_subplot(211)
+ax2 = fig.add_subplot(212)
+ax.plot(q,p,'.')
+ax.set_xlabel('qmult')
+ax.set_ylabel('pmult')
+
+ax2.plot(BnLI,q95,'.')
+ax2.set_xlabel('B_N')
+ax2.set_ylabel('q95')
+fig.savefig('temp2.png')
+print 'figure end'

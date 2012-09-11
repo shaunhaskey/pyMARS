@@ -1,0 +1,340 @@
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code15/': File exists
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code15/': File exists
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+Total Time for this step : 0.00
+start corsica setup
+<<calldcon>> 0
+<<qstep>> 0.2
+<<nqmult>> 3
+<<thetac>> 0.0030
+<<pmin>> 0.5
+<<pstep>> 0.2
+<<npmult>> 3
+<<qmin>> 0.5
+finished corsica setup, starting corsica runs
+1
+0
+[['ml10', 0.5, 0.0, 30, -0.005, 0.03]]
+running corsica_script0.sh script
+copying files across
+Successful read in : 9, failed read in : 0
+Removed 0 for q95, 0 for Bn_Div_Li, 0 for stability, and 0 due to read error
+Remaining eq : 9
+1
+2
+3
+4
+5
+6
+7
+8
+9
+dumping data to pickle file
+Total Time for this step : 0.11
+1
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69189527
+<<QSPEC>> 4.348
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97388018
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+2
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69189786
+<<QSPEC>> 4.348
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97387717
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+3
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69190046
+<<QSPEC>> 4.348
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97387413
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+4
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69189756
+<<QSPEC>> 4.928
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97387751
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+5
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69190108
+<<QSPEC>> 4.928
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.9738734
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+6
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69190435
+<<QSPEC>> 4.928
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97386959
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+7
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69190089
+<<QSPEC>> 5.508
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97387362
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+8
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69190478
+<<QSPEC>> 5.508
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97386909
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+9
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> -1
+<<R0EXP>> 1.69190826
+<<QSPEC>> 5.508
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 1
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97386502
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+1
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69189527
+<<QSPEC>> 4.348
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97388018
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+2
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69189786
+<<QSPEC>> 4.348
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97387717
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+3
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69190046
+<<QSPEC>> 4.348
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97387413
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+4
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69189756
+<<QSPEC>> 4.928
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97387751
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+5
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69190108
+<<QSPEC>> 4.928
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.9738734
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+6
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69190435
+<<QSPEC>> 4.928
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97386959
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+7
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69190089
+<<QSPEC>> 5.508
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97387362
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+8
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69190478
+<<QSPEC>> 5.508
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97386909
+<<NS>> 60
+creating fxin and runing fxrun
+opening file
+9
+Modifying CHEASE datain file
+<<NCHI>> 240
+<<NT>> 60
+<<NEGP>> 0
+<<R0EXP>> 1.69190826
+<<QSPEC>> 5.508
+<<NPSI>> 180
+<<NTOR>> -2
+<<NER>> 2
+<<SHOT>> 138344
+<<TIME>> 2306
+<<B0EXP>> 1.97386502
+<<NS>> 60
+creating fxin and runing fxrun
+opening filex
+Total Time for this step : 0.02
+Traceback (most recent call last):
+  File "./run_through.py", line 222, in <module>
+    project_dict = cont_funcs.RMZM_func(project_dict, coilN, RMZM_name, Nchi)
+  File "/u/haskeysr/pyMARS/control_funcs.py", line 134, in RMZM_func
+    FCCHI, FWCHI, IFEED = Icoil_MARS_grid_details(coilN,RMZMFILE,Nchi)
+  File "/u/haskeysr/pyMARS/RZfuncs.py", line 31, in Icoil_MARS_grid_details
+    RM, ZM, Ns, Ns1, Ns2, Nm0, R0EXP, B0EXP, s = readRMZM(RMZMFILE)
+  File "/u/haskeysr/pyMARS/RZfuncs.py", line 107, in readRMZM
+    RMZM = num.loadtxt(open(file_name))
+IOError: [Errno 2] No such file or directory: '/scratch/haskeysr/mars/testing_new_code15/qmult0.500/exp0.500/cheaserun/RMZM_F'

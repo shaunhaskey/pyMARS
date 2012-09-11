@@ -1,0 +1,3 @@
+sleep 
+./run_through_shot146382_scaled.py > log_146382 &
+./run_through_shot146398_scaled.py > log_146398 &

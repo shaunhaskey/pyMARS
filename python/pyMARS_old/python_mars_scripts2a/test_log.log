@@ -1,0 +1,413 @@
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code': File exists
+hello world
+1  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 2.84376788139 s, finished  1  of  9
+2  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 5.62307786942 s, finished  2  of  9
+3  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 8.39578294754 s, finished  3  of  9
+4  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 11.1100709438 s, finished  4  of  9
+5  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 13.8685238361 s, finished  5  of  9
+6  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 16.6232199669 s, finished  6  of  9
+7  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 19.3631279469 s, finished  7  of  9
+8  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 22.4531209469 s, finished  8  of  9
+9  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 25.2022609711 s, finished  9  of  9
+Total Time for this step : 0.42
+1
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.9739182
+R0EXP (m)                  :  1.69186269
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755666.59881
+Central Alfven time (s)       : 4.50482662795e-07
+Central Alfven Frequency (1/s): 2219841.25603
+TAUW              :  31188.7696473
+ROTE              :  0.0228850372467
+Thermal OMEGACIO :  42.5593751027
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97391820
+R0EXP: 1.69186269
+tauwp: 0.01405000
+tauwm: 31188.76964728
+f_v0a: 2219841.25603408
+fcio: 42.55937510
+Modify Mars run file
+( 0, 9.0096532559e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.0096532559e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+2
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.97391737
+R0EXP (m)                  :  1.6918634
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755665.01961
+Central Alfven time (s)       : 4.50483041263e-07
+Central Alfven Frequency (1/s): 2219839.39106
+TAUW              :  31188.7434444
+ROTE              :  0.0228850468695
+Thermal OMEGACIO :  42.5593929629
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97391737
+R0EXP: 1.69186340
+tauwp: 0.01405000
+tauwm: 31188.74344438
+f_v0a: 2219839.39105901
+fcio: 42.55939296
+Modify Mars run file
+( 0, 9.00966082526e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.00966082526e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+3
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.97391542
+R0EXP (m)                  :  1.69186507
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755661.30945
+Central Alfven time (s)       : 4.5048393095e-07
+Central Alfven Frequency (1/s): 2219835.00697
+TAUW              :  31188.6818479
+ROTE              :  0.0228850694773
+Thermal OMEGACIO :  42.5594349724
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97391542
+R0EXP: 1.69186507
+tauwp: 0.01405000
+tauwm: 31188.68184790
+f_v0a: 2219835.00696795
+fcio: 42.55943497
+Modify Mars run file
+( 0, 9.00967861901e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.00967861901e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+4
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.97391297
+R0EXP (m)                  :  1.69186717
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755656.64797
+Central Alfven time (s)       : 4.50485049243e-07
+Central Alfven Frequency (1/s): 2219829.49641
+TAUW              :  31188.6044245
+ROTE              :  0.022885097882
+Thermal OMEGACIO :  42.5594877986
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97391297
+R0EXP: 1.69186717
+tauwp: 0.01405000
+tauwm: 31188.60442454
+f_v0a: 2219829.49640827
+fcio: 42.55948780
+Modify Mars run file
+( 0, 9.00970098486e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.00970098486e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+5
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.97391735
+R0EXP (m)                  :  1.69186342
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755664.98156
+Central Alfven time (s)       : 4.50483051153e-07
+Central Alfven Frequency (1/s): 2219839.34233
+TAUW              :  31188.7427597
+ROTE              :  0.0228850471014
+Thermal OMEGACIO :  42.5593934661
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97391735
+R0EXP: 1.69186342
+tauwp: 0.01405000
+tauwm: 31188.74275968
+f_v0a: 2219839.34232594
+fcio: 42.55939347
+Modify Mars run file
+( 0, 9.00966102306e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.00966102306e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+6
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.97391645
+R0EXP (m)                  :  1.69186418
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755663.26918
+Central Alfven time (s)       : 4.5048345891e-07
+Central Alfven Frequency (1/s): 2219837.33303
+TAUW              :  31188.714529
+ROTE              :  0.0228850575357
+Thermal OMEGACIO :  42.5594125841
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97391645
+R0EXP: 1.69186418
+tauwp: 0.01405000
+tauwm: 31188.71452905
+f_v0a: 2219837.33302821
+fcio: 42.55941258
+Modify Mars run file
+( 0, 9.0096691782e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.0096691782e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+7
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.97391444
+R0EXP (m)                  :  1.69186591
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755659.44486
+Central Alfven time (s)       : 4.50484378267e-07
+Central Alfven Frequency (1/s): 2219832.80274
+TAUW              :  31188.6508785
+ROTE              :  0.0228850808392
+Thermal OMEGACIO :  42.5594561028
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97391444
+R0EXP: 1.69186591
+tauwp: 0.01405000
+tauwm: 31188.65087853
+f_v0a: 2219832.80274244
+fcio: 42.55945610
+Modify Mars run file
+( 0, 9.00968756534e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.00968756534e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+8
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.97391191
+R0EXP (m)                  :  1.69186807
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755654.63117
+Central Alfven time (s)       : 4.50485530794e-07
+Central Alfven Frequency (1/s): 2219827.1235
+TAUW              :  31188.5710851
+ROTE              :  0.0228851101714
+Thermal OMEGACIO :  42.5595104384
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97391191
+R0EXP: 1.69186807
+tauwp: 0.01405000
+tauwm: 31188.57108515
+f_v0a: 2219827.12349819
+fcio: 42.55951044
+Modify Mars run file
+( 0, 9.00971061588e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.00971061588e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+9
+equal character =
+NW : 30
+0.000   6.5668e+19
+
+Rotation section ------------
+0.000     85948.57
+
+vtor0_r 0.0 vtor0 85948.57
+From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro
+=======================================
+Input values
+=======================================
+B0EXP (T)                  :  1.9739092
+R0EXP (m)                  :  1.6918704
+Central density (m^-3)    :  6.5668e+19
+Tau wall physics (s)      :  0.01405
+=======================================
+Normalized values
+=======================================
+Central Alfven speed (m/s)    :  3755649.475
+Central Alfven time (s)       : 4.50486769669e-07
+Central Alfven Frequency (1/s): 2219821.0188
+TAUW              :  31188.4853141
+ROTE              :  0.0228851415906
+Thermal OMEGACIO :  42.5595690503
+=======================================
+Coil Frequencies
+=======================================
+I-coil (Hz)      OMEGA
+2.0000e+01       9.0097e-06
+=======================================
+B0EXP: 1.97390920
+R0EXP: 1.69187040
+tauwp: 0.01405000
+tauwm: 31188.48531407
+f_v0a: 2219821.01879506
+fcio: 42.55956905
+Modify Mars run file
+( 0, 9.00973539338e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Modify Mars run file
+( 0, 9.00973539338e-06),
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Total Time for this step : 0.04
+Traceback (most recent call last):
+  File "./run_through.py", line 209, in <module>
+    project_dict = cont_funcs.run_mars_function(input_file_name, output_file_name, MARS_simultaneous_jobs)
+NameError: name 'input_file_name' is not defined

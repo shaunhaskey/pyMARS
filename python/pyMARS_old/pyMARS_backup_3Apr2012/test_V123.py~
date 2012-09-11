@@ -1,0 +1,37 @@
+import numpy as num
+
+def GetV123(VM1,VM2,VM3,R, Mm, chi, dRds, dZds, dRdchi, dZdchi, jacobian, Nchi,s, DPSIDS, T):
+    #Convert BM1, BM2 and BM3 into B1, B2, B3
+    expmchi = num.exp(num.dot(Mm,chi)*1j)
+
+    V1a = num.dot(VM1,expmchi)
+    V2a = num.dot(VM2,expmchi)
+    V3a = num.dot(VM3,expmchi)
+
+    V1 = V1a
+    chione = num.ones(1,Nchi)
+    #ss = s[0:Mac.Ns1]*chione
+    #ss[0,:] = ss[1,:]
+
+
+
+    # V2 along e_chi
+    Bchi = DPSIDS*chione/jacobian[0:Mac.Ns1,:]
+    Bphi = T*chione/R[0:Mac.Ns1,:]**2;
+    G11  = dRds[0:Mac.Ns1,:]**2 + dZds[0:Mac.Ns1,:]**2;
+    G12  = dRds[0:Mac.Ns1,:]*dRdchi[0:Mac.Ns1,:] + dZds[0:Mac.Ns1,:]*dZdchi[0:Mac.Ns1,:]
+    G22  = dRdchi[0:Mac.Ns1,:]**2 + dZdchi[0:Mac.Ns1,:]**2;
+    G22[0,:] = G22[1,:]
+    G33  = R[0:Mac.Ns1,:]**2;
+    B2   = (Bchi**2)*G22 + (Bphi**2)*G33
+    V2 = -V1*G12*(Bchi**2)/ B2 + V2a*Bphi*G33/B2 + V3a*Bchi
+
+    
+
+    G22  = dRdchi**2 + dZdchi**2
+    G22[0,:] = G22[1,:]
+    Bn   = B1/num.sqrt(G22)/R
+    expmchi = num.exp(num.dot(-(chi.transpose()), Mm.transpose()*1j))
+    BMn = num.dot(Bn,expmchi)*(chi[0,1]-chi[0,0])/2/num.pi
+
+    return B1,B2,B3,Bn, BMn

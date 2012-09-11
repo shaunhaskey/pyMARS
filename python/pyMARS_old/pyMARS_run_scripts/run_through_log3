@@ -1,0 +1,282 @@
+mkdir: cannot create directory `/scratch/haskeysr/mars/shot146398_single2/': File exists
+mkdir: cannot create directory `/scratch/haskeysr/mars/shot146398_single2/': File exists
+Your job 591792 ("CH32p100_q100") has been submitted
+Your job 591794 ("CH11p100_q100") has been submitted
+Your job 591796 ("MAR40_p100_q100") has been submitted
+rm: cannot remove `/scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/': No such file or directory
+Your job 591800 ("blah") has been submitted
+running a cluster job or running on venus, must use Python RZplot funcs
+Matlab not available
+(1.0,0.0),(1.00000, 0.00000)
+#####################################################################
+##*****STEP 1 - Copy EFIT files + CORSICA(??) ********************###
+g146398.03332
+g146398.03332
+146398 3332
+Total Time for this step : 0.02
+start corsica setup
+<<calldcon>> 0
+<<qstep>> 0.000
+<<nqmult>> 1
+<<thetac>> 0.003
+<<npsi>> 270
+<<pmin>> 1.000000
+<<pstep>> 0.000
+<<npmult>> 1
+<<qmin>> 1.000
+finished corsica setup, starting corsica runs
+1
+0
+[['ml10']]
+running corsica_script0.sh script
+copying files across
+#####################################################################
+##***************************STEP 2 - Generate Directory Structure ############
+Successful read in : 1, failed read in : 0
+Removed 0 for q95, 0 for Bn_Div_Li, 0 for stability, and 0 due to read error
+Remaining eq : 1
+generate_directories serial :  1
+/scratch/haskeysr/mars/shot146398_single2/qmult1.000/exp1.000/cheaserun/
+/scratch/haskeysr/mars/shot146398_single2/qmult1.000/exp1.000/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_single2/qmult1.000/exp1.000/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_single2/qmult1.000/exp1.000/marsrun/RUNrfa.p/
+STEP 2 : dumping data to pickle file
+Total Time for step 2 (DIR_Setup) : 0.09
+#####################################################################
+##***************************STEP 3 - CHEASE RUN********************#
+1
+Modifying CHEASE datain file
+creating fxin
+1
+Submitted 1 jobs of 1, time 0.00mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.00mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.25mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.50mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.76mins
+Running Jobs : 0
+1
+Modifying CHEASE datain file
+creating fxin
+1
+Submitted 1 jobs of 1, time 0.04mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.05mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.30mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.55mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.80mins
+Running Jobs : 0
+Total Time for step 3 (CHEASE) : 2.06
+########################################################################
+##*************** STEP 4 - I-coil grid location *** *          #########
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_single2/qmult1.000/exp1.000/cheaserun/RMZM_F 240
+1  FCCHI= [ 0.21338912 -0.20083682]  FWCHI= [ 0.13389121  0.12552301]  IFEED= [28, 28]  time: 2.49304199219 s, finished  0  of  1
+finished RMZM calculations, errors :  0
+Total Time for step 4 : 0.04
+#########################################################################
+##*************************** Step 5 - MARS setup**************############
+1
+ROTE: 3.55104995334e-05  OMEGA_NORM: 4.2457466834e-06  TAUWM: 33091.9412948  v0a: 4003297.6688
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+Total Time for this step : 0.00
+####################################################################
+##*************************** Step 6 - run MARS ********************########
+setpoint : 15
+1
+Submitted 1 jobs of 1, time 0.32mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.41mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.66mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 0.91mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 1.16mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 1.41mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 1.66mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 1.91mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 2.16mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 2.41mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 2.67mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 2.92mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 3.17mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 3.42mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 3.67mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 3.92mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 4.17mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 4.42mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 4.67mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 4.92mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 5.17mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 5.43mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 5.68mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 5.93mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 6.18mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 6.43mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 6.68mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 6.93mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 7.18mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 7.43mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 7.69mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 7.94mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 8.19mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 8.47mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 8.72mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 8.98mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 9.23mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 9.48mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 9.73mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 9.98mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 10.23mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 10.48mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 10.73mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 10.98mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 11.23mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 11.49mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 11.74mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 11.99mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 12.24mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 12.49mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 12.74mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 12.99mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 1 of 1, Waiting for last 1 jobs to finish, time so far : 13.24mins
+Running Jobs : 1
+Running Jobs : 0
+Submitted 1 of 1, Waiting for last 0 jobs to finish, time so far : 13.49mins
+Running Jobs : 0
+Total Time for this step : 13.75
+####################################################################
+##***************************STEP 7 - Post Processing **********####
+changing number of post_proc workers
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+finished  /scratch/haskeysr/mars/shot146398_single2/post_proc_tmp/tmp_0.pickle
+Total Time for this step : 1.19
+completion time : 18.1895 mins

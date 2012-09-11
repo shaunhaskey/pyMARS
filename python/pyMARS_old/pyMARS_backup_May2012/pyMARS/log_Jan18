@@ -1,0 +1,371 @@
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code1/': File exists
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code1/': File exists
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code1/': File exists
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code1/efit/': File exists
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code1//corsica_temp/': File exists
+mkdir: cannot create directory `/scratch/haskeysr/mars/testing_new_code1//corsica_temp/ml10': File exists
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+cp: cannot stat `m138344.02306': No such file or directory
+Your job 571915 ("CH28p050_q050") has been submitted
+Your job 571916 ("CH28p070_q050") has been submitted
+Your job 571917 ("CH28p090_q050") has been submitted
+Your job 571918 ("CH28p050_q070") has been submitted
+Your job 571919 ("CH28p070_q070") has been submitted
+Your job 571920 ("CH28p090_q070") has been submitted
+Your job 571921 ("CH35p050_q050") has been submitted
+Your job 571922 ("CH35p070_q050") has been submitted
+Your job 571923 ("CH35p090_q050") has been submitted
+Your job 571924 ("CH35p050_q070") has been submitted
+Your job 571925 ("CH35p070_q070") has been submitted
+Your job 571926 ("CH35p090_q070") has been submitted
+Your job 571928 ("MAR12_p50_q50") has been submitted
+Your job 571929 ("MAR12_p50_q50") has been submitted
+Your job 571930 ("MAR12_p70_q50") has been submitted
+Your job 571931 ("MAR12_p70_q50") has been submitted
+Your job 571932 ("MAR12_p90_q50") has been submitted
+Your job 571933 ("MAR12_p90_q50") has been submitted
+Your job 571934 ("MAR12_p50_q70") has been submitted
+Your job 571935 ("MAR12_p50_q70") has been submitted
+Your job 571936 ("MAR12_p70_q70") has been submitted
+Your job 571937 ("MAR12_p70_q70") has been submitted
+Your job 571938 ("MAR12_p90_q70") has been submitted
+Your job 571939 ("MAR12_p90_q70") has been submitted
+rm: cannot remove `/scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/': No such file or directory
+Your job 571940 ("blah") has been submitted
+Your job 571941 ("blah") has been submitted
+Your job 571942 ("blah") has been submitted
+Your job 571943 ("blah") has been submitted
+Your job 571944 ("blah") has been submitted
+Your job 571945 ("blah") has been submitted
+Total Time for this step : 0.00
+start corsica setup
+<<calldcon>> 0
+<<qstep>> 0.2
+<<nqmult>> 2
+<<thetac>> 0.003
+<<pmin>> 0.5
+<<pstep>> 0.2
+<<npmult>> 3
+<<qmin>> 0.5
+finished corsica setup, starting corsica runs
+1
+0
+[['ml10']]
+running corsica_script0.sh script
+copying files across
+Successful read in : 6, failed read in : 0
+Removed 0 for q95, 0 for Bn_Div_Li, 0 for stability, and 0 due to read error
+Remaining eq : 6
+generate_directories serial :  1
+generate_directories serial :  2
+generate_directories serial :  3
+generate_directories serial :  4
+generate_directories serial :  5
+generate_directories serial :  6
+dumping data to pickle file
+Total Time for this step : 0.09
+1
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+2
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+3
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+4
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+5
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+6
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+1
+Submitted 1 jobs of 6, time 0.00mins
+2
+Submitted 2 jobs of 6, time 0.01mins
+3
+Submitted 3 jobs of 6, time 0.01mins
+4
+Submitted 4 jobs of 6, time 0.01mins
+5
+Submitted 5 jobs of 6, time 0.01mins
+6
+Submitted 6 jobs of 6, time 0.01mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 0.01mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 0.26mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 0.51mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 0.77mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 1.02mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 6 of 6, Waiting for last 5 jobs to finish, time so far : 1.28mins
+Running Jobs : 0
+1
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+2
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+3
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+4
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+5
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+6
+Modifying CHEASE datain file
+creating fxin and runing fxrun
+opening file
+1
+Submitted 1 jobs of 6, time 0.00mins
+2
+Submitted 2 jobs of 6, time 0.00mins
+3
+Submitted 3 jobs of 6, time 0.00mins
+4
+Submitted 4 jobs of 6, time 0.00mins
+5
+Submitted 5 jobs of 6, time 0.01mins
+6
+Submitted 6 jobs of 6, time 0.01mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 0.01mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 0.26mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 0.51mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 0.76mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 6 of 6, Waiting for last 6 jobs to finish, time so far : 1.01mins
+Running Jobs : 3
+Running Jobs : 3
+Submitted 6 of 6, Waiting for last 3 jobs to finish, time so far : 1.28mins
+Running Jobs : 0
+Total Time for this step : 3.08
+1  FCCHI= [ 0.20920502 -0.20920502]  FWCHI= [ 0.14225941  0.12552301]  IFEED= [30, 30]  time: 2.52342295647 s, finished  1  of  6
+2  FCCHI= [ 0.20502092 -0.20920502]  FWCHI= [ 0.13389121  0.12552301]  IFEED= [30, 30]  time: 4.86466479301 s, finished  2  of  6
+3  FCCHI= [ 0.20502092 -0.20920502]  FWCHI= [ 0.13389121  0.12552301]  IFEED= [30, 30]  time: 7.60960197449 s, finished  3  of  6
+4  FCCHI= [ 0.20502092 -0.20920502]  FWCHI= [ 0.13389121  0.12552301]  IFEED= [29, 29]  time: 10.3493750095 s, finished  4  of  6
+5  FCCHI= [ 0.20502092 -0.20920502]  FWCHI= [ 0.13389121  0.12552301]  IFEED= [29, 29]  time: 13.122633934 s, finished  5  of  6
+6  FCCHI= [ 0.20502092 -0.20920502]  FWCHI= [ 0.13389121  0.12552301]  IFEED= [29, 29]  time: 15.8717958927 s, finished  6  of  6
+Total Time for this step : 0.26
+1
+ROTE: 0.0228854780481  OMEGA_NORM: 9.01000029699e-06  TAUWM: 31187.5683394  v0a: 3755594.26022
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+2
+ROTE: 0.0228855129466  OMEGA_NORM: 9.01002782928e-06  TAUWM: 31187.4730383  v0a: 3755588.53326
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+3
+ROTE: 0.022885548193  OMEGA_NORM: 9.01005555184e-06  TAUWM: 31187.3770792  v0a: 3755582.74922
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+Possible error IFEED value is greater than or equal to NW :30, IFEED30
+4
+ROTE: 0.0228855090046  OMEGA_NORM: 9.01002467968e-06  TAUWM: 31187.4839404  v0a: 3755589.18016
+Possible error IFEED value is greater than or equal to NW :29, IFEED29
+Possible error IFEED value is greater than or equal to NW :29, IFEED29
+5
+ROTE: 0.0228855566568  OMEGA_NORM: 9.01006218579e-06  TAUWM: 31187.3541165  v0a: 3755581.36029
+Possible error IFEED value is greater than or equal to NW :29, IFEED29
+Possible error IFEED value is greater than or equal to NW :29, IFEED29
+6
+ROTE: 0.0228856008309  OMEGA_NORM: 9.0100969913e-06  TAUWM: 31187.2336415  v0a: 3755574.11121
+Possible error IFEED value is greater than or equal to NW :29, IFEED29
+Possible error IFEED value is greater than or equal to NW :29, IFEED29
+Total Time for this step : 0.02
+setpoint : 10
+1
+Submitted 2 jobs of 12, time 0.34mins
+setpoint : 10
+2
+Submitted 4 jobs of 12, time 0.77mins
+setpoint : 10
+3
+Submitted 6 jobs of 12, time 1.19mins
+setpoint : 10
+4
+Submitted 8 jobs of 12, time 1.61mins
+setpoint : 10
+5
+Submitted 10 jobs of 12, time 2.03mins
+setpoint : 10
+6
+Running Jobs : 10
+Submitted 12 jobs of 12, time 2.96mins
+Running Jobs : 11
+Running Jobs : 11
+Submitted 12 of 12, Waiting for last 11 jobs to finish, time so far : 2.96mins
+Running Jobs : 11
+Running Jobs : 11
+Submitted 12 of 12, Waiting for last 11 jobs to finish, time so far : 3.21mins
+Running Jobs : 10
+Running Jobs : 10
+Submitted 12 of 12, Waiting for last 10 jobs to finish, time so far : 3.47mins
+Running Jobs : 9
+Running Jobs : 9
+Submitted 12 of 12, Waiting for last 9 jobs to finish, time so far : 3.72mins
+Running Jobs : 9
+Running Jobs : 9
+Submitted 12 of 12, Waiting for last 9 jobs to finish, time so far : 3.97mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 12 of 12, Waiting for last 8 jobs to finish, time so far : 4.22mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 12 of 12, Waiting for last 7 jobs to finish, time so far : 4.47mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 12 of 12, Waiting for last 7 jobs to finish, time so far : 4.72mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 12 of 12, Waiting for last 7 jobs to finish, time so far : 4.97mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 12 of 12, Waiting for last 7 jobs to finish, time so far : 5.23mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 5.48mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 5.73mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 5.98mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 6.23mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 6.48mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 6.73mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 6.99mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 7.24mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 7.49mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 7.74mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 7.99mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 8.24mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 8.49mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 8.74mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 9.00mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 9.25mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 9.50mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 9.75mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 10.00mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 10.25mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 12 of 12, Waiting for last 6 jobs to finish, time so far : 10.50mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 12 of 12, Waiting for last 5 jobs to finish, time so far : 10.76mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 12 of 12, Waiting for last 5 jobs to finish, time so far : 11.01mins
+Running Jobs : 4
+Running Jobs : 4
+Submitted 12 of 12, Waiting for last 4 jobs to finish, time so far : 11.26mins
+Running Jobs : 4
+Running Jobs : 4
+Submitted 12 of 12, Waiting for last 4 jobs to finish, time so far : 11.51mins
+Running Jobs : 3
+Running Jobs : 3
+Submitted 12 of 12, Waiting for last 3 jobs to finish, time so far : 11.76mins
+Running Jobs : 2
+Running Jobs : 2
+Submitted 12 of 12, Waiting for last 2 jobs to finish, time so far : 12.01mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 12 of 12, Waiting for last 1 jobs to finish, time so far : 12.26mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 12 of 12, Waiting for last 1 jobs to finish, time so far : 12.51mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 12 of 12, Waiting for last 1 jobs to finish, time so far : 12.76mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 12 of 12, Waiting for last 1 jobs to finish, time so far : 13.02mins
+Running Jobs : 0
+Total Time for this step : 13.27
+waiting for  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_0.pickle
+finished  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_0.pickle
+finished  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_1.pickle
+finished  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_2.pickle
+finished  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_3.pickle
+finished  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_4.pickle
+finished  /scratch/haskeysr/mars/testing_new_code1/post_proc_tmp/tmp_5.pickle
+Total Time for this step : 0.51
+completion time : 18.4328 mins

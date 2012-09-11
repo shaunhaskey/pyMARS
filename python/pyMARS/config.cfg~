@@ -1,0 +1,101 @@
+#PROCESS CONTROL starting and finishing step variables
+[process_control]
+start_from_step = 1
+end_at_step = 1
+
+#directory details
+[directory_details]
+project_name = testing_new_code8
+base_directory = /scratch/haskeysr/mars/
+efit_file_location = /u/haskeysr/mars/eq_from_matt/efit_files/
+template_directory = /u/haskeysr/mars/templates/
+post_proc_script = /u/haskeysr/python_mars_scripts/post_proc_script.py
+
+[shot_details]
+shot_time = 2306
+shot_number = 138344
+
+#Cluster related variables
+[cluster_details]
+CHEASE_simultaneous_jobs = 10
+MARS_simultaneous_jobs = 10
+post_proc_simultaneous_jobs = 6
+CORSICA_workers = 4
+
+#filter out equilibria that DCON finds unstable (1=filter, 0=don't filter)
+#also set allowable q95 and Beta_N/Li range, must have set <<calldcon>>=1 in corsica
+#for the DCON filters to be meaningful
+[filters]
+filter_WTOTN1 = 0
+filter_WTOTN2 = 0
+filter_WTOTN3 = 0
+filter_WWTOTN1 = 0
+q95_range_min = 0
+q85_range_max = 10
+Bn_Div_Li_range_min = 0
+Bn_Div_Li_range_max = 5
+
+# # Also run chease in PEST mode, useful for viewing results in PEST co-ords
+# # but not necessary for MARS run
+
+include_chease_PEST_run = 1
+
+# #I-coil details, used to place I-coils onto the CHEASE grid
+# [i_coil_details]
+# coilN  = num.array([[2.164, 1.012, 2.374, 0.504],[2.164, -1.012, 2.374, -0.504]])
+# I_coil_frequency = 20 #Hz
+
+
+# #Post processing coil details need to be included here
+# #instead of using the defaults which are stored in PythonMARS_funcs.py
+# # probe type 1: poloidal field, 2: radial field
+# [pickup_probe_details]
+# probe  = [ '67A', '66M', '67B', 'ESL', 'ISL','UISL','LISL','Inner_pol','Inner_rad']
+# probe_type   = num.array([     1,     1,     1,     0,     0,     0,     0, 1,0])
+# Rprobe = num.array([ 2.265, 2.413, 2.265, 2.477, 2.431, 2.300, 2.300,1.,1.])
+# Zprobe = num.array([ 0.755,   0.0,-0.755, 0.000, 0.000, 0.714,-0.714,0.,0.])
+# tprobe = num.array([ -67.5, -90.0,-112.5, 0.000, 0.000,  22.6, -22.6,-90.,0.])*2*num.pi/360  #DTOR # poloidal inclination
+# lprobe = num.array([ 0.155, 0.140, 0.155, 1.194, 0.800, 0.680, 0.680, 0.05,0.05])  # Length of probe
+
+
+
+# #Corsica settings, note, each <<XXX>> must exist in the template as a placeholder to be
+# #replaced. You can add other values to this list if you want, just include the new placeholder
+# #in the template
+# [corsica_settings]
+# <<pmin>> : 0.5
+# <<qmin>>:0.5
+# <<pstep>>:0.2
+# <<qstep>>:0.2
+# <<npmult>>:3
+# <<nqmult>>:2
+# <<calldcon>> :0
+# <<thetac>> : 0.003
+
+
+# #CHEASE settings, note, each <<XXX>> must exist in the template as a placeholder to be
+# #replaced. You can add other values to this list if you want, just include the new placeholder
+# #in the template
+# [CHEASE_settings]
+# <<NCHI>>: 240
+# <<NPSI>>: 180
+# <<NT>>: 60
+# <<NS>>: 60
+# <<NV>>: 200
+# <<REXT>>: 7.0
+
+
+# #MARS settings
+# #Will update to include an upper and lower calculation as a single run (?)
+# [MARS_settings]
+# MARS_settings = {'<<M1>>': -29,
+#                  '<<M2>>': 29,
+#                  '<<FEEDI>>': '(1.0,0.0),(1.0, 0.0)',
+#                  '<<RNTOR>>' : -2,
+#                  '<<ROTE>>': 0}
+
+# # Cleaning up to save space, these files will be removed, make sure a file you need isn't listed!
+# [clean_up_settings]
+# MARS_rm_files = 'OUTDATA  JPLASMA VPLASMA PLASMA JACOBIAN'
+# CHEASE_rm_files = 'NUPLO INP1_FORMATTED'
+# CHEASE_PEST_rm_files = 'OUTRMAR OUTVMAR INP1_FORMATTED NUPLO'

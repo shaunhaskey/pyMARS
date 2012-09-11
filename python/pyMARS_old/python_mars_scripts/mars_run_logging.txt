@@ -1,0 +1,960 @@
+Your job 51289 ("Mars_p125_q6") has been submitted
+Your job 51290 ("Mars_p125_q6") has been submitted
+Your job 51291 ("Mars_p145_q18") has been submitted
+Your job 51292 ("Mars_p145_q18") has been submitted
+Your job 51293 ("Mars_p110_q18") has been submitted
+Your job 51294 ("Mars_p110_q18") has been submitted
+Your job 51295 ("Mars_p115_q21") has been submitted
+Your job 51296 ("Mars_p115_q21") has been submitted
+Your job 51297 ("Mars_p125_q9") has been submitted
+Your job 51298 ("Mars_p125_q9") has been submitted
+Your job 51299 ("Mars_p145_q15") has been submitted
+Your job 51300 ("Mars_p145_q15") has been submitted
+Your job 51301 ("Mars_p100_q9") has been submitted
+Your job 51302 ("Mars_p100_q9") has been submitted
+Your job 51303 ("Mars_p145_q21") has been submitted
+Your job 51304 ("Mars_p145_q21") has been submitted
+Your job 51305 ("Mars_p115_q15") has been submitted
+Your job 51306 ("Mars_p115_q15") has been submitted
+Your job 51307 ("Mars_p130_q27") has been submitted
+Your job 51308 ("Mars_p130_q27") has been submitted
+Your job 51309 ("Mars_p125_q21") has been submitted
+Your job 51310 ("Mars_p125_q21") has been submitted
+Your job 51311 ("Mars_p145_q3") has been submitted
+Your job 51312 ("Mars_p145_q3") has been submitted
+Your job 51313 ("Mars_p115_q6") has been submitted
+Your job 51314 ("Mars_p115_q6") has been submitted
+Your job 51315 ("Mars_p125_q3") has been submitted
+Your job 51316 ("Mars_p125_q3") has been submitted
+Your job 51317 ("Mars_p120_q0") has been submitted
+Your job 51318 ("Mars_p120_q0") has been submitted
+Your job 51319 ("Mars_p115_q24") has been submitted
+Your job 51320 ("Mars_p115_q24") has been submitted
+Your job 51321 ("Mars_p140_q9") has been submitted
+Your job 51322 ("Mars_p140_q9") has been submitted
+Your job 51323 ("Mars_p105_q0") has been submitted
+Your job 51324 ("Mars_p105_q0") has been submitted
+Your job 51325 ("Mars_p130_q24") has been submitted
+Your job 51326 ("Mars_p130_q24") has been submitted
+Your job 51327 ("Mars_p100_q21") has been submitted
+Your job 51328 ("Mars_p100_q21") has been submitted
+Your job 51329 ("Mars_p100_q15") has been submitted
+Your job 51330 ("Mars_p100_q15") has been submitted
+Your job 51331 ("Mars_p125_q12") has been submitted
+Your job 51332 ("Mars_p125_q12") has been submitted
+Your job 51333 ("Mars_p120_q15") has been submitted
+Your job 51334 ("Mars_p120_q15") has been submitted
+Your job 51335 ("Mars_p125_q0") has been submitted
+Your job 51336 ("Mars_p125_q0") has been submitted
+Your job 51337 ("Mars_p145_q12") has been submitted
+Your job 51338 ("Mars_p145_q12") has been submitted
+Your job 51339 ("Mars_p105_q27") has been submitted
+Your job 51340 ("Mars_p105_q27") has been submitted
+Your job 51341 ("Mars_p100_q6") has been submitted
+Your job 51342 ("Mars_p100_q6") has been submitted
+Your job 51343 ("Mars_p125_q18") has been submitted
+Your job 51344 ("Mars_p125_q18") has been submitted
+Your job 51345 ("Mars_p125_q27") has been submitted
+Your job 51346 ("Mars_p125_q27") has been submitted
+Your job 51347 ("Mars_p100_q24") has been submitted
+Your job 51348 ("Mars_p100_q24") has been submitted
+Your job 51349 ("Mars_p135_q12") has been submitted
+Your job 51350 ("Mars_p135_q12") has been submitted
+Your job 51351 ("Mars_p125_q15") has been submitted
+Your job 51352 ("Mars_p125_q15") has been submitted
+Your job 51353 ("Mars_p105_q18") has been submitted
+Your job 51354 ("Mars_p105_q18") has been submitted
+running mars setup section
+('1.25', '0.06')
+Submitted 2 jobs of 200, time 0.00mins
+('1.45', '0.18')
+Submitted 4 jobs of 200, time 0.00mins
+('1.10', '0.18')
+Submitted 6 jobs of 200, time 0.01mins
+('1.15', '0.21')
+Submitted 8 jobs of 200, time 0.01mins
+('1.25', '0.09')
+Submitted 10 jobs of 200, time 0.01mins
+('1.45', '0.15')
+Submitted 12 jobs of 200, time 0.01mins
+('1.00', '0.09')
+Submitted 14 jobs of 200, time 0.01mins
+('1.45', '0.21')
+Submitted 16 jobs of 200, time 0.02mins
+('1.15', '0.15')
+Submitted 18 jobs of 200, time 0.02mins
+('1.30', '0.27')
+Submitted 20 jobs of 200, time 0.02mins
+('1.25', '0.21')
+Running Jobs : 20
+Submitted 22 jobs of 200, time 0.58mins
+('1.45', '0.03')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 24 jobs of 200, time 3.78mins
+('1.15', '0.06')
+Running Jobs : 22
+Running Jobs : 20
+Submitted 26 jobs of 200, time 4.03mins
+('1.25', '0.03')
+Running Jobs : 22
+Running Jobs : 19
+Submitted 28 jobs of 200, time 4.20mins
+('1.20', '0.00')
+Running Jobs : 21
+Running Jobs : 17
+Submitted 30 jobs of 200, time 4.37mins
+('1.15', '0.24')
+Running Jobs : 19
+Submitted 32 jobs of 200, time 4.37mins
+('1.40', '0.09')
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 34 jobs of 200, time 7.23mins
+('1.05', '0.00')
+Running Jobs : 21
+Running Jobs : 18
+Submitted 36 jobs of 200, time 7.40mins
+('1.30', '0.24')
+Running Jobs : 20
+Submitted 38 jobs of 200, time 7.40mins
+('1.00', '0.21')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 40 jobs of 200, time 10.81mins
+('1.00', '0.15')
+Running Jobs : 22
+Running Jobs : 20
+Submitted 42 jobs of 200, time 10.98mins
+('1.25', '0.12')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 44 jobs of 200, time 11.65mins
+('1.20', '0.15')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 46 jobs of 200, time 11.99mins
+('1.25', '0.00')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 17
+Submitted 48 jobs of 200, time 12.33mins
+('1.45', '0.12')
+Running Jobs : 19
+Submitted 50 jobs of 200, time 12.34mins
+('1.05', '0.27')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 52 jobs of 200, time 12.51mins
+('1.00', '0.06')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 54 jobs of 200, time 14.19mins
+('1.25', '0.18')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 19
+Submitted 56 jobs of 200, time 15.13mins
+('1.25', '0.27')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 58 jobs of 200, time 15.30mins
+('1.00', '0.24')
+Running Jobs : 22
+Running Jobs : 19
+Submitted 60 jobs of 200, time 15.48mins
+('1.35', '0.12')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 62 jobs of 200, time 15.65mins
+('1.25', '0.15')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 64 jobs of 200, time 16.32mins
+('1.05', '0.18')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 66 jobs of 20Your job 51355 ("Mars_p105_q24") has been submitted
+Your job 51356 ("Mars_p105_q24") has been submitted
+Your job 51357 ("Mars_p140_q3") has been submitted
+Your job 51358 ("Mars_p140_q3") has been submitted
+Your job 51359 ("Mars_p105_q6") has been submitted
+Your job 51360 ("Mars_p105_q6") has been submitted
+Your job 51361 ("Mars_p120_q27") has been submitted
+Your job 51362 ("Mars_p120_q27") has been submitted
+Your job 51363 ("Mars_p100_q27") has been submitted
+Your job 51364 ("Mars_p100_q27") has been submitted
+Your job 51365 ("Mars_p140_q24") has been submitted
+Your job 51366 ("Mars_p140_q24") has been submitted
+Your job 51367 ("Mars_p145_q9") has been submitted
+Your job 51368 ("Mars_p145_q9") has been submitted
+Your job 51369 ("Mars_p105_q21") has been submitted
+Your job 51370 ("Mars_p105_q21") has been submitted
+Your job 51371 ("Mars_p140_q6") has been submitted
+Your job 51372 ("Mars_p140_q6") has been submitted
+Your job 51373 ("Mars_p140_q12") has been submitted
+Your job 51374 ("Mars_p140_q12") has been submitted
+Your job 51375 ("Mars_p110_q21") has been submitted
+Your job 51376 ("Mars_p110_q21") has been submitted
+Your job 51377 ("Mars_p100_q0") has been submitted
+Your job 51378 ("Mars_p100_q0") has been submitted
+Your job 51379 ("Mars_p145_q0") has been submitted
+Your job 51380 ("Mars_p145_q0") has been submitted
+Your job 51381 ("Mars_p135_q15") has been submitted
+Your job 51382 ("Mars_p135_q15") has been submitted
+Your job 51383 ("Mars_p130_q18") has been submitted
+Your job 51384 ("Mars_p130_q18") has been submitted
+Your job 51385 ("Mars_p135_q18") has been submitted
+Your job 51386 ("Mars_p135_q18") has been submitted
+Your job 51387 ("Mars_p130_q15") has been submitted
+Your job 51388 ("Mars_p130_q15") has been submitted
+Your job 51389 ("Mars_p115_q27") has been submitted
+Your job 51390 ("Mars_p115_q27") has been submitted
+Your job 51391 ("Mars_p140_q27") has been submitted
+Your job 51392 ("Mars_p140_q27") has been submitted
+Your job 51393 ("Mars_p105_q12") has been submitted
+Your job 51394 ("Mars_p105_q12") has been submitted
+Your job 51395 ("Mars_p115_q18") has been submitted
+Your job 51396 ("Mars_p115_q18") has been submitted
+Your job 51397 ("Mars_p145_q27") has been submitted
+Your job 51398 ("Mars_p145_q27") has been submitted
+Your job 51399 ("Mars_p135_q24") has been submitted
+Your job 51400 ("Mars_p135_q24") has been submitted
+Your job 51401 ("Mars_p100_q12") has been submitted
+Your job 51402 ("Mars_p100_q12") has been submitted
+Your job 51403 ("Mars_p115_q0") has been submitted
+Your job 51404 ("Mars_p115_q0") has been submitted
+Your job 51405 ("Mars_p120_q6") has been submitted
+Your job 51406 ("Mars_p120_q6") has been submitted
+Your job 51407 ("Mars_p140_q15") has been submitted
+Your job 51408 ("Mars_p140_q15") has been submitted
+Your job 51409 ("Mars_p145_q24") has been submitted
+Your job 51410 ("Mars_p145_q24") has been submitted
+0, time 18.00mins
+('1.05', '0.24')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 19
+Submitted 68 jobs of 200, time 18.34mins
+('1.40', '0.03')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 70 jobs of 200, time 18.51mins
+('1.05', '0.06')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 72 jobs of 200, time 19.18mins
+('1.20', '0.27')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 74 jobs of 200, time 20.86mins
+('1.00', '0.27')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 76 jobs of 200, time 21.38mins
+('1.40', '0.24')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 78 jobs of 200, time 22.39mins
+('1.45', '0.09')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 19
+Submitted 80 jobs of 200, time 23.06mins
+('1.05', '0.21')
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 19
+Submitted 82 jobs of 200, time 23.41mins
+('1.40', '0.06')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 84 jobs of 200, time 23.58mins
+('1.40', '0.12')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 86 jobs of 200, time 24.26mins
+('1.10', '0.21')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 88 jobs of 200, time 25.28mins
+('1.00', '0.00')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 19
+Submitted 90 jobs of 200, time 25.95mins
+('1.45', '0.00')
+Running Jobs : 21
+Running Jobs : 19
+Submitted 92 jobs of 200, time 26.13mins
+('1.35', '0.15')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 94 jobs of 200, time 26.31mins
+('1.30', '0.18')
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 96 jobs of 200, time 27.15mins
+('1.35', '0.18')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 98 jobs of 200, time 28.16mins
+('1.30', '0.15')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 18
+Submitted 100 jobs of 200, time 29.01mins
+('1.15', '0.27')
+Running Jobs : 20
+Submitted 102 jobs of 200, time 29.01mins
+('1.40', '0.27')
+Running Jobs : 22
+Running Jobs : 20
+Submitted 104 jobs of 200, time 29.18mins
+('1.05', '0.12')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 106 jobs of 200, time 30.02mins
+('1.15', '0.18')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 108 jobs of 200, time 31.54mins
+('1.45', '0.27')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 19
+Submitted 110 jobs of 200, time 31.88mins
+('1.35', '0.24')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 112 jobs of 200, time 32.05mins
+('1.00', '0.12')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 114 jobs of 200, time 33.06mins
+('1.15', '0.00')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 19
+Submitted 116 jobs of 200, time 34.23mins
+('1.20', '0.06')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 118 jobs of 200, time 34.40mins
+('1.40', '0.15')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 120 jobs of 200, time 34.91mins
+('1.45', '0.24')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 122 jobs of 200, time 35.92mins
+('1.40', '0.18')
+Running Jobs Your job 51411 ("Mars_p140_q18") has been submitted
+Your job 51412 ("Mars_p140_q18") has been submitted
+Your job 51413 ("Mars_p110_q27") has been submitted
+Your job 51414 ("Mars_p110_q27") has been submitted
+Your job 51415 ("Mars_p125_q24") has been submitted
+Your job 51416 ("Mars_p125_q24") has been submitted
+Your job 51417 ("Mars_p135_q27") has been submitted
+Your job 51418 ("Mars_p135_q27") has been submitted
+Your job 51419 ("Mars_p115_q3") has been submitted
+Your job 51420 ("Mars_p115_q3") has been submitted
+Your job 51421 ("Mars_p130_q12") has been submitted
+Your job 51422 ("Mars_p130_q12") has been submitted
+Your job 51423 ("Mars_p115_q12") has been submitted
+Your job 51424 ("Mars_p115_q12") has been submitted
+Your job 51425 ("Mars_p135_q0") has been submitted
+Your job 51426 ("Mars_p135_q0") has been submitted
+Your job 51427 ("Mars_p130_q6") has been submitted
+Your job 51428 ("Mars_p130_q6") has been submitted
+Your job 51429 ("Mars_p100_q18") has been submitted
+Your job 51430 ("Mars_p100_q18") has been submitted
+Your job 51431 ("Mars_p120_q18") has been submitted
+Your job 51432 ("Mars_p120_q18") has been submitted
+Your job 51433 ("Mars_p130_q21") has been submitted
+Your job 51434 ("Mars_p130_q21") has been submitted
+Your job 51435 ("Mars_p100_q3") has been submitted
+Your job 51436 ("Mars_p100_q3") has been submitted
+Your job 51437 ("Mars_p130_q3") has been submitted
+Your job 51438 ("Mars_p130_q3") has been submitted
+Your job 51439 ("Mars_p120_q12") has been submitted
+Your job 51440 ("Mars_p120_q12") has been submitted
+Your job 51441 ("Mars_p115_q9") has been submitted
+Your job 51442 ("Mars_p115_q9") has been submitted
+Your job 51443 ("Mars_p105_q15") has been submitted
+Your job 51444 ("Mars_p105_q15") has been submitted
+Your job 51445 ("Mars_p110_q9") has been submitted
+Your job 51446 ("Mars_p110_q9") has been submitted
+Your job 51447 ("Mars_p135_q9") has been submitted
+Your job 51448 ("Mars_p135_q9") has been submitted
+Your job 51449 ("Mars_p140_q21") has been submitted
+Your job 51450 ("Mars_p140_q21") has been submitted
+Your job 51451 ("Mars_p110_q6") has been submitted
+Your job 51452 ("Mars_p110_q6") has been submitted
+Your job 51453 ("Mars_p105_q3") has been submitted
+Your job 51454 ("Mars_p105_q3") has been submitted
+Your job 51455 ("Mars_p110_q24") has been submitted
+Your job 51456 ("Mars_p110_q24") has been submitted
+Your job 51457 ("Mars_p130_q9") has been submitted
+Your job 51458 ("Mars_p130_q9") has been submitted
+Your job 51459 ("Mars_p110_q12") has been submitted
+Your job 51460 ("Mars_p110_q12") has been submitted
+Your job 51461 ("Mars_p110_q3") has been submitted
+Your job 51462 ("Mars_p110_q3") has been submitted
+Your job 51463 ("Mars_p135_q3") has been submitted
+Your job 51464 ("Mars_p135_q3") has been submitted
+Your job 51465 ("Mars_p120_q21") has been submitted
+Your job 51466 ("Mars_p120_q21") has been submitted
+Your job 51467 ("Mars_p135_q21") has been submitted
+Your job 51468 ("Mars_p135_q21") has been submitted
+: 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 124 jobs of 200, time 36.76mins
+('1.10', '0.27')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 126 jobs of 200, time 37.09mins
+('1.25', '0.24')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 19
+Submitted 128 jobs of 200, time 37.60mins
+('1.35', '0.27')
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 130 jobs of 200, time 38.28mins
+('1.15', '0.03')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 132 jobs of 200, time 38.95mins
+('1.30', '0.12')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 134 jobs of 200, time 39.96mins
+('1.15', '0.12')
+Running Jobs : 22
+Running Jobs : 20
+Submitted 136 jobs of 200, time 40.13mins
+('1.35', '0.00')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 138 jobs of 200, time 40.64mins
+('1.30', '0.06')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 140 jobs of 200, time 41.14mins
+('1.00', '0.18')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 142 jobs of 200, time 42.15mins
+('1.20', '0.18')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 144 jobs of 200, time 42.66mins
+('1.30', '0.21')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 146 jobs of 200, time 43.00mins
+('1.00', '0.03')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 148 jobs of 200, time 43.50mins
+('1.30', '0.03')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 150 jobs of 200, time 44.84mins
+('1.20', '0.12')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 18
+Submitted 152 jobs of 200, time 45.35mins
+('1.15', '0.09')
+Running Jobs : 20
+Submitted 154 jobs of 200, time 45.35mins
+('1.05', '0.15')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 19
+Submitted 156 jobs of 200, time 46.36mins
+('1.10', '0.09')
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 18
+Submitted 158 jobs of 200, time 47.96mins
+('1.35', '0.09')
+Running Jobs : 20
+Submitted 160 jobs of 200, time 47.97mins
+('1.40', '0.21')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 19
+Submitted 162 jobs of 200, time 48.46mins
+('1.10', '0.06')
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 19
+Submitted 164 jobs of 200, time 49.17mins
+('1.05', '0.03')
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 166 jobs of 200, time 49.67mins
+('1.10', '0.24')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 168 jobs of 200, time 50.86mins
+('1.30', '0.09')
+Running Jobs : 22
+Running Jobs : 20
+Submitted 170 jobs of 200, time 51.03mins
+('1.10', '0.12')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 172 jobs of 200, time 51.37mins
+('1.10', '0.03')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 174 jobs of 200, time 52.05mins
+('1.35', '0.03')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 176 jobs of 200, time 52.91mins
+('1.20', '0.21')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 178 jobs of 200, time 53.75mins
+('1.35', '0.21')
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 180 jobs of 200, time 54.09mins
+('1.20', '0.03')
+RunnYour job 51469 ("Mars_p120_q3") has been submitted
+Your job 51470 ("Mars_p120_q3") has been submitted
+Your job 51471 ("Mars_p110_q15") has been submitted
+Your job 51472 ("Mars_p110_q15") has been submitted
+Your job 51473 ("Mars_p110_q0") has been submitted
+Your job 51474 ("Mars_p110_q0") has been submitted
+Your job 51475 ("Mars_p140_q0") has been submitted
+Your job 51476 ("Mars_p140_q0") has been submitted
+Your job 51477 ("Mars_p120_q9") has been submitted
+Your job 51478 ("Mars_p120_q9") has been submitted
+Your job 51479 ("Mars_p135_q6") has been submitted
+Your job 51480 ("Mars_p135_q6") has been submitted
+Your job 51481 ("Mars_p105_q9") has been submitted
+Your job 51482 ("Mars_p105_q9") has been submitted
+Your job 51483 ("Mars_p145_q6") has been submitted
+Your job 51484 ("Mars_p145_q6") has been submitted
+Your job 51485 ("Mars_p120_q24") has been submitted
+Your job 51486 ("Mars_p120_q24") has been submitted
+Your job 51487 ("Mars_p130_q0") has been submitted
+Your job 51488 ("Mars_p130_q0") has been submitted
+ing Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 20
+Submitted 182 jobs of 200, time 54.60mins
+('1.10', '0.15')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 184 jobs of 200, time 55.44mins
+('1.10', '0.00')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 186 jobs of 200, time 55.95mins
+('1.40', '0.00')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 188 jobs of 200, time 56.79mins
+('1.20', '0.09')
+Running Jobs : 22
+Running Jobs : 20
+Submitted 190 jobs of 200, time 56.97mins
+('1.35', '0.06')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 192 jobs of 200, time 58.64mins
+('1.05', '0.09')
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 19
+Submitted 194 jobs of 200, time 59.01mins
+('1.45', '0.06')
+Running Jobs : 21
+Running Jobs : 20
+Submitted 196 jobs of 200, time 59.18mins
+('1.20', '0.24')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 20
+Submitted 198 jobs of 200, time 59.69mins
+('1.30', '0.00')
+Running Jobs : 22
+Running Jobs : 22
+Running Jobs : 21
+Running Jobs : 21
+Running Jobs : 20
+Submitted 200 jobs of 200, time 60.38mins
+Running Jobs : 22
+Running Jobs : 22
+Submitted 200 of 200, Waiting for last 22 jobs to finish, time so far : 60.38mins
+Running Jobs : 22
+Running Jobs : 22
+Submitted 200 of 200, Waiting for last 22 jobs to finish, time so far : 60.63mins
+Running Jobs : 22
+Running Jobs : 22
+Submitted 200 of 200, Waiting for last 22 jobs to finish, time so far : 60.88mins
+Running Jobs : 22
+Running Jobs : 22
+Submitted 200 of 200, Waiting for last 22 jobs to finish, time so far : 61.13mins
+Running Jobs : 22
+Running Jobs : 22
+Submitted 200 of 200, Waiting for last 22 jobs to finish, time so far : 61.39mins
+Running Jobs : 21
+Running Jobs : 21
+Submitted 200 of 200, Waiting for last 21 jobs to finish, time so far : 61.64mins
+Running Jobs : 18
+Running Jobs : 18
+Submitted 200 of 200, Waiting for last 18 jobs to finish, time so far : 61.89mins
+Running Jobs : 17
+Running Jobs : 17
+Submitted 200 of 200, Waiting for last 17 jobs to finish, time so far : 62.14mins
+Running Jobs : 16
+Running Jobs : 16
+Submitted 200 of 200, Waiting for last 16 jobs to finish, time so far : 62.40mins
+Running Jobs : 14
+Running Jobs : 14
+Submitted 200 of 200, Waiting for last 14 jobs to finish, time so far : 62.65mins
+Running Jobs : 14
+Running Jobs : 14
+Submitted 200 of 200, Waiting for last 14 jobs to finish, time so far : 62.90mins
+Running Jobs : 13
+Running Jobs : 13
+Submitted 200 of 200, Waiting for last 13 jobs to finish, time so far : 63.15mins
+Running Jobs : 13
+Running Jobs : 13
+Submitted 200 of 200, Waiting for last 13 jobs to finish, time so far : 63.40mins
+Running Jobs : 13
+Running Jobs : 13
+Submitted 200 of 200, Waiting for last 13 jobs to finish, time so far : 63.65mins
+Running Jobs : 13
+Running Jobs : 13
+Submitted 200 of 200, Waiting for last 13 jobs to finish, time so far : 63.90mins
+Running Jobs : 12
+Running Jobs : 12
+Submitted 200 of 200, Waiting for last 12 jobs to finish, time so far : 64.15mins
+Running Jobs : 12
+Running Jobs : 12
+Submitted 200 of 200, Waiting for last 12 jobs to finish, time so far : 64.40mins
+Running Jobs : 11
+Running Jobs : 11
+Submitted 200 of 200, Waiting for last 11 jobs to finish, time so far : 64.65mins
+Running Jobs : 11
+Running Jobs : 11
+Submitted 200 of 200, Waiting for last 11 jobs to finish, time so far : 64.91mins
+Running Jobs : 10
+Running Jobs : 10
+Submitted 200 of 200, Waiting for last 10 jobs to finish, time so far : 65.16mins
+Running Jobs : 10
+Running Jobs : 10
+Submitted 200 of 200, Waiting for last 10 jobs to finish, time so far : 65.41mins
+Running Jobs : 10
+Running Jobs : 10
+Submitted 200 of 200, Waiting for last 10 jobs to finish, time so far : 65.66mins
+Running Jobs : 10
+Running Jobs : 10
+Submitted 200 of 200, Waiting for last 10 jobs to finish, time so far : 65.98mins
+Running Jobs : 10
+Running Jobs : 10
+Submitted 200 of 200, Waiting for last 10 jobs to finish, time so far : 66.23mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 200 of 200, Waiting for last 8 jobs to finish, time so far : 66.65mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 200 of 200, Waiting for last 7 jobs to finish, time so far : 66.90mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 200 of 200, Waiting for last 7 jobs to finish, time so far : 67.15mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 200 of 200, Waiting for last 6 jobs to finish, time so far : 67.40mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 200 of 200, Waiting for last 5 jobs to finish, time so far : 67.65mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 200 of 200, Waiting for last 5 jobs to finish, time so far : 67.90mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 200 of 200, Waiting for last 5 jobs to finish, time so far : 68.15mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 200 of 200, Waiting for last 5 jobs to finish, time so far : 68.41mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 200 of 200, Waiting for last 5 jobs to finish, time so far : 68.66mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 200 of 200, Waiting for last 5 jobs to finish, time so far : 68.91mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 200 of 200, Waiting for last 5 jobs to finish, time so far : 69.16mins
+Running Jobs : 4
+Running Jobs : 4
+Submitted 200 of 200, Waiting for last 4 jobs to finish, time so far : 69.41mins
+Running Jobs : 3
+Running Jobs : 3
+Submitted 200 of 200, Waiting for last 3 jobs to finish, time so far : 69.66mins
+Running Jobs : 3
+Running Jobs : 3
+Submitted 200 of 200, Waiting for last 3 jobs to finish, time so far : 69.91mins
+Running Jobs : 3
+Running Jobs : 3
+Submitted 200 of 200, Waiting for last 3 jobs to finish, time so far : 70.17mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 200 of 200, Waiting for last 1 jobs to finish, time so far : 70.42mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 200 of 200, Waiting for last 1 jobs to finish, time so far : 70.67mins
+Running Jobs : 0
+Total Time for this step : 70.95

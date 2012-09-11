@@ -1,0 +1,457 @@
+0
+ABS(FDI(K))= 0.2768E+00 0.2768
+starting calc
+(7,) (7,)
+0 plasma
+0.0550739259552 0.0424789133926 0.0406487588935
+fails : 0  passes : 1
+ABS(FDI(K))= 0.5147E+00 0.5147
+starting calc
+(7,) (7,)
+0 vac
+0.0982877120307 0.0497609005869 0.214623410531
+fails : 0  passes : 2
+1
+ABS(FDI(K))= 0.4007E+00 0.4007
+starting calc
+(7,) (7,)
+1 plasma
+0.153225507973 0.152059949264 0.0883952382265
+fails : 0  passes : 3
+ABS(FDI(K))= 0.5134E+00 0.5134
+starting calc
+(7,) (7,)
+1 vac
+0.22813583872 0.159607644846 0.317414765136
+fails : 0  passes : 4
+2
+ABS(FDI(K))= 0.4329E+00 0.4329
+starting calc
+(7,) (7,)
+2 plasma
+0.0479981521106 0.059398456419 0.0642756793112
+fails : 0  passes : 5
+ABS(FDI(K))= 0.5172E+00 0.5172
+starting calc
+(7,) (7,)
+2 vac
+0.0676470859047 0.0450150781222 0.162804277681
+fails : 0  passes : 6
+3
+ABS(FDI(K))= 0.4407E+00 0.4407
+starting calc
+(7,) (7,)
+3 plasma
+0.031321462731 0.0387879027253 0.0395899103471
+fails : 0  passes : 7
+ABS(FDI(K))= 0.5159E+00 0.5159
+starting calc
+(7,) (7,)
+3 vac
+0.049476686109 0.0208428519434 0.244063102769
+fails : 0  passes : 8
+4
+ABS(FDI(K))= 0.2431E+00 0.2431
+starting calc
+(7,) (7,)
+4 plasma
+0.0976997505682 0.0889345100703 0.0574470398529
+fails : 0  passes : 9
+ABS(FDI(K))= 0.5146E+00 0.5146
+starting calc
+(7,) (7,)
+4 vac
+0.1542481056 0.108803635 0.329494934588
+fails : 0  passes : 10
+5
+ABS(FDI(K))= 0.4025E+00 0.4025
+starting calc
+(7,) (7,)
+5 plasma
+0.0927146766622 0.112570730446 0.101081604012
+fails : 0  passes : 11
+ABS(FDI(K))= 0.5134E+00 0.5134
+starting calc
+(7,) (7,)
+5 vac
+0.173384769127 0.0935322057877 0.422543676799
+fails : 0  passes : 12
+6
+ABS(FDI(K))= 0.4244E+00 0.4244
+starting calc
+(7,) (7,)
+6 plasma
+0.0929850235207 0.110024968453 0.0417120530253
+fails : 0  passes : 13
+ABS(FDI(K))= 0.5172E+00 0.5172
+starting calc
+(7,) (7,)
+6 vac
+0.111387154214 0.0895548706895 0.142578271992
+fails : 0  passes : 14
+7
+ABS(FDI(K))= 0.4391E+00 0.4391
+starting calc
+(7,) (7,)
+7 plasma
+0.0356069521114 0.0370939009636 0.0353923859775
+fails : 0  passes : 15
+ABS(FDI(K))= 0.5158E+00 0.5158
+starting calc
+(7,) (7,)
+7 vac
+0.0550478229605 0.0346431211091 0.159472633732
+fails : 0  passes : 16
+8
+ABS(FDI(K))= 0.4036E+00 0.4036
+starting calc
+(7,) (7,)
+8 plasma
+0.0843533281012 0.0774387921738 0.151531404894
+fails : 0  passes : 17
+ABS(FDI(K))= 0.5191E+00 0.5191
+starting calc
+(7,) (7,)
+8 vac
+0.101344271688 0.0932662999606 0.250097709581
+fails : 0  passes : 18
+9
+ABS(FDI(K))= 0.4670E+00 0.467
+starting calc
+(7,) (7,)
+9 plasma
+0.134340819339 0.123214511421 0.208170268598
+fails : 0  passes : 19
+ABS(FDI(K))= 0.5176E+00 0.5176
+starting calc
+(7,) (7,)
+9 vac
+0.169416159191 0.130247907634 0.24097277483
+fails : 0  passes : 20
+10
+ABS(FDI(K))= 0.4742E+00 0.4742
+starting calc
+(7,) (7,)
+10 plasma
+0.0914963065404 0.0460363507322 0.521873930604
+fails : 0  passes : 21
+ABS(FDI(K))= 0.5235E+00 0.5235
+starting calc
+(7,) (7,)
+10 vac
+0.176583731184 0.0506702996374 0.327075077569
+fails : 0  passes : 22
+11
+ABS(FDI(K))= 0.4832E+00 0.4832
+starting calc
+(7,) (7,)
+11 plasma
+0.0972952901928 0.0849340734041 0.324285119516
+fails : 0  passes : 23
+ABS(FDI(K))= 0.5191E+00 0.5191
+starting calc
+(7,) (7,)
+11 vac
+0.140632742729 0.0951810918368 0.586903203359
+fails : 0  passes : 24
+12
+ABS(FDI(K))= 0.2623E+00 0.2623
+starting calc
+(7,) (7,)
+12 plasma
+0.0806064205627 0.0911131460694 0.0557564550641
+fails : 0  passes : 25
+ABS(FDI(K))= 0.5146E+00 0.5146
+starting calc
+(7,) (7,)
+12 vac
+0.121817889589 0.0710754883084 0.319468897397
+fails : 0  passes : 26
+13
+ABS(FDI(K))= 0.4006E+00 0.4006
+starting calc
+(7,) (7,)
+13 plasma
+0.0936019987971 0.0824426074146 0.0604230447844
+fails : 0  passes : 27
+ABS(FDI(K))= 0.5133E+00 0.5133
+starting calc
+(7,) (7,)
+13 vac
+0.151637499934 0.0852957135884 0.272444333287
+fails : 0  passes : 28
+14
+ABS(FDI(K))= 0.4101E+00 0.4101
+starting calc
+(7,) (7,)
+14 plasma
+0.0594784777295 0.0540368318346 0.0667314451164
+fails : 0  passes : 29
+ABS(FDI(K))= 0.5172E+00 0.5172
+starting calc
+(7,) (7,)
+14 vac
+0.0858586702659 0.0665952124985 0.207037236923
+fails : 0  passes : 30
+15
+ABS(FDI(K))= 0.4360E+00 0.436
+starting calc
+(7,) (7,)
+15 plasma
+0.114635885315 0.131378579274 0.0536656900721
+fails : 0  passes : 31
+ABS(FDI(K))= 0.5158E+00 0.5158
+starting calc
+(7,) (7,)
+15 vac
+0.143151414506 0.117188651052 0.405518363628
+fails : 0  passes : 32
+16
+ABS(FDI(K))= 0.4446E+00 0.4446
+starting calc
+(7,) (7,)
+16 plasma
+0.0907864464327 0.0927852855468 0.0739650383176
+fails : 0  passes : 33
+ABS(FDI(K))= 0.5190E+00 0.519
+starting calc
+(7,) (7,)
+16 vac
+0.0935056356809 0.0798685343541 0.266010550602
+fails : 0  passes : 34
+17
+ABS(FDI(K))= 0.4645E+00 0.4645
+starting calc
+(7,) (7,)
+17 plasma
+240818867.49 242066072.653 49209779.9777
+fails : 1  passes : 34
+ABS(FDI(K))= 0.5176E+00 0.5176
+starting calc
+(7,) (7,)
+17 vac
+239820128.926 241081299.326 81889744.7965
+fails : 2  passes : 34
+18
+ABS(FDI(K))= 0.4710E+00 0.471
+starting calc
+(7,) (7,)
+18 plasma
+3768037.81046 3777024.99808 2857689.42568
+fails : 3  passes : 34
+ABS(FDI(K))= 0.5234E+00 0.5234
+starting calc
+(7,) (7,)
+18 vac
+3735316.24873 3744579.68506 2851068.46138
+fails : 4  passes : 34
+19
+ABS(FDI(K))= 0.4809E+00 0.4809
+starting calc
+(7,) (7,)
+19 plasma
+0.170980156345 0.138656906931 0.510026011199
+fails : 4  passes : 35
+ABS(FDI(K))= 0.5190E+00 0.519
+starting calc
+(7,) (7,)
+19 vac
+0.17221089543 0.145265599471 0.593670866082
+fails : 4  passes : 36
+20
+ABS(FDI(K))= 0.4390E+00 0.439
+starting calc
+(7,) (7,)
+20 plasma
+0.11428174313 0.185456036154 0.244770013184
+fails : 4  passes : 37
+ABS(FDI(K))= 0.5247E+00 0.5247
+starting calc
+(7,) (7,)
+20 vac
+0.12716937997 0.103567000176 0.405522800385
+fails : 4  passes : 38
+21
+ABS(FDI(K))= 0.4959E+00 0.4959
+starting calc
+(7,) (7,)
+21 plasma
+0.0828960750323 0.0650161304979 0.14966621148
+fails : 4  passes : 39
+ABS(FDI(K))= 0.5229E+00 0.5229
+starting calc
+(7,) (7,)
+21 vac
+0.121936914148 0.0716949778526 0.251748385071
+fails : 4  passes : 40
+22
+ABS(FDI(K))= 0.2963E+00 0.2963
+starting calc
+(7,) (7,)
+22 plasma
+0.108951262567 0.122281259667 0.0638138464976
+fails : 4  passes : 41
+ABS(FDI(K))= 0.5146E+00 0.5146
+starting calc
+(7,) (7,)
+22 vac
+0.158839049118 0.116416005924 0.233164841839
+fails : 4  passes : 42
+23
+ABS(FDI(K))= 0.3986E+00 0.3986
+starting calc
+(7,) (7,)
+23 plasma
+0.092722082926 0.128104572752 0.0700409744563
+fails : 4  passes : 43
+ABS(FDI(K))= 0.5133E+00 0.5133
+starting calc
+(7,) (7,)
+23 vac
+0.162399396211 0.0624482872923 0.505450520934
+fails : 4  passes : 44
+24
+ABS(FDI(K))= 0.4248E+00 0.4248
+starting calc
+(7,) (7,)
+24 plasma
+4483884.21196 4493697.16923 3604278.80903
+fails : 5  passes : 44
+ABS(FDI(K))= 0.5171E+00 0.5171
+starting calc
+(7,) (7,)
+24 vac
+4440620.13729 4449290.194 3638251.02647
+fails : 6  passes : 44
+25
+ABS(FDI(K))= 0.4343E+00 0.4343
+starting calc
+(7,) (7,)
+25 plasma
+1.44148378815 1.52466746031 0.508173159556
+fails : 6  passes : 45
+ABS(FDI(K))= 0.5157E+00 0.5157
+starting calc
+(7,) (7,)
+25 vac
+1.51194197083 1.47756115256 0.961717443711
+fails : 6  passes : 46
+26
+ABS(FDI(K))= 0.4232E+00 0.4232
+starting calc
+(7,) (7,)
+26 plasma
+0.0803270651816 0.0802709533981 0.0453338426598
+fails : 6  passes : 47
+ABS(FDI(K))= 0.5190E+00 0.519
+starting calc
+(7,) (7,)
+26 vac
+0.0990739613308 0.0881675490009 0.334204842661
+fails : 6  passes : 48
+27
+ABS(FDI(K))= 0.4611E+00 0.4611
+starting calc
+(7,) (7,)
+27 plasma
+0.0718740682468 0.059468206294 0.174462414887
+fails : 6  passes : 49
+ABS(FDI(K))= 0.5175E+00 0.5175
+starting calc
+(7,) (7,)
+27 vac
+0.101555550655 0.0683883265219 0.223179424988
+fails : 6  passes : 50
+28
+ABS(FDI(K))= 0.4669E+00 0.4669
+starting calc
+(7,) (7,)
+28 plasma
+0.135317262587 0.0630220217026 0.396353997038
+fails : 6  passes : 51
+ABS(FDI(K))= 0.5233E+00 0.5233
+starting calc
+(7,) (7,)
+28 vac
+0.213378238445 0.0746931562725 0.479633880153
+fails : 6  passes : 52
+29
+ABS(FDI(K))= 0.4779E+00 0.4779
+starting calc
+(7,) (7,)
+29 plasma
+0.108675406384 0.0911642913997 1.32151577417
+fails : 6  passes : 53
+ABS(FDI(K))= 0.5190E+00 0.519
+starting calc
+(7,) (7,)
+29 vac
+0.165111457371 0.104860961852 0.630139337544
+fails : 6  passes : 54
+30
+ABS(FDI(K))= 0.4317E+00 0.4317
+starting calc
+(7,) (7,)
+30 plasma
+0.0588177946797 0.0415671511703 0.599319208028
+fails : 6  passes : 55
+ABS(FDI(K))= 0.5246E+00 0.5246
+starting calc
+(7,) (7,)
+30 vac
+0.079972304745 0.0467682360038 0.344919874802
+fails : 6  passes : 56
+31
+ABS(FDI(K))= 0.5005E+00 0.5005
+starting calc
+(7,) (7,)
+31 plasma
+0.0734546282375 0.0484988723508 0.210852183664
+fails : 6  passes : 57
+ABS(FDI(K))= 0.5334E+00 0.5334
+starting calc
+(7,) (7,)
+31 vac
+0.0951656365772 0.0577291705928 0.186604947962
+fails : 6  passes : 58
+32
+ABS(FDI(K))= 0.4929E+00 0.4929
+starting calc
+(7,) (7,)
+32 plasma
+0.133390923351 0.136966709054 0.13617436976
+fails : 6  passes : 59
+ABS(FDI(K))= 0.5257E+00 0.5257
+starting calc
+(7,) (7,)
+32 vac
+0.142137162075 0.113953161785 0.380468418665
+fails : 6  passes : 60
+33
+ABS(FDI(K))= 0.5002E+00 0.5002
+starting calc
+(7,) (7,)
+33 plasma
+0.138962515221 0.115696703318 0.265671642152
+fails : 6  passes : 61
+ABS(FDI(K))= 0.5343E+00 0.5343
+starting calc
+(7,) (7,)
+33 vac
+0.17012060161 0.112704629565 0.225017516022
+fails : 6  passes : 62
+34
+ABS(FDI(K))= 0.4682E+00 0.4682
+starting calc
+Traceback (most recent call last):
+  File "./8_new_post_proc.py", line 50, in <module>
+    new_answer = num.array(coil_responses4(new_data.R*new_data.R0EXP,new_data.Z*new_data.R0EXP,new_data.Br,new_data.Bz,new_data.Bphi))
+  File "/u/haskeysr/python_mars_scripts/PythonMARS_funcs.py", line 838, in coil_responses4
+    Brprobek = griddata(r_filt_array, z_filt_array, num.real(Br_filt_array), Rprobek, Zprobek) + 1j*griddata(r_filt_array, z_filt_array, num.imag(Br_filt_array), Rprobek, Zprobek)
+  File "/f/python/linux64/lib/python2.7/site-packages/matplotlib/mlab.py", line 2768, in griddata
+    tri = delaunay.Triangulation(x,y)
+  File "/f/python/linux64/lib/python2.7/site-packages/matplotlib/delaunay/triangulate.py", line 90, in __init__
+    self.hull = self._compute_convex_hull()
+  File "/f/python/linux64/lib/python2.7/site-packages/matplotlib/delaunay/triangulate.py", line 125, in _compute_convex_hull
+    hull.append(edges.pop(hull[-1]))
+KeyError: 65

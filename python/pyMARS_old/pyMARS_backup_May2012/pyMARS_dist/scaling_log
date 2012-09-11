@@ -1,0 +1,500 @@
+mkdir: cannot create directory `/scratch/haskeysr/mars/shot146398_scaled/': File exists
+mkdir: cannot create directory `/scratch/haskeysr/mars/shot146398_scaled/': File exists
+Your job 594065 ("CH63p005_q100") has been submitted
+Your job 594066 ("CH63p034_q100") has been submitted
+Your job 594067 ("CH63p064_q100") has been submitted
+Your job 594068 ("CH63p093_q100") has been submitted
+Your job 594069 ("CH63p122_q100") has been submitted
+Your job 594070 ("CH63p152_q100") has been submitted
+Your job 594071 ("CH63p181_q100") has been submitted
+Your job 594072 ("CH63p210_q100") has been submitted
+Your job 594073 ("CH38p005_q100") has been submitted
+Your job 594074 ("CH38p034_q100") has been submitted
+Your job 594075 ("CH38p064_q100") has been submitted
+Your job 594076 ("CH38p093_q100") has been submitted
+Your job 594077 ("CH38p122_q100") has been submitted
+Your job 594078 ("CH38p152_q100") has been submitted
+Your job 594079 ("CH38p181_q100") has been submitted
+Your job 594080 ("CH38p210_q100") has been submitted
+Your job 594082 ("MAR25_p5_q100") has been submitted
+Your job 594083 ("MAR25_p34_q100") has been submitted
+Your job 594084 ("MAR25_p64_q100") has been submitted
+Your job 594085 ("MAR25_p93_q100") has been submitted
+Your job 594086 ("MAR25_p122_q100") has been submitted
+Your job 594087 ("MAR25_p152_q100") has been submitted
+Your job 594088 ("MAR25_p181_q100") has been submitted
+Your job 594089 ("MAR25_p210_q100") has been submitted
+rm: cannot remove `/scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/': No such file or directory
+Your job 594091 ("blah") has been submitted
+Your job 594092 ("blah") has been submitted
+Your job 594093 ("blah") has been submitted
+Your job 594094 ("blah") has been submitted
+Your job 594095 ("blah") has been submitted
+Your job 594096 ("blah") has been submitted
+Your job 594097 ("blah") has been submitted
+Your job 594098 ("blah") has been submitted
+running a cluster job or running on venus, must use Python RZplot funcs
+Matlab not available
+(1.0,0.0),(1.00000, 0.00000)
+#####################################################################
+##*****STEP 1 - Copy EFIT files + CORSICA(??) ********************###
+g146398.03332
+g146398.03332
+146398 3332
+Total Time for this step : 0.00
+start corsica setup
+<<calldcon>> 0
+<<qstep>> 0.000
+<<nqmult>> 1
+<<thetac>> 0.003
+<<npsi>> 270
+<<pmin>> 0.050000
+<<pstep>> 0.293
+<<npmult>> 8
+<<qmin>> 1.000
+finished corsica setup, starting corsica runs
+1
+0
+[['ml10']]
+running corsica_script0.sh script
+copying files across
+#####################################################################
+##***************************STEP 2 - Generate Directory Structure ############
+Successful read in : 8, failed read in : 0
+Removed 0 for q95, 0 for Bn_Div_Li, 0 for stability, and 0 due to read error
+Remaining eq : 8
+generate_directories serial :  1
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.050/cheaserun/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.050/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.050/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.050/marsrun/RUNrfa.p/
+generate_directories serial :  2
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.343/cheaserun/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.343/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.343/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.343/marsrun/RUNrfa.p/
+generate_directories serial :  3
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.636/cheaserun/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.636/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.636/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.636/marsrun/RUNrfa.p/
+generate_directories serial :  4
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.929/cheaserun/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.929/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.929/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.929/marsrun/RUNrfa.p/
+generate_directories serial :  5
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.222/cheaserun/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.222/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.222/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.222/marsrun/RUNrfa.p/
+generate_directories serial :  6
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.515/cheaserun/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.515/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.515/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.515/marsrun/RUNrfa.p/
+generate_directories serial :  7
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.808/cheaserun/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.808/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.808/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.808/marsrun/RUNrfa.p/
+generate_directories serial :  8
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp2.101/cheaserun/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp2.101/cheaserun_PEST
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp2.101/marsrun/RUNrfa.vac/
+/scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp2.101/marsrun/RUNrfa.p/
+STEP 2 : dumping data to pickle file
+Total Time for step 2 (DIR_Setup) : 0.09
+#####################################################################
+##***************************STEP 3 - CHEASE RUN********************#
+1
+Modifying CHEASE datain file
+creating fxin
+2
+Modifying CHEASE datain file
+creating fxin
+3
+Modifying CHEASE datain file
+creating fxin
+4
+Modifying CHEASE datain file
+creating fxin
+5
+Modifying CHEASE datain file
+creating fxin
+6
+Modifying CHEASE datain file
+creating fxin
+7
+Modifying CHEASE datain file
+creating fxin
+8
+Modifying CHEASE datain file
+creating fxin
+1
+Submitted 1 jobs of 8, time 0.00mins
+2
+Submitted 2 jobs of 8, time 0.00mins
+3
+Submitted 3 jobs of 8, time 0.00mins
+4
+Submitted 4 jobs of 8, time 0.00mins
+5
+Submitted 5 jobs of 8, time 0.01mins
+6
+Submitted 6 jobs of 8, time 0.01mins
+7
+Submitted 7 jobs of 8, time 0.01mins
+8
+Submitted 8 jobs of 8, time 0.01mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 0.01mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 0.26mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 0.51mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 0.87mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 1.14mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 8 of 8, Waiting for last 5 jobs to finish, time so far : 1.39mins
+Running Jobs : 0
+1
+Modifying CHEASE datain file
+creating fxin
+2
+Modifying CHEASE datain file
+creating fxin
+3
+Modifying CHEASE datain file
+creating fxin
+4
+Modifying CHEASE datain file
+creating fxin
+5
+Modifying CHEASE datain file
+creating fxin
+6
+Modifying CHEASE datain file
+creating fxin
+7
+Modifying CHEASE datain file
+creating fxin
+8
+Modifying CHEASE datain file
+creating fxin
+1
+Submitted 1 jobs of 8, time 0.00mins
+2
+Submitted 2 jobs of 8, time 0.00mins
+3
+Submitted 3 jobs of 8, time 0.00mins
+4
+Submitted 4 jobs of 8, time 0.00mins
+5
+Submitted 5 jobs of 8, time 0.00mins
+6
+Submitted 6 jobs of 8, time 0.01mins
+7
+Submitted 7 jobs of 8, time 0.01mins
+8
+Submitted 8 jobs of 8, time 0.01mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 0.01mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 0.26mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 0.51mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 0.76mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 1.02mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 8 of 8, Waiting for last 7 jobs to finish, time so far : 1.42mins
+Running Jobs : 2
+Running Jobs : 2
+Submitted 8 of 8, Waiting for last 2 jobs to finish, time so far : 1.68mins
+Running Jobs : 0
+Total Time for step 3 (CHEASE) : 3.58
+########################################################################
+##*************** STEP 4 - I-coil grid location *** *          #########
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.050/cheaserun/RMZM_F 240
+1  FCCHI= [ 0.22175732 -0.20502092]  FWCHI= [ 0.13389121  0.13389121]  IFEED= [28, 28]  time: 2.7379758358 s, finished  0  of  8
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.343/cheaserun/RMZM_F 240
+2  FCCHI= [ 0.21338912 -0.20502092]  FWCHI= [ 0.13389121  0.13389121]  IFEED= [28, 28]  time: 5.48957490921 s, finished  1  of  8
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.636/cheaserun/RMZM_F 240
+3  FCCHI= [ 0.21338912 -0.20502092]  FWCHI= [ 0.13389121  0.13389121]  IFEED= [28, 28]  time: 8.27380990982 s, finished  2  of  8
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp0.929/cheaserun/RMZM_F 240
+4  FCCHI= [ 0.21338912 -0.20083682]  FWCHI= [ 0.13389121  0.12552301]  IFEED= [28, 28]  time: 11.0435960293 s, finished  3  of  8
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.222/cheaserun/RMZM_F 240
+5  FCCHI= [ 0.20920502 -0.20083682]  FWCHI= [ 0.12552301  0.12552301]  IFEED= [28, 28]  time: 13.8387989998 s, finished  4  of  8
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.515/cheaserun/RMZM_F 240
+6  FCCHI= [ 0.20920502 -0.20083682]  FWCHI= [ 0.12552301  0.12552301]  IFEED= [28, 28]  time: 16.9697418213 s, finished  5  of  8
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp1.808/cheaserun/RMZM_F 240
+7  FCCHI= [ 0.20920502 -0.20083682]  FWCHI= [ 0.12552301  0.12552301]  IFEED= [28, 28]  time: 19.6988859177 s, finished  6  of  8
+[[ 2.164  1.012  2.374  0.504]
+ [ 2.164 -1.012  2.374 -0.504]] /scratch/haskeysr/mars/shot146398_scaled/qmult1.000/exp2.101/cheaserun/RMZM_F 240
+8  FCCHI= [ 0.20502092 -0.20083682]  FWCHI= [ 0.13389121  0.12552301]  IFEED= [28, 28]  time: 22.4061410427 s, finished  7  of  8
+finished RMZM calculations, errors :  0
+Total Time for step 4 : 0.37
+#########################################################################
+##*************************** Step 5 - MARS setup**************############
+1
+ROTE: 3.55107136011e-05  OMEGA_NORM: 4.24579785708e-06  TAUWM: 33091.5424449  v0a: 4003273.5359
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+2
+ROTE: 3.55107447452e-05  OMEGA_NORM: 4.24580532773e-06  TAUWM: 33091.4842191  v0a: 4003270.02489
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+3
+ROTE: 3.55107494356e-05  OMEGA_NORM: 4.24580643808e-06  TAUWM: 33091.4755651  v0a: 4003269.49612
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+4
+ROTE: 3.55107338635e-05  OMEGA_NORM: 4.24580270275e-06  TAUWM: 33091.504678  v0a: 4003271.25162
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+5
+ROTE: 3.55107032823e-05  OMEGA_NORM: 4.24579539932e-06  TAUWM: 33091.5616006  v0a: 4003274.69918
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+6
+ROTE: 3.55106623822e-05  OMEGA_NORM: 4.24578563815e-06  TAUWM: 33091.6376789  v0a: 4003279.31003
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+7
+ROTE: 3.55106895864e-05  OMEGA_NORM: 4.24579213812e-06  TAUWM: 33091.5870183  v0a: 4003276.24318
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+8
+ROTE: 3.55107181039e-05  OMEGA_NORM: 4.245798945e-06  TAUWM: 33091.5339657  v0a: 4003273.02828
+Possible error IFEED value is greater than or equal to NW :28, IFEED28
+   IFEED set to :27
+Total Time for this step : 0.02
+####################################################################
+##*************************** Step 6 - run MARS ********************########
+setpoint : 15
+1
+Submitted 1 jobs of 8, time 0.17mins
+setpoint : 15
+2
+Submitted 2 jobs of 8, time 0.42mins
+setpoint : 15
+3
+Submitted 3 jobs of 8, time 0.67mins
+setpoint : 15
+4
+Submitted 4 jobs of 8, time 0.92mins
+setpoint : 15
+5
+Submitted 5 jobs of 8, time 1.17mins
+setpoint : 15
+6
+Submitted 6 jobs of 8, time 1.42mins
+setpoint : 15
+7
+Submitted 7 jobs of 8, time 1.68mins
+setpoint : 15
+8
+Submitted 8 jobs of 8, time 1.93mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 2.01mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 2.26mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 2.51mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 2.77mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 3.02mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 3.27mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 3.52mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 3.77mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 4.02mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 4.27mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 4.53mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 4.78mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 5.03mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 5.28mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 5.54mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 5.79mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 6.04mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 6.29mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 6.54mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 6.79mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 7.04mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 7.29mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 7.55mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 7.80mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 8.05mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 8.30mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 8.55mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 8.80mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 9.05mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 9.30mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 9.56mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 9.81mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 10.06mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 10.31mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 10.56mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 10.81mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 11.06mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 11.31mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 11.57mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 11.82mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 12.07mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 12.32mins
+Running Jobs : 8
+Running Jobs : 8
+Submitted 8 of 8, Waiting for last 8 jobs to finish, time so far : 12.57mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 8 of 8, Waiting for last 7 jobs to finish, time so far : 12.82mins
+Running Jobs : 7
+Running Jobs : 7
+Submitted 8 of 8, Waiting for last 7 jobs to finish, time so far : 13.07mins
+Running Jobs : 6
+Running Jobs : 6
+Submitted 8 of 8, Waiting for last 6 jobs to finish, time so far : 13.33mins
+Running Jobs : 5
+Running Jobs : 5
+Submitted 8 of 8, Waiting for last 5 jobs to finish, time so far : 13.58mins
+Running Jobs : 4
+Running Jobs : 4
+Submitted 8 of 8, Waiting for last 4 jobs to finish, time so far : 13.83mins
+Running Jobs : 3
+Running Jobs : 3
+Submitted 8 of 8, Waiting for last 3 jobs to finish, time so far : 14.08mins
+Running Jobs : 2
+Running Jobs : 2
+Submitted 8 of 8, Waiting for last 2 jobs to finish, time so far : 14.33mins
+Running Jobs : 1
+Running Jobs : 1
+Submitted 8 of 8, Waiting for last 1 jobs to finish, time so far : 14.58mins
+Running Jobs : 0
+Total Time for this step : 14.84
+####################################################################
+##***************************STEP 7 - Post Processing **********####
+changing number of post_proc workers
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_0.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_0.pickle
+finished  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_0.pickle
+finished  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_1.pickle
+finished  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_2.pickle
+finished  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_3.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_4.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_4.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_4.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_4.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_4.pickle
+waiting for  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_4.pickle
+finished  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_4.pickle
+finished  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_5.pickle
+finished  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_6.pickle
+finished  /scratch/haskeysr/mars/shot146398_scaled/post_proc_tmp/tmp_7.pickle
+Total Time for this step : 1.02
+completion time : 24.4536 mins

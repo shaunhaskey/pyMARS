@@ -1,0 +1,22 @@
+
+check_serials.py - compare serials in two different pickle files
+combine_dicts.py - create a dictionary with upper and lower details in it from seperate files
+IFEED_check.py - check to see if 
+Interpolation.py - not sure what this one does... makes nice plots though
+Line_Troubleshoot.py
+plot_dots.py
+plot_res_strength_Bn_q95.py - plots resonant strenght as a func of q95 and Bn (make animation that includes phase?)
+Post_Proc_Funcs.py
+q95_search.py - find nearest q95 value in a dictionary and print out its details
+return_serial.py
+test_probe_location.py
+chu_memo.py
+Eq_space.py
+Interpolation3.py - looks like a predecessor to the plotting the pickup output as a func of q95 and Bn
+line_animation.py
+MARS_plot_results.py
+plot_resonant_strength.py - plots resonant strength as a func of q95 and phasing for fixed Bn - reads in pickle files - what generates them?
+Plot_ROTE_results.py
+PythonMARS_funcs.py
+qscaling.py - plots q profile scaling that happens in Corsica - why does Matt do it this way?
+Single.py

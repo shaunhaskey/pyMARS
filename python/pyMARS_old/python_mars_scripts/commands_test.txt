@@ -1,0 +1,2 @@
+read "sspqi_sh_this_dir.bas
+quit
