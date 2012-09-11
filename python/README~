@@ -1,4 +1,4 @@
-new**
+new
 check_serials.py - compare serials in two different pickle files
 combine_dicts.py - create a dictionary with upper and lower details in it from seperate files
 IFEED_check.py - check to see if 
