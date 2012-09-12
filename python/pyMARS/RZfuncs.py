@@ -482,7 +482,7 @@ def calc_BNORM(FEEDI, R0EXP, I0EXP=1.0e+3 * 3./num.pi,phas=0.):
     fac   = mu0/R0EXP;
     #FEEDI = 1.0;
     #FEEDI = temp_ans
-    BNORM  = BNORM*fac*I0EXP/FEEDI*1e+4
+    BNORM  = BNORM*fac*I0EXP/FEEDI*1.e4
     return BNORM
 
 def increase_grid(x, y, z, number=100):

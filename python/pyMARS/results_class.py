@@ -190,7 +190,7 @@ class data():
 
         self.mk = mk[0,II]
         self.mk.resize(1,len(self.mk))
-
+        print 'PEST, facn = %.2f'%(facn)
         BnPEST  = BMnPEST[:,II.flatten()]/facn
 
         BnPEST[0,:] = BnPEST[1,:]
@@ -218,28 +218,28 @@ class data():
         return total_integral
 
 
-    def plot1(self,title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None):
+    def plot1(self,title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):
         os.chdir(self.directory) 
         os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
         file_name = 'PROFEQ_PEST'
-        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=2)
-
-
-
-        n = 2
+        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         print 'grid values :', np.max(mk_grid.flatten()), np.min(mk_grid.flatten()), np.min(ss_grid.flatten()), np.max(ss_grid.flatten())
         qn_grid, s_grid = np.meshgrid(q*n, self.s.flatten())
         #print q.shape, s.shape, mk_grid.shape, ss_grid.shape, self.BnPEST.shape
         temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(q*n, s.flatten()),method='linear')
-
-        mk,ss,BnPEST=increase_grid(self.mk.flatten(),self.ss.flatten(),abs(self.BnPEST),number=200)
+        if increase_grid:
+            mk,ss,BnPEST=increase_grid(self.mk.flatten(),self.ss.flatten(),abs(self.BnPEST),number=200)
+        else:
+            BnPEST= self.BnPEST
+            mk = self.mk
+            ss = self.ss
         import matplotlib.pyplot as pt
         tmp_cmap = copy.deepcopy(matplotlib.cm.gist_rainbow_r)
         tmp_cmap.name[0] = (0.0, (0.0, 0.0, 0.0))
         dummy = tmp_cmap.name.pop(1)
         tmp_cmap = tmp_cmap.from_list(tmp_cmap.name, tmp_cmap.name)
-
+        ss_plas_edge = np.argmin(np.abs(ss-1.0))
         if surfmn_file != None:
             import h5py
             fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1, sharey=1)
@@ -253,26 +253,59 @@ class data():
             print 'ss, mk values :', min(self.ss), max(self.ss), min(self.mk), max(self.mk)
             max_mk = np.argmin(np.abs(self.mk.flatten()-30))
             min_mk = np.argmin(np.abs(self.mk.flatten()+30))
-            print self.ss
-            print self.mk
-            print self.ss.flatten()[1:]-self.ss.flatten()[0:-1]
-            print self.BnPEST.shape, zdat[min_loc:max_loc+1,:].shape, min_mk, max_mk, self.ss.shape, self.mk.shape, self.BnPEST[:,min_mk:max_mk+1].shape
-            image2 = ax_tmp[1].imshow(abs(self.BnPEST[:,min_mk:max_mk+1]),cmap = tmp_cmap, interpolation='bicubic',aspect='auto',extent = [-30,30,0,1],origin='lower',clim=clim_value)
-            #image2 = ax_tmp[1].pcolor(mk,(ss)**2,abs(BnPEST),cmap=tmp_cmap,clim=clim_value)
-            image1 = ax_tmp[0].imshow(zdat[min_loc:max_loc+1,:].transpose(),cmap = tmp_cmap, interpolation='bicubic',aspect='auto',extent = [-30,30,0,1],origin='lower',clim=clim_value)
-            ax_tmp[0].plot(mq,sq,'wo')
-            ax_tmp[0].plot(mq,sq**2,'yo')
-            n=2
-            ax_tmp[0].plot(q*n,s,'w--') 
-            ax_tmp[0].plot(q*n,s**2,'y--') 
 
+            #image2 = ax_tmp[1].imshow(abs(self.BnPEST[:,min_mk:max_mk+1]),cmap = tmp_cmap, interpolation='bicubic',aspect='auto',extent = [-30,30,0,1],origin='lower',clim=clim_value)
+            #image2 = ax_tmp[1].pcolor(mk,(ss)**2,np.abs(BnPEST),cmap=tmp_cmap,clim=clim_value)
+            image2 = ax_tmp[1].pcolor(mk,(ss[:ss_plas_edge]),np.abs(BnPEST[:ss_plas_edge,:]),cmap='hot')#clim_value)
+            ax_tmp[1].set_title('MARS-F, max:%.2f'%(np.max(np.abs(BnPEST[:ss_plas_edge,:]))))
+            image2.set_clim([0,1.6])
+            #image1 = ax_tmp[0].imshow(zdat[min_loc:max_loc+1,:].transpose(),cmap = tmp_cmap, interpolation='bicubic',aspect='auto',extent = [-30,30,0,1],origin='lower',clim=clim_value)
+            image1 = ax_tmp[0].pcolor(xdat,ydat,zdat,cmap = 'hot')
+            ax_tmp[0].set_title('SURFMN, max:%.2f'%(np.max(np.abs(zdat))))
+            image1.set_clim([0,1.6])
+            for ax_tmp1 in ax_tmp:
+                ax_tmp1.plot(mq,sq,'wo')
+                ax_tmp1.plot(mq,sq**2,'yo')
+                ax_tmp1.plot(q*n,s,'w--') 
+                ax_tmp1.plot(q*n,s**2,'y--') 
+                ax_tmp1.set_xlim([-30,30])
+                ax_tmp1.set_ylim([0,1])
             fig_tmp.canvas.draw(); fig_tmp.show()
+            #MATLAB PART
+            RZ_dir = '/home/srh112/Desktop/Test_Case/matlab_outputs/'
+            print 'reading in data from ', RZ_dir
+            BnPEST_matlab = np.loadtxt(RZ_dir+'PEST_BnPEST_real.txt',delimiter=',')+np.loadtxt(RZ_dir+'PEST_BnPEST_imag.txt',delimiter=',')*1j
+            ss_matlab = np.loadtxt(RZ_dir+'PEST_ss.txt',delimiter=',')
+            mk_matlab = np.loadtxt(RZ_dir+'PEST_mk.txt',delimiter=',')
+            mat_fig, mat_ax = pt.subplots()
+            mat_image = mat_ax.pcolor(mk_matlab, (ss_matlab)**2, np.abs(BnPEST_matlab),cmap = tmp_cmap)
+            mat_image.set_clim([0,1.2])
+            mat_ax.set_xlim([-30,30])
+            mat_ax.set_ylim([0,1])
+            mat_fig.canvas.draw();mat_fig.show()
+            print 'finished reading in data from ', RZ_dir
+            fig_tmp, ax_tmp = pt.subplots(nrows = 2)
+            diff = np.abs(BnPEST-BnPEST_matlab)
+            self.diff = diff
+            self.BnPEST = BnPEST
+            print 'differences'
+            print 'max diff :'
+            print np.max(diff), np.mean(np.max(diff)), np.max(diff).shape
+            print 'as a percent:'
+            self.diff_percent = diff/np.abs(BnPEST)*100.
+            print np.max(self.diff_percent), np.mean(self.diff_percent)
 
+            diff_image = ax_tmp[0].pcolor(mk_matlab, ss_matlab, diff, cmap=tmp_cmap)
+            diff_image2 = ax_tmp[1].pcolor(mk_matlab, ss_matlab, (diff/np.abs(BnPEST))*100, cmap=tmp_cmap)
+            diff_image.set_clim([0,0.1])
+            diff_image2.set_clim([0,5])
+            fig_tmp.canvas.draw(); fig_tmp.show()
+            print diff_image.get_clim(), diff_image2.get_clim()
         fig = pt.figure()
         #ax =fig.add_subplot(121)
         if inc_phase==0:
             ax = fig.add_axes([0.05,0.1,0.65,0.8])
-            ax2 = fig.add_axes([0.75,0.1,0.2,0.8])
+            ax2 = fig.add_axes([0.75,0.1,0.2,0.8],sharey=ax)
         else:
             ax = fig.add_axes([0.05,0.55,0.65,0.4])
             ax2 = fig.add_axes([0.75,0.55,0.2,0.4])
@@ -281,10 +314,14 @@ class data():
         print 'maximum value : ', np.max(np.abs(BnPEST))
 
         if ss_squared:
-            color_ax = ax.pcolor(mk,(ss)**2,abs(BnPEST),cmap=tmp_cmap)
+            color_ax = ax.pcolor(mk,(ss)**2,np.abs(BnPEST),cmap=tmp_cmap)
+            ax.plot(mq,sq**2,'wo')
+            ax.plot(q*n,s**2,'w--') 
         else:
-            color_ax = ax.pcolor(mk,ss,abs(BnPEST),cmap=tmp_cmap)
-
+            print 'not ss_squared'
+            color_ax = ax.pcolor(mk,ss,np.abs(BnPEST),cmap=tmp_cmap)
+            ax.plot(mq,sq,'wo')
+            ax.plot(q*n,s,'w--') 
 
         if inc_phase!=0:
             if phase_correction!=None:
@@ -317,7 +354,6 @@ class data():
             ax3.set_ylim([0,1])#[min(ss.flatten()),max(ss.flatten())])
             ax3.set_xlim([-29,29])
             ax3.plot(mq,sq,'bo')
-            n=2
             ax3.plot(q*n,s,'b--') 
 
         if clim_value == None:
@@ -325,9 +361,6 @@ class data():
         else:
             color_ax.set_clim(clim_value)
         
-        ax.plot(mq,sq,'wo')
-        n=2
-        ax.plot(q*n,s,'w--') 
         
         ax.set_title(title)
         ax.set_xlim([min(mk.flatten()),max(mk.flatten())])
