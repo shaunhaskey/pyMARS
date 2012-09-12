@@ -1,0 +1,57 @@
+
+
+; INPUT FILE FOR   plot3d.pro
+;
+; This file must be executed as lines of IDL. 
+; Can't do loops or branches in this file.
+; Type  @plot3d.in  from IDL.
+;
+; Inputs:
+;  wfile    = 'path to surfmn.out.idl3d file'
+;  title    = 'alphanumeric data' that will be printed above plot
+;  subtitle = 'subtitle text' that will be printed below plot
+;  n_mode   = sets toroidal mode number of data to be plotted
+;  msign    < 0 changes sign of m (x axis) on plot
+;  qsign    +1 is normal, -1 changes sign of q curve on plot, 
+;	    0 plots + and -; any other number scales q curve on plot
+;  yvar    le 0 uses normalized poloidal fluxpsi, gt 0 uses SQRT(psi)
+;  xrange   = e.g. [-20,20] sets m range 
+;  yrange   = e.g. [0.5,1.0] sets radial variable range 
+;  zrange   = e.g. [5.0,10.0] sets range of contours; ignored if the two 
+;                limits are equal; 1st element must be smaller, 2nd larger
+;  username = 'F. Lastname'
+;  psname  = 'some_name.ps'
+;  epsname = 'some_name.eps'
+;
+; = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+; Input data:
+; = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+n_mode   =  2
+
+wfile = 'surfmn.out.idl3d'
+
+title   = 'SURFMN, "n=2" I-coil, 0 deg phasing, -/+/-'
+subtitle= 'g146382.03230'
+
+
+msign    = +1		; < 0 changes sign of m (x axis) on plot
+qsign    = +1		; < 0 changes sign of q curve on plot; 0 plots on both sides
+yvar     =  4 		; le 0 for pol flux psi, gt 1 for sqrt(psi) as x-axis variable
+
+ xrange = [-32, +32]	; m range to plot
+;; xrange = [-16, +16]
+yrange = [-0.005, 1.005]	; radial range
+zrange = [0.0, 0.0]	; contouring range; equal limits does autorange
+
+c_labls = [0,1,0,1,0,1,0,1,0,1,0]	; 1 to label corresponding contour, up to 11
+dxgrid = 1 & dygrid = 0.05
+dxgrid = 0 & dygrid = 0.00
+
+;In the following: cl_ = color (0=blk, 255=wh);  th_ = thickness 
+clc = 255  &  thc = 2.0	; contour line color & thickhness
+clg = 000  &  thg = 2.0	; grid line      "   &     "
+clq = 255  &  thq = 6.0	; q curve        "   &     "
+
+;username='F. lastname'
+psname  = 'Cntor_n'+STRING(n_mode,FORMAT='(I1)')+'.ps'
+epsname = 'Cntor_n'+STRING(n_mode,FORMAT='(I1)')+'.eps'
