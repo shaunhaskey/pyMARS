@@ -1,3 +1,9 @@
+'''
+Appears to be older than probe_g.py - this one doesn't contain my Biot-Savart calcuations
+Just does probe_g and MARS comparison.
+
+SH:14Sept2012
+'''
 import numpy as num
 import os, time
 import PythonMARS_funcs as pyMARS

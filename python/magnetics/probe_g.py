@@ -1,3 +1,9 @@
+'''
+This will run probe_g and SH biot-savart calculation and compare their values across the
+face of a pickup coil. Produces the plots that show large spikes around the conductors
+SH : 14 Sept 2012
+'''
+
 import numpy as num
 import os, time
 import PythonMARS_funcs as pyMARS
@@ -6,6 +12,8 @@ import RZfuncs
 import biot_funcs
 start_working_dir = os.getcwd()
 
+
+probe_name = 'LISL'
 N = 6; n = 2; I = num.array([1.,-1.,0.,1,-1.,0.])
 phi_location = 85
 print 'phi_location %.2fdeg'%(phi_location)
@@ -39,7 +47,6 @@ Zprobe = num.array([ 0.755,   0.0,-0.755, 0.000, 0.000, 0.714,-0.714,0.,0.])
 tprobe = num.array([ -67.5, -90.0,-112.5, 0.000, 0.000,  22.6, -22.6,-90.,0.])*2*num.pi/360  #DTOR # poloidal inclination
 lprobe = num.array([ 0.155, 0.140, 0.155, 1.194, 0.800, 0.680, 0.680, 0.05,0.05])  # Length of probe
 
-probe_name = 'LISL'
 k = probe.index(probe_name)
 #Generate interpolation points
 Rprobek, Zprobek = pyMARS.pickup_interp_points(Rprobe[k], Zprobe[k], lprobe[k], tprobe[k], probe_type[k], 800)
@@ -118,14 +125,11 @@ grid_z = vac_run.Z*vac_run.R0EXP
 Brprobek, Bzprobek = pyMARS.pickup_field_interpolation(grid_r, grid_z, vac_run.Br, vac_run.Bz, vac_run.Bphi, num.array(Rprobek), num.array(Zprobek))
 
 MARS_pickup_output = (num.average((num.sin(tprobe[k])*num.real(Bzprobek) + num.cos(tprobe[k])*num.real(Brprobek)) + 1j * (num.sin(tprobe[k])*num.imag(Bzprobek) +num.cos(tprobe[k])*num.imag(Brprobek))))
-
 biot_savart_pickup_output = (num.average((num.sin(tprobe[k])*num.real(B_Z) + num.cos(tprobe[k])*num.real(B_R)) + 1j * (num.sin(tprobe[k])*num.imag(B_Z) +num.cos(tprobe[k])*num.imag(B_R))))
-
 biot_savart_sh_pickup_output = (num.average((num.sin(tprobe[k])*num.real(Bz_sh) + num.cos(tprobe[k])*num.real(Bx_sh)) + 1j * (num.sin(tprobe[k])*num.imag(Bz_sh) +num.cos(tprobe[k])*num.imag(Bx_sh))))
 
 
 print 'biot :', biot_savart_pickup_output*10000., ' MARS : ', MARS_pickup_output, ' Biot_sh :', biot_savart_sh_pickup_output
-
     
 import matplotlib.pyplot as pt
 fig = pt.figure()

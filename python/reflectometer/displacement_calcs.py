@@ -30,8 +30,13 @@ shot = 146386; start_time = 2500; end_time = 4900
 shot = 146388; start_time = 2980; end_time = 5100
 shot = 146392; start_time = 2990; end_time = 4700
 shot = 146397; start_time = 3030; end_time = 4800
-shot = 146398; start_time = 3200; end_time = 3620
-shot = 146398; start_time = 3050; end_time = 3950
+#shot = 146398; start_time = 3200; end_time = 3620
+#shot = 146398; start_time = 3050; end_time = 3950
+#shot = 146398; start_time = 3350; end_time = 3650 #around 3500
+#shot = 146398; start_time = 3650; end_time = 3950 #around 3800
+#shot = 146398; start_time = 3150; end_time = 3450 #around 3800
+
+
 #shot = 146400; start_time = 2800; end_time = 4300
 #shot = 138340; start_time = 2800; end_time = 4300
 #shot = 146392; start_time = 3010; end_time = 3950
@@ -41,7 +46,7 @@ shot = 146398; start_time = 3050; end_time = 3950
 
 reg_grid_pts = 100
 rad_thresh = 208
-include_MARS = 1
+include_MARS = 0
 perform_interp = 1
 density_interp_range = [0.1e19, 6.e19]
 radius_interp_range = [2.1, 2.35]
@@ -134,7 +139,7 @@ if load_pickle == 1:
     I_coil_x, I_coil_y = stored_data['I_coil']
     boundary_x, boundary_y = stored_data['boundary']
 elif load_hdf5 ==1:
-    tmp_filename = 'hdf5testfile2.h5'
+    tmp_filename = '/home/srh112/NAMP_datafiles/hdf5testfile2.h5'
     tmp_file = h5py.File(tmp_filename,'r')
     stored_data = tmp_file.get(str(shot))
     n_data = stored_data[0][0]
@@ -142,7 +147,7 @@ elif load_hdf5 ==1:
     n_r = stored_data[0][2]
     n_rho = stored_data[0][3]
     tmp_file.close()
-    tmp_filename = file('displacement_data%s.pickle'%(shot),'r') #tmp hack to make it work
+    tmp_filename = file('/home/srh112/NAMP_datafiles/displacement_data%s.pickle'%(shot),'r') #tmp hack to make it work
     stored_data = pickle.load(tmp_filename)
     tmp_filename.close()
     I_coil_x, I_coil_y = stored_data['I_coil']
@@ -426,8 +431,8 @@ def perform_fft_calc(const_dens, const_rad, I_coil_interp, I_coil_freq, time_bas
     period = time_base[1]-time_base[0]
     fft_length = end_pos - start_pos
     answer_dict = {}
-    const_dens_fft = np.fft.fft(const_dens[:,start_pos:end_pos],axis=1)/fft_length*100
-    const_rad_fft = np.fft.fft(const_rad[:,start_pos:end_pos],axis=1)/fft_length*100
+    const_dens_fft = np.fft.fft(const_dens[:,start_pos:end_pos],axis=1)/fft_length*100 #cm
+    const_rad_fft = np.fft.fft(const_rad[:,start_pos:end_pos],axis=1)/fft_length#*100
     I_coil_fft = np.fft.fft(I_coil_interp[start_pos:end_pos])/fft_length/1000. #->kA
     freq_list = np.fft.fftfreq(const_rad_fft.shape[1],period/1000.)
     loc_10Hz = np.argmin(np.abs(freq_list - I_coil_freq))
@@ -450,8 +455,8 @@ def perform_fft_calc(const_dens, const_rad, I_coil_interp, I_coil_freq, time_bas
 
     answer_dict['SNR_list'] = answer_dict['signal_power']/answer_dict['noise_power']
     answer_dict['SNR_list_n'] = answer_dict['signal_power_n']/answer_dict['noise_power_n']
-    answer_dict['const_dens_fft'] = const_dens_fft
-    answer_dict['const_rad_fft'] = const_rad_fft
+    answer_dict['const_dens_fft'] = const_dens_fft/I_coil_fft[loc_10Hz]
+    answer_dict['const_rad_fft'] = const_rad_fft/I_coil_fft[loc_10Hz]
     return answer_dict
 
 
@@ -486,9 +491,9 @@ def step_through(cycles, overlap, I_coil_freq, time_base):
         tmp_ax[2].plot(j, plot_list_SNR[i],'-',label = label_list[i])
         tmp_ax[3].plot(j, plot_list_power[i],'-',label = label_list[i])
     #tmp_ax[0].legend(loc='best')    
+    tmp_ax[0].legend(loc='best')
     tmp_fig.canvas.draw(); tmp_fig.show()
-
-step_through(3, 0.05, 10, time_base)    
+step_through(5, 0.3, 10, time_base)    
 
 #if cycles == None:
 #    end_pos = const_dens.shape[1]
@@ -638,6 +643,75 @@ for i in [start_loc+10, int((start_loc+end_loc)/2), end_loc-10]:
     ax_delta2.plot(np.array(input_r)*100, input_dens, label='density profile')
 
 fig_delta.canvas.draw(); fig_delta.show()
+
+#plot to show the comparison between the two ways of calculating the
+fig_tmp10, ax_tmp10 = pt.subplots(nrows = 4, sharex = 1)
+#for i in [start_loc+10, int((start_loc+end_loc)/2), end_loc-10]:
+for i in [int((start_loc+end_loc)/2)]:
+    input_dens = np.flipud(n_data[:,i])
+    input_r = np.flipud(n_r[:,i])
+    dr_drho = np.diff(input_r)/np.diff(input_dens)
+    new_r = (input_r[1:]+input_r[:-1])/2.
+    dr_drho_interp = np.interp(plot_radius,new_r[::-1],dr_drho[::-1])
+    ax_tmp10[0].plot(plot_radius, amp_list_n)
+    ax_tmp10[1].plot(input_r, input_dens)
+    ax_tmp10[2].plot(new_r,dr_drho)
+    ax_tmp10[2].plot(plot_radius, dr_drho_interp,'x-')
+    ax_tmp10[3].plot(plot_radius,np.abs(dr_drho_interp*amp_list_n)*100,label=str(i))
+
+ax_tmp10[0].set_ylabel(r'$d\rho$')
+ax_tmp10[1].set_ylabel(r'$\rho$')
+ax_tmp10[2].set_ylabel(r'$dr/d\rho$')
+ax_tmp10[3].set_ylabel(r'$dr$')
+ax_tmp10[3].plot(radius_list/100., amp_list, 'x-', label='dr_1')
+ax_tmp10[3].legend(loc='best')
+fig_tmp10.canvas.draw();fig_tmp10.show()
+
+#Overlay the 
+fig_tmp11, ax_tmp11 = pt.subplots()
+tmp_xaxis = np.arange(start_time, end_time, 10)/1000.
+tmp_data = np.ones((len(amp_list),len(tmp_xaxis)),dtype=float)
+for i in range(0,len(amp_list)):
+    tmp_data[i,:] = amp_list[i] * np.sin(10.*np.pi*2*tmp_xaxis)
+clr_tmp11 = ax_tmp11.pcolor(tmp_xaxis,plot_radius,tmp_data, rasterized=True)
+pt.colorbar(clr_tmp11,ax=ax_tmp11)
+fig_tmp11.canvas.draw();fig_tmp11.show()
+
+
+if single_clr_plot == 1:
+    #tmp_fig, tmp_ax = pt.subplots(nrows = 2, sharex = 1)
+    tmp_fig, tmp_ax = pt.subplots()
+    tmp_ax = [tmp_ax]
+    clr_plot1 = tmp_ax[0].pcolor(time_base[::10], plot_radius, const_rad[:,::10], cmap = 'jet')
+    clr_plot1.set_rasterized(True)
+    #clr_plot2 = tmp_ax[1].pcolor(time_base[::10], plot_densities, const_dens[:,::10], cmap = 'jet')
+    #clr_plot2.set_rasterized(True)
+
+    tmp_ax[0].set_xlim([start_time,end_time])
+    tmp_ax[0].set_ylim([2.1,2.35])
+    clr_plot1.set_clim([0,5e19])
+    #clr_plot2.set_clim([2.2,2.35])
+    if boundary_x != None:
+        tmp_ax[0].plot(boundary_x, boundary_y, 'k--', linewidth=5)
+    tmp_ax[0].set_xlabel('Time (ms)', fontsize = 15)
+    tmp_ax[0].set_ylabel('Radius (m)', fontsize = 15)
+    tmp_ax[0].set_title('Shot %d'%(shot,), fontsize = 15)
+    
+    new_vals_tmp = np.arange(210.,233.,1.)/100.
+    new_vals_amp = np.interp(new_vals_tmp, plot_radius,amp_list/100.)
+    new_vals_phase = np.interp(new_vals_tmp, plot_radius,phase_list)
+
+    for i in range(0,len(new_vals_amp)):
+        tmp_data = new_vals_amp[i] * np.cos(10.*np.pi*2*time_base[::10]/1000.+phase_list[i]/180.*np.pi)*4. + new_vals_tmp[i]
+        tmp_ax[0].plot(time_base[::10],tmp_data,'k-')
+    cbar = pt.colorbar(clr_plot1, ax=tmp_ax[0])
+    cbar.set_label(r'Density   $(m^{-3})$', fontsize = 15)
+    #cbar = pt.colorbar(clr_plot2, ax=tmp_ax[1])
+    tmp_fig.canvas.draw(); tmp_fig.show()
+    tmp_fig.savefig('/home/srh112/Desktop/testing.pdf')
+    #clr_ax[2].plot(I_coil_x, I_coil_y,'k')
+
+
 
 ax6_2.set_ylabel('density profile')
 ax7_2.set_ylabel('density profiles')
