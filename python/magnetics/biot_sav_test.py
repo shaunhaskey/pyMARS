@@ -1,13 +1,13 @@
-'''
-Uses Biot Savart to calculate the field on a MARS cross-section. Or any other points you want.
-The coil model can come from the description of the I-coils in magnetics_details or
-from the SURFMN details. The biot-Sav results can be plotted next to MARS-F results if a MARS-F
-simulation directory is supplied.
 
-Additionally, the predicted output from a pickup coil can be calculated using this model - however,
-note that it doesn't take the effect of hte walls shielding into account.
-SH 6 Sept 2012
-'''
+# Uses Biot Savart to calculate the field on a MARS cross-section. Or any other points you want.
+# The coil model can come from the description of the I-coils in magnetics_details or
+# from the SURFMN details. The biot-Sav results can be plotted next to MARS-F results if a MARS-F
+# simulation directory is supplied.
+
+# Additionally, the predicted output from a pickup coil can be calculated using this model - however,
+# note that it doesn't take the effect of hte walls shielding into account.
+# SH 6 Sept 2012
+
 
 import numpy as np
 import PythonMARS_funcs as pyMARS

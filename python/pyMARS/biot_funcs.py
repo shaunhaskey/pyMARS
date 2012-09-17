@@ -157,7 +157,7 @@ def biot_calc(coil_point_list, xyz_X, xyz_Y, xyz_Z, coil_currents, dist_thresh=0
             print 'in single proc option'
             #coil_points = np.array(coil_point_list[i])
             job1 = biot_sav_job(coil_point_list[i], xyz_X, xyz_Y, xyz_Z, coil_currents[i], dist_thresh)
-            B_list.append(job1.run_calc())
+            B_list.append(job1.runn())
             #B = basic_calculation(coil_point_list[i], xyz_X, xyz_Y, xyz_Z, coil_currents[i], dist_thresh)
             print 'time so far : ', time.time() - start_time
     elif multi_proc==2:
@@ -250,7 +250,7 @@ def stich_together(list_files):
     print ' finished stiching together'    
     return B_list
 
-def generate_coil_points2(r, z, n, phi_zero, phi_range, axis):
+def generate_coil_points2(r, z, n, phi_zero, phi_range, axis=None):
     '''
     generate the geometry for an I-coil based on 4 points
     '''
@@ -261,8 +261,9 @@ def generate_coil_points2(r, z, n, phi_zero, phi_range, axis):
     point2 = np.array([r[1]*np.cos(phi_zero+phi_range*0.5),r[1]*np.sin(phi_zero+phi_range*0.5),z[1]])
     point3 = np.array([r[0]*np.cos(phi_zero+phi_range*0.5),r[0]*np.sin(phi_zero+phi_range*0.5),z[0]])
     point_list = [point0, point1, point2, point3]
-    #for i in range(0,len(point_list)):
-    #    axis.text3D(point_list[i][0], point_list[i][1], point_list[i][2], str(i))
+    if axis != None:
+        for i in range(0,len(point_list)):
+            axis.text3D(point_list[i][0], point_list[i][1], point_list[i][2], str(i))
     coil_points = []
     for tmp in range(0,len(point_list)):
         start_point = point_list[tmp-1]
