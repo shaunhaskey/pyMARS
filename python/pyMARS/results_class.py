@@ -218,11 +218,41 @@ class data():
         return total_integral
 
 
+    def kink_amp(self, psi, q_range, n = 2):
+        #self.q_profile
+        #self.q_profile_s
+        #self.mk, self.ss, self.BnPEST
+        os.chdir(self.directory) 
+        os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
+        file_name = 'PROFEQ_PEST'
+        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
+        self.qn = qn
+        self.sq = sq
+        self.q_profile = q
+        self.q_profile_s = s
+        self.mq = mq
+        s_loc = np.argmin(np.abs(self.ss-psi))
+        relevant_q = q[s_loc]
+        print np.max(self.mk), q_range[0]*relevant_q, q_range[1]*relevant_q
+        lower_bound = np.argmin(np.abs(self.mk.flatten() - q_range[0]*relevant_q))
+        upper_bound = np.argmin(np.abs(self.mk.flatten() - q_range[1]*relevant_q))
+        print 'kink_amp: s_loc: %d, self.ss_val: %.2f, self.q_profile_s: %.2f'%(s_loc, self.ss[s_loc], q[s_loc])
+        upper_bound_new = np.min([upper_bound, len(self.mk.flatten())-1])
+        print lower_bound, upper_bound, upper_bound_new
+        print 'relevant_q: %.2f, bounds: %d %d, values: %d, %d'%(relevant_q, lower_bound, upper_bound_new, self.mk.flatten()[lower_bound], self.mk.flatten()[upper_bound_new])
+        relevant_values = self.BnPEST[s_loc,lower_bound:upper_bound_new]
+        print relevant_values
+        print 'sum', np.abs(np.sum(np.abs(relevant_values)))
+        return self.mk.flatten()[lower_bound:upper_bound_new], self.ss[s_loc],relevant_values
+
+
     def plot1(self,title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):
         os.chdir(self.directory) 
         os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
         file_name = 'PROFEQ_PEST'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
+        self.q_profile = q
+        self.q_profile_s = s
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         print 'grid values :', np.max(mk_grid.flatten()), np.min(mk_grid.flatten()), np.min(ss_grid.flatten()), np.max(ss_grid.flatten())
         qn_grid, s_grid = np.meshgrid(q*n, self.s.flatten())
@@ -240,6 +270,10 @@ class data():
         dummy = tmp_cmap.name.pop(1)
         tmp_cmap = tmp_cmap.from_list(tmp_cmap.name, tmp_cmap.name)
         ss_plas_edge = np.argmin(np.abs(ss-1.0))
+
+
+        tmp_mk_range, tmp_ss, tmp_relevant_values = self.kink_amp(0.92, [2,4], n = n)
+
         if surfmn_file != None:
             import h5py
             fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1, sharey=1)
@@ -321,6 +355,8 @@ class data():
             print 'not ss_squared'
             color_ax = ax.pcolor(mk,ss,np.abs(BnPEST),cmap=tmp_cmap)
             ax.plot(mq,sq,'wo')
+            ax.plot(tmp_mk_range, tmp_mk_range*0+tmp_ss,'ko')
+            #tmp_relevant_values = self.kink_amp(0.92, [2,4])
             ax.plot(q*n,s,'w--') 
 
         if inc_phase!=0:
