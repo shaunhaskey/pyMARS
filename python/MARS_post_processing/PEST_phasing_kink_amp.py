@@ -16,13 +16,18 @@ I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
 facn = 1.0; psi = 0.92
 q_range = [2,4]; ylim = [0,10]
-phasing_range = [-180.,180.]
+#phasing_range = [-180.,180.]
+phasing_range = [0.,360.]
 phase_machine_ntor = 1
 make_animations = 0
-upper_data_tot = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/RUN_rfa_upper.p',I0EXP=I0EXP)
-lower_data_tot = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/RUN_rfa_lower.p', I0EXP=I0EXP)
-upper_data_vac = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/RUN_rfa_upper.vac',I0EXP=I0EXP)
-lower_data_vac = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/RUN_rfa_lower.vac', I0EXP=I0EXP)
+#upper_data_tot = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/RUN_rfa_upper.p',I0EXP=I0EXP)
+#lower_data_tot = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/RUN_rfa_lower.p', I0EXP=I0EXP)
+#upper_data_vac = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/RUN_rfa_upper.vac',I0EXP=I0EXP)
+#lower_data_vac = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/RUN_rfa_lower.vac', I0EXP=I0EXP)
+upper_data_tot = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_upper_lower/qmult1.000/exp1.000/marsrun/RUN_rfa_upper.p',I0EXP=I0EXP)
+lower_data_tot = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_upper_lower/qmult1.000/exp1.000/marsrun/RUN_rfa_lower.p', I0EXP=I0EXP)
+upper_data_vac = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_upper_lower/qmult1.000/exp1.000/marsrun/RUN_rfa_upper.vac',I0EXP=I0EXP)
+lower_data_vac = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_upper_lower/qmult1.000/exp1.000/marsrun/RUN_rfa_lower.vac', I0EXP=I0EXP)
 
 upper_data_tot.get_PEST(facn = facn)
 lower_data_tot.get_PEST(facn = facn)
@@ -80,6 +85,59 @@ ax[0].vlines([phasings[max_loc], phasings[min_loc]],ylim[0],ylim[1])
 ax[0].plot(phasings, amps_vac, 'bx-', label = 'Vac')
 ax[0].plot(phasings, amps_plasma, 'rx-', label = 'Plasma')
 ax[0].plot(phasings, amps_tot, 'kx-', label='Total')
+
+
+
+#single_answers
+single_phasings = range(0,360,60)
+#single_phasings = [0,120]
+single_data_vac_dict = {}
+single_data_tot_dict = {}
+
+for i in single_phasings:
+    single_data_vac_dict[str(i)] = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_%ddeg/qmult1.000/exp1.000/marsrun/RUNrfa.vac'%(i),I0EXP=I0EXP)
+    single_data_tot_dict[str(i)] = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146398_%ddeg/qmult1.000/exp1.000/marsrun/RUNrfa.p'%(i),I0EXP=I0EXP)
+    
+kink_values_vac = []; kink_values_tot = [];kink_values_plas = []
+resonant_values_vac = []
+
+for i in single_phasings:
+    single_data_vac_dict[str(i)].get_PEST(facn = facn)
+    single_data_tot_dict[str(i)].get_PEST(facn = facn)
+    mk_upper, ss_upper, relevant_tmp_vac = single_data_vac_dict[str(i)].kink_amp(psi, q_range, n = n)
+    kink_values_vac.append(np.sum(np.abs(relevant_tmp_vac)))
+    mk_upper, ss_upper, relevant_tmp_tot = single_data_tot_dict[str(i)].kink_amp(psi, q_range, n = n)
+    kink_values_tot.append(np.sum(np.abs(relevant_tmp_tot)))
+    kink_values_plas.append(np.sum(np.abs(relevant_tmp_tot-relevant_tmp_vac)))
+    
+    a, res_tmp_vac = single_data_vac_dict[str(i)].resonant_strength()
+    #vac_qn.append(np.abs(upper_vac_res + lower_vac_res*phasor))
+    resonant_values_vac.append(np.abs(res_tmp_vac))
+
+#for i in range(0, len(single_phasings)):
+#    if single_phasings[i]>phasing_range[1]:
+#        single_phasings[i] = single_phasings[i] - 360
+
+#plot_angles = np.array(single_angles)*n*-1
+if phase_machine_ntor:
+    plot_angles = (np.array(single_phasings)*-1)/2.
+else:
+    plot_angles = single_phasings
+
+for i in range(0, len(plot_angles)):
+    while (plot_angles[i]>phasing_range[1]) or (plot_angles[i]<=phasing_range[0]):
+        if plot_angles[i]>phasing_range[1]:
+            plot_angles[i] = plot_angles[i] - 360
+        elif plot_angles[i]<=phasing_range[0]:
+            plot_angles[i] = plot_angles[i] + 360
+    
+ax[0].plot(plot_angles,kink_values_tot, 'ks-')
+ax[0].plot(plot_angles,kink_values_vac, 'bs-')
+ax[0].plot(plot_angles,kink_values_plas, 'rs-')
+
+resonant_values_vac = np.array(resonant_values_vac)
+for i,j in enumerate(single_phasings):
+    ax[1].plot(plot_angles[i]*np.ones(len(resonant_values_vac[i,:])), resonant_values_vac[i,:], 'ys')
 
 ax[0].set_xlabel('Phasing (deg)')
 ax[0].set_ylabel('Kink amplitude')
