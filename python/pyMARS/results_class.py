@@ -206,6 +206,7 @@ class data():
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         qn_grid, s_grid = np.meshgrid(q*n, self.s.flatten())
         temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(q*n, s.flatten()),method='linear')
+        temp_discrete  = griddata((mk_grid.flatten(),ss_grid.flatten()),self.BnPEST.flatten(),(qn.flatten()*n, sq.flatten()),method='linear')
         #print s.shape,len(s), temp_qn.shape, len(temp_qn)
         total_integral = 0
         min_location = np.argmin(np.abs(s-min_s))
@@ -215,7 +216,7 @@ class data():
 
         #ax2.plot(temp_qn, s,'.-')
         #ax2.plot(mq*0, sq,'o')
-        return total_integral
+        return total_integral, temp_discrete
 
 
     def kink_amp(self, psi, q_range, n = 2):
