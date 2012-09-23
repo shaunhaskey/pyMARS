@@ -63,10 +63,12 @@ def coil_outputs_B(project_dict, upper_and_lower=0):
 pickle_file = open(project_name,'r')
 project_dict = pickle.load(pickle_file)
 pickle_file.close()
-
+print 'opened project_dict %d items'%(len(project_dict.keys()))
 project_dict = coil_outputs_B(project_dict, upper_and_lower = upper_and_lower)
+print 'finished calc'
 
 output_name = project_name + 'output'
 pickle_file = open(output_name,'w')
 pickle.dump(project_dict, pickle_file)
 pickle_file.close()
+print 'output file'
