@@ -226,7 +226,7 @@ def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
     BM2 = num.reshape(BM2,[Ns,Nm1],order='F')
     BM3 = num.reshape(BM3,[Ns,Nm1],order='F')
 
-    print 'BNORM ', BNORM
+    print 'BNORM used in ReadBPLASMA', BNORM
     BM1 = BM1[0:Ns,:]*BNORM
     BM2 = BM2[0:Ns,:]*BNORM
     BM3 = BM3[0:Ns,:]*BNORM
@@ -253,7 +253,7 @@ def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
         BM3new[-1,:] = BM3new[-2,:]
         BM3 = copy.deepcopy(BM3new)
 
-    return BM1, BM2, BM3,Mm
+    return BM1, BM2, BM3, Mm
 
 
 
@@ -328,7 +328,7 @@ def GetB123(BM1,BM2,BM3,R, Mm, chi, dRdchi, dZdchi):
     G22[0,:] = G22[1,:]
     Bn   = B1/num.sqrt(G22)/R
     expmchi = num.exp(num.dot(-(chi.transpose()), Mm.transpose()*1j))
-    BMn = num.dot(Bn,expmchi)*(chi[0,1]-chi[0,0])/2/num.pi
+    BMn = num.dot(Bn, expmchi)*(chi[0,1]-chi[0,0])/2./num.pi
 
     return B1,B2,B3,Bn, BMn
 
@@ -425,8 +425,8 @@ def GetUnitVec(R,Z,s,chi):
     Z1_2[:,0]=Z1_2[:,1];    Z1_2[:,-1]=Z1_2[:,-2]
     Z2_2[:,0]=Z2_2[:,1];    Z2_2[:,-1]=Z2_2[:,-2]
 
-    dRdchi = (R2_2-R1_2)/hchi/2
-    dZdchi = ((Z2_2-Z1_2)/hchi/2)
+    dRdchi = (R2_2-R1_2)/hchi/2.
+    dZdchi = ((Z2_2-Z1_2)/hchi/2.)
 
     dRdchi[0,:]=dRdchi[1,:]
     dZdchi[0,:]=dZdchi[1,:]
@@ -457,7 +457,7 @@ def get_FEEDI(file_name):
     FEEDI_1 = num.sqrt(num.sum(FEEDI_matrix[0,:]**2))
     FEEDI_2 = num.sqrt(num.sum(FEEDI_matrix[1,:]**2))
     FEEDI_float= num.max([FEEDI_1,FEEDI_2])
-    print FEEDI_float
+    print 'FEEDI :',FEEDI_float
     return FEEDI_float
 
 def calc_VNORM(FEEDI, B0EXP, I0EXP=1.0e+3 * 3./num.pi,phas=0.):

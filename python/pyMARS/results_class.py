@@ -55,7 +55,7 @@ class data():
         self.BNORM = calc_BNORM(self.FEEDI, self.R0EXP, I0EXP = self.I0EXP)
         print self.directory, self.BNORM, self.FEEDI, self.R0EXP, self.I0EXP
         file_name = 'BPLASMA'
-        self.BM1,self.BM2,self.BM3,self.Mm = ReadBPLASMA(file_name, self.BNORM, self.Ns,self.s,spline_B23=self.spline_B23)
+        self.BM1, self.BM2, self.BM3, self.Mm = ReadBPLASMA(file_name, self.BNORM, self.Ns, self.s, spline_B23=self.spline_B23)
         self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian = GetUnitVec(self.R, self.Z, self.s, self.chi)
         self.B1,self.B2,self.B3,self.Bn,self.BMn = GetB123(self.BM1, self.BM2, self.BM3, self.R, self.Mm, self.chi, self.dRdchi, self.dZdchi)
         self.Br,self.Bz,self.Bphi = MacGetBphysC(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3)
@@ -134,36 +134,32 @@ class data():
         os.chdir(self.directory) 
         os.system('ln -f -s ../../cheaserun_PEST/RMZM_F RMZM_F_PEST')
         II=np.arange(1,self.Ns1+21,dtype=int)-1
-        BnEQAC = self.Bn[II,:]
-        R_EQAC = self.R[II,:]
-        Z_EQAC = self.Z[II,:]
+        BnEQAC = copy.deepcopy(self.Bn[II,:])
+        R_EQAC = copy.deepcopy(self.R[II,:])
+        Z_EQAC = copy.deepcopy(self.Z[II,:])
         
-        Rs = R_EQAC[-1,:]
-        Zs = Z_EQAC[-1,:]
+        Rs = copy.deepcopy(R_EQAC[-1,:])
+        Zs = copy.deepcopy(Z_EQAC[-1,:])
         Rc = (np.min(Rs)+np.max(Rs))/2.
         Zc = (np.min(Zs)+np.max(Zs))/2.
         Tg = np.arctan2(Zs-Zc,Rs-Rc)
-        BnEDGE = BnEQAC[-1,:]
+        BnEDGE = copy.deepcopy(BnEQAC[-1,:])
 
         file_name = 'RMZM_F_PEST'
-        RM, ZM, Ns,Ns1,Ns2, Nm0, R0EXP, B0EXP, s = readRMZM(file_name)
-        #print self.Ns1, Ns1, self.Ns, Ns, self.Ns2, Ns2, self.Nm0, Nm0
-        #print self.R0EXP,R0EXP, self.B0EXP, B0EXP
-        #print sum(np.abs(self.s-s))
-        Nm2 = Nm0
-        R,Z =  GetRZ(RM,ZM,Nm0,Nm2,self.chi,self.phi)
-        dRds,dZds,dRdchi,dZdchi,jacobian = GetUnitVec(R,Z, s, self.chi)
+        RM, ZM, Ns, Ns1, Ns2, Nm0, R0EXP, B0EXP, s = readRMZM(file_name)
+        Nm2 = copy.deepcopy(Nm0)
+        R, Z =  GetRZ(RM, ZM, Nm0, Nm2, self.chi, self.phi)
+        dRds, dZds, dRdchi, dZdchi, jacobian = GetUnitVec(R,Z, s, self.chi)
 
         self.ss = copy.deepcopy(s[II])
-
-        R_PEST = R[II,:]
-        Z_PEST = Z[II,:]
+        R_PEST = copy.deepcopy(R[II,:])
+        Z_PEST = copy.deepcopy(Z[II,:])
 
         G22_PEST = dRdchi[II,:]**2 + dZdchi[II,:]**2
-        G22_PEST[0,:] = G22_PEST[1,:]
+        G22_PEST[0,:] = copy.deepcopy(G22_PEST[1,:])
         #seems to make sense up to here
 
-
+        #this section is to make it work in griddata
         R_Z_EQAC = np.ones([len(R_EQAC.flatten()),2],dtype='float')
         R_Z_EQAC[:,0] = R_EQAC.flatten()
         R_Z_EQAC[:,1] = Z_EQAC.flatten()
@@ -171,14 +167,16 @@ class data():
         R_Z_PEST = np.ones([len(R_EQAC.flatten()),2],dtype='float')
         R_Z_PEST[:,0] = R_PEST.flatten()
         R_Z_PEST[:,1] = Z_PEST.flatten()
+        #this section is to make it work in griddata
 
         BnPEST  = griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
         BnPEST.resize(BnEQAC.shape)
-        BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST 
+        BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST
 
         mk = np.arange(-29,29+1,dtype=int)
         mk.resize(1,len(mk))
 
+        #Fourier transform the data
         expmchi = np.exp(np.dot(-self.chi.transpose(),mk)*1j)
         BMnPEST = np.dot(BnPEST,expmchi)*(self.chi[0,1]-self.chi[0,0])/2./np.pi
 
