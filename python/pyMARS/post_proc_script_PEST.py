@@ -96,7 +96,7 @@ pickle_file = open(project_name,'r')
 project_dict = pickle.load(pickle_file)
 pickle_file.close()
 
-project_dict = coil_outputs_B(project_dict, upper_and_lower = upper_and_lower)
+project_dict = kink_resonant_response(project_dict, upper_and_lower = upper_and_lower)
 
 output_name = project_name + 'output'
 pickle_file = open(output_name,'w')

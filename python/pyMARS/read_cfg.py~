@@ -1,16 +1,17 @@
+#!/usr/bin/env Python
 
 import PythonMARS_funcs as pyMARS
 import control_funcs as cont_funcs
 import Batch_Launcher as batch_launch
 import pickle, time, os,sys
 import numpy as num
-
-
 from ConfigParser import SafeConfigParser
 import numpy as num
 
+config_filename = sys.argv[1]
 parser = SafeConfigParser()
-parser.read('config.cfg')
+parser.optionxform=str
+parser.read(config_filename)
 
 #process control
 start_from_step = int(parser.get('process_control', 'start_from_step'))
@@ -112,14 +113,21 @@ CHEASE_settings = {}
 for i,j in parser.items('CHEASE_settings'):
     CHEASE_settings[i] =j
 
+#MARS
+MARS_phasing = float(parser.get('MARS_settings', 'MARS_phasing'))
+upper_and_lower = int(parser.get('MARS_settings', 'upper_and_lower'))
 MARS_settings = {}
-for i,j in parser.items('MARS_settings'):
-    MARS_settings[i] =j
+FEEDI_string =  pyMARS.construct_FEEDI(MARS_phasing)
+print FEEDI_string
+MARS_settings['<<FEEDI>>'] = FEEDI_string
+for i,j in parser.items('MARS_settings2'):
+    print i, j
+    MARS_settings[i] = int(j)
 
-
-
-#pickup details
+print MARS_settings
+#cleaning up to save space
 MARS_rm_files = parser.get('clean_up_settings', 'MARS_rm_files')
+MARS_rm_files2 = parser.get('clean_up_settings', 'MARS_rm_files2')
 CHEASE_rm_files = parser.get('clean_up_settings', 'CHEASE_rm_files')
 CHEASE_PEST_rm_files = parser.get('clean_up_settings', 'CHEASE_PEST_rm_files')
 
@@ -349,7 +357,7 @@ if start_from_step <=7 and end_at_step>=7:
         project_dict = pyMARS.read_data(project_dir + project_name + '_post_mars_run.pickle')
 
     serial_list = project_dict['sims'].keys()
-    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, upper_and_lower = upper_and_lower, cluster_job = cluster_job)
+    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, directory = 'post_proc_tmp/', upper_and_lower = upper_and_lower, cluster_job = cluster_job)
 
     #project_dict = cont_funcs.coil_outputs_B(project_dict,serial_list)
 
@@ -358,3 +366,21 @@ if start_from_step <=7 and end_at_step>=7:
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 
 print 'completion time : %.4f mins' %((time.time()-initial_start_time)/60)
+
+
+print '####################################################################'
+print '##***************************STEP 8 - MARS PEST Post Processing **********####'
+if start_from_step <=8 and end_at_step>=8:
+    if start_from_step == 7:
+        print 'reading pickle_file'
+        project_dict = pyMARS.read_data(project_dir + project_name + '_post_processing.pickle')
+
+    #serial_list = project_dict['sims'].keys()
+    post_proc_script = '/u/haskeysr/code/NAMP_analysis/python/pyMARS/post_proc_script_PEST.py'
+    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, directory = 'post_proc_tmp2/', upper_and_lower = upper_and_lower, cluster_job = cluster_job)
+
+    #project_dict = cont_funcs.coil_outputs_B(project_dict,serial_list)
+
+    pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_processing_PEST.pickle')
+
+    print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
