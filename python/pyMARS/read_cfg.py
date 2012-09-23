@@ -357,7 +357,7 @@ if start_from_step <=7 and end_at_step>=7:
         project_dict = pyMARS.read_data(project_dir + project_name + '_post_mars_run.pickle')
 
     serial_list = project_dict['sims'].keys()
-    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, upper_and_lower = upper_and_lower, cluster_job = cluster_job)
+    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, directory = 'post_proc_tmp/', upper_and_lower = upper_and_lower, cluster_job = cluster_job)
 
     #project_dict = cont_funcs.coil_outputs_B(project_dict,serial_list)
 

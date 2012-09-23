@@ -429,7 +429,7 @@ def run_mars_function(project_dict,job_num_filename, MARS_execution_script,rm_fi
 
 ###################################################################
 #step8
-def post_processing(master_pickle, post_proc_workers, python_file, upper_and_lower = 0, cluster_job = 0):
+def post_processing(master_pickle, post_proc_workers, python_file, directory = 'post_proc_tmp/', upper_and_lower = 0, cluster_job = 0):
     start_time = time.time()
     pickle_file_list = []; worker_serial_list = []
     serial_list = master_pickle['sims'].keys()
@@ -457,16 +457,16 @@ def post_processing(master_pickle, post_proc_workers, python_file, upper_and_low
         for jjj in worker_serial_list[i]:
             tmp_pickle['sims'][jjj]=copy.deepcopy(master_pickle['sims'][jjj])
 
-        pickle_file_name = master_pickle['details']['base_dir']+'post_proc_tmp/tmp_'+str(i)+'.pickle'
+        pickle_file_name = master_pickle['details']['base_dir']+directory+'/tmp_'+str(i)+'.pickle'
         pickle.dump(tmp_pickle, open(pickle_file_name,'w'))
 
         job_string = '#!/bin/bash\n#$ -N '+ 'PostProc'+str(i)+'\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\nexport PATH=$PATH:/f/python/linux64/bin\n'
-        log_file_name = master_pickle['details']['base_dir']+'post_proc_tmp/' + 'log_test' + str(i) + '.log'
+        log_file_name = master_pickle['details']['base_dir']+directory + '/log_test' + str(i) + '.log'
         #execute_command = python_file + ' ' + pickle_file_name + ' '  ' > ' + log_file_name + '\n'
         execute_command = '%s %s %d > %s\n'%(python_file,pickle_file_name, upper_and_lower,log_file_name)
         job_string += execute_command
 
-        job_name = master_pickle['details']['base_dir'] + 'post_proc_tmp/step9_'+str(i)+'.job'
+        job_name = master_pickle['details']['base_dir'] + directory+'/step9_'+str(i)+'.job'
         job_file = open(job_name,'w')
         job_file.write(job_string)
         job_file.close()
