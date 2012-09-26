@@ -43,7 +43,7 @@ d = data('/home/srh112/NAMP_datafiles/mars/shot146398_0_MARS_SURFMN/qmult1.000/e
 #c.plot1(inc_phase=0,clim_value=[0,1.2], surfmn_file = None)#'/home/srh112/code/python/NAMP_analysis/spectral_info.h5',ss_squared = 1)
 
 d.get_PEST(facn = facn)
-d.plot1(inc_phase=0,clim_value=[0,1.2], surfmn_file = '/home/srh112/NAMP_datafiles/spectral_info.h5', ss_squared = 0)
+d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/NAMP_datafiles/spectral_info.h5', ss_squared = 0)
 
 
 

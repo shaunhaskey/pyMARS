@@ -352,7 +352,7 @@ class data():
             ax.plot(q*n,s**2,'w--') 
         else:
             print 'not ss_squared'
-            color_ax = ax.pcolor(mk,ss,np.abs(BnPEST),cmap=tmp_cmap)
+            color_ax = ax.pcolor(mk,ss,np.abs(BnPEST),cmap='hot')#tmp_cmap)
             ax.plot(mq,sq,'wo')
             ax.plot(tmp_mk_range, tmp_mk_range*0+tmp_ss,'ko')
             #tmp_relevant_values = self.kink_amp(0.92, [2,4])

@@ -166,6 +166,38 @@ Bx, By, Bz = biot_funcs.biot_calc(coil_point_list, xyz_X, xyz_Y, xyz_Z, coil_cur
 print 'biot total time = ', time.time() - biot_start_time
 print 'start plot'
 
+
+
+
+
+'''
+
+        pool_size = multiprocessing.cpu_count()
+        pool = multiprocessing.Pool(processes=pool_size)
+        #xyz_X_list = []; xyz_Y_list = []; xyz_Z_list = []; dist_thresh_list=[]
+        #for i in range(0,len(coil_point_list)):
+        #    xyz_X_list.append(xyz_X); xyz_Y_list.append(xyz_Y); xyz_Z_list.append(xyz_Z)
+        #    dist_thresh_list.append(dist_thresh)
+        print 'creating pool map'
+        B_list = pool.map(basic_calculation_wrapper, itertools.izip(coil_point_list, itertools.repeat(xyz_X), 
+                                                     itertools.repeat(xyz_Y), itertools.repeat(xyz_Z), 
+                                                     coil_currents, itertools.repeat(dist_thresh)))
+        print B_list
+        print len(B_list)
+        #B_list = pool.map(basic_calculation, coil_point_list, xyz_X_list, xyz_Y_list, xyz_Z_list, coil_currents, dist_thresh_list)
+        #B_list = map(basic_calculation, coil_point_list, xyz_X_list, xyz_Y_list, xyz_Z_list, coil_currents, dist_thresh_list)
+        print 'closing pool'
+        pool.close() # no more tasks
+        print 'waiting for pool to finish'
+        pool.join()  # wrap up current tasks
+        print 'pool finished'
+        #basic_calculation(coil_points, xyz_X, xyz_Y, xyz_Z, coil_currents, dist_thresh)
+
+
+'''
+
+
+
 '''
 fig1 = pt.figure()
 ax1 = fig1.add_subplot(111)

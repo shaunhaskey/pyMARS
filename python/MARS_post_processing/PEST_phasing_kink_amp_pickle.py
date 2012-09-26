@@ -10,11 +10,14 @@ from RZfuncs import I0EXP_calc
 import numpy as np
 import matplotlib.pyplot as pt
 import PythonMARS_funcs as pyMARS
+from scipy.interpolate import griddata
+import pickle
+file_name = '/home/srh112/NAMP_datafiles/mars/shot146382_scan/shot146382_scan_post_processing_PEST.pickle'
 
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
-facn = 1.0; psi = np.sqrt(0.92)
+facn = 1.0; psi = 0.92
 q_range = [2,4]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
@@ -29,6 +32,95 @@ plot_type = 'best_harmonic'
 #plot_type = 'normalised'
 #plot_type = 'normalised_average'
 #plot_type = 'standard_average'
+
+
+project_dict = pickle.load(file(file_name,'r'))
+phasing = 0.
+q95_list = []; Bn_Li_list = []
+phase_machine_ntor = 0
+amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]
+for i in project_dict['sims'].keys():
+    q95_list.append(project_dict['sims'][i]['Q95'])
+    Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
+
+    relevant_values_upper_tot = project_dict['sims'][i]['total_kink_response_upper']
+    relevant_values_lower_tot = project_dict['sims'][i]['total_kink_response_lower']
+    relevant_values_upper_vac = project_dict['sims'][i]['vacuum_kink_response_upper']
+    relevant_values_lower_vac = project_dict['sims'][i]['vacuum_kink_response_lower']
+
+    upper_tot_res = project_dict['sims'][i]['total_resonant_response_upper']
+    lower_tot_res = project_dict['sims'][i]['total_resonant_response_lower']
+    upper_vac_res = project_dict['sims'][i]['vacuum_resonant_response_upper']
+    lower_vac_res = project_dict['sims'][i]['vacuum_resonant_response_lower']
+
+    phasing = phasing/180.*np.pi
+    if phase_machine_ntor:
+        phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
+    else:
+        phasor = (np.cos(phasing)+1j*np.sin(phasing))
+
+    amps_vac_comp.append(relevant_values_upper_vac + relevant_values_lower_vac*phasor)
+    amps_tot_comp.append(relevant_values_upper_tot + relevant_values_lower_tot*phasor)
+    amps_plas_comp.append(relevant_values_upper_tot-relevant_values_upper_vac + (relevant_values_lower_tot-relevant_values_lower_vac)*phasor)
+
+plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
+for i in range(0,len(amps_vac_comp)):
+    plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
+    plot_quantity_plas.append(np.sum(np.abs(amps_plas_comp[i])**2)/len(amps_vac_comp[i]))
+    plot_quantity_tot.append(np.sum(np.abs(amps_tot_comp[i])**2)/len(amps_vac_comp[i]))
+
+xnew = np.linspace(2.5,5.5,50)
+ynew = np.linspace(2.,3.8,50)
+xnew_grid, ynew_grid = np.meshgrid(xnew,ynew)
+q95_Bn_array = np.zeros((len(q95_list),2),dtype=float)
+q95_Bn_array[:,0] = q95_list[:]
+q95_Bn_array[:,1] = Bn_Li_list[:]
+
+q95_Bn_new = np.zeros((len(xnew),2),dtype=float)
+q95_Bn_new[:,0] = xnew[:]
+q95_Bn_new[:,1] = ynew[:]
+
+plas_data = griddata(q95_Bn_array, plot_quantity_plas, (xnew_grid, ynew_grid))
+vac_data = griddata(q95_Bn_array, plot_quantity_vac, (xnew_grid, ynew_grid))
+tot_data = griddata(q95_Bn_array, plot_quantity_tot, (xnew_grid, ynew_grid))
+
+fig,ax = pt.subplots()
+color_fig = ax.pcolor(xnew, ynew, plas_data)
+color_fig.set_clim([0,5])
+ax.set_title('plasma data')
+fig.canvas.draw(); fig.show()
+
+fig,ax = pt.subplots()
+color_fig = ax.pcolor(xnew, ynew, vac_data)
+color_fig.set_clim([0,5])
+ax.set_title('vacuum data')
+fig.canvas.draw(); fig.show()
+
+fig,ax = pt.subplots()
+color_fig = ax.pcolor(xnew, ynew, tot_data)
+color_fig.set_clim([0,5])
+ax.set_title('total data')
+fig.canvas.draw(); fig.show()
+
+'''
+if plot_type == 'best_harmonic':
+    plot_quantity_vac = np.abs(amps_vac_comp)[:,best_harmonic]
+    plot_quantity_plas = np.abs(amps_plasma_comp)[:,best_harmonic]
+    plot_quantity_tot = np.abs(amps_tot_comp)[:,best_harmonic]
+elif plot_type == 'normalised':
+    ax[0].plot(phasings, np.sqrt(np.sum(np.abs(amps_vac_comp)**2,axis=1)), 'b-', label = 'Vacuum')
+    ax[0].plot(phasings, np.sqrt(np.sum(np.abs(amps_plasma_comp)**2,axis=1)), 'r-', label = 'Plasma')
+    ax[0].plot(phasings, np.sqrt(np.sum(np.abs(amps_tot_comp)**2,axis=1)), 'k-', label='Total')
+elif plot_type == 'normalised_average':
+    ax[0].plot(phasings, np.sqrt(np.sum(np.abs(amps_vac_comp)**2,axis=1))/number_points, 'b-', label = 'Vacuum')
+    ax[0].plot(phasings, np.sqrt(np.sum(np.abs(amps_plasma_comp)**2,axis=1))/number_points, 'r-', label = 'Plasma')
+    ax[0].plot(phasings, np.sqrt(np.sum(np.abs(amps_tot_comp)**2,axis=1))/number_points, 'k-', label='Total')
+elif plot_type == 'standard_average':
+    ax[0].plot(phasings, np.sum(np.abs(amps_vac_comp),axis=1)/number_points, 'b-', label = 'Vacuum')
+    ax[0].plot(phasings, np.sum(np.abs(amps_plasma_comp),axis=1)/number_points, 'r-', label = 'Plasma')
+    ax[0].plot(phasings, np.sum(np.abs(amps_tot_comp),axis=1)/number_points, 'k-', label='Total')
+
+
 
 #using a few different ones
 #-sim
@@ -276,3 +368,5 @@ if make_animations:
         fig_anim.savefig('/home/srh112/code/NAMP_analysis/python/MARS_post_processing/plas_tmp_%d.png'%(phasing/np.pi*180.))
         pt.close()
 
+
+'''
