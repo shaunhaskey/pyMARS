@@ -369,18 +369,20 @@ print 'completion time : %.4f mins' %((time.time()-initial_start_time)/60)
 
 
 print '####################################################################'
-print '##***************************STEP 8 - MARS PEST Post Processing **********####'
+print '##**************** STEP 8 - MARS PEST Post Processing **********####'
 if start_from_step <=8 and end_at_step>=8:
-    if start_from_step == 7:
+    if start_from_step == 8:
         print 'reading pickle_file'
+        tmp_filename = project_dir + project_name + '_post_processing.pickle'
+        print tmp_filename
         project_dict = pyMARS.read_data(project_dir + project_name + '_post_processing.pickle')
 
     #serial_list = project_dict['sims'].keys()
     post_proc_script = '/u/haskeysr/code/NAMP_analysis/python/pyMARS/post_proc_script_PEST.py'
-    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, directory = 'post_proc_tmp2/', upper_and_lower = upper_and_lower, cluster_job = cluster_job)
+    working_directory = 'post_proc_tmp2/'
+    os.system('mkdir ' + project_dir + working_directory)
+    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, directory = working_directory, upper_and_lower = upper_and_lower, cluster_job = cluster_job)
 
     #project_dict = cont_funcs.coil_outputs_B(project_dict,serial_list)
-
     pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_processing_PEST.pickle')
-
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)

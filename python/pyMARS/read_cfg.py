@@ -371,6 +371,7 @@ print 'completion time : %.4f mins' %((time.time()-initial_start_time)/60)
 print '####################################################################'
 print '##**************** STEP 8 - MARS PEST Post Processing **********####'
 if start_from_step <=8 and end_at_step>=8:
+    overall_start = time.time()
     if start_from_step == 8:
         print 'reading pickle_file'
         tmp_filename = project_dir + project_name + '_post_processing.pickle'

@@ -62,6 +62,8 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
                 project_dict['sims'][i]['responses'][current_label]['vacuum_kink_response_lower'] = copy.deepcopy(relevant_values_lower_vac)
                 project_dict['sims'][i]['responses'][current_label]['total_kink_response_upper'] = copy.deepcopy(relevant_values_upper_tot)
                 project_dict['sims'][i]['responses'][current_label]['total_kink_response_lower'] = copy.deepcopy(relevant_values_lower_tot)
+                project_dict['sims'][i]['responses'][current_label]['mk'] = copy.deepcopy(mk_upper)
+                project_dict['sims'][i]['responses'][current_label]['ss'] = copy.deepcopy(ss_upper)
 
 
 

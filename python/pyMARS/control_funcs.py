@@ -448,8 +448,8 @@ def post_processing(master_pickle, post_proc_workers, python_file, directory = '
     for i in range(0, len(serial_list)):
         worker_serial_list[i%post_proc_workers].append(serial_list[i])
 
-    os.system('rm -r '+master_pickle['details']['base_dir']+'post_proc_tmp/') #remove temp directory contents
-    os.system('mkdir '+master_pickle['details']['base_dir']+'post_proc_tmp/') #remove temp directory contents
+    os.system('rm -r '+master_pickle['details']['base_dir']+directory) #remove temp directory contents
+    os.system('mkdir '+master_pickle['details']['base_dir']+directory) #remove temp directory contents
 
     #setup the serial numbers for each worker
     for i in range(0,post_proc_workers):

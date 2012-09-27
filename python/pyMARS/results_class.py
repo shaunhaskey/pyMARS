@@ -217,6 +217,11 @@ class data():
 
         #ax2.plot(temp_qn, s,'.-')
         #ax2.plot(mq*0, sq,'o')
+        self.qn = qn
+        self.mq = mq
+        self.sq = sq
+        self.q_profile = q
+        self.q_profile_s = s
         return total_integral, temp_discrete
 
 
