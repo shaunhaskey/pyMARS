@@ -12,13 +12,13 @@ import matplotlib.pyplot as pt
 import PythonMARS_funcs as pyMARS
 from scipy.interpolate import griddata
 import pickle
-file_name = '/home/srh112/NAMP_datafiles/mars/shot146382_scan/shot146382_scan_post_processing_PEST.pickle'
-
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot146382_scan/shot146382_scan_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
 facn = 1.0; psi = 0.92
-q_range = [2,4]; ylim = [0,1.4]
+q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
 phasing_range = [-90.,90.]
@@ -43,15 +43,15 @@ for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
 
-    relevant_values_upper_tot = project_dict['sims'][i]['total_kink_response_upper']
-    relevant_values_lower_tot = project_dict['sims'][i]['total_kink_response_lower']
-    relevant_values_upper_vac = project_dict['sims'][i]['vacuum_kink_response_upper']
-    relevant_values_lower_vac = project_dict['sims'][i]['vacuum_kink_response_lower']
+    relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
+    relevant_values_lower_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_lower']
+    relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
+    relevant_values_lower_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_lower']
 
-    upper_tot_res = project_dict['sims'][i]['total_resonant_response_upper']
-    lower_tot_res = project_dict['sims'][i]['total_resonant_response_lower']
-    upper_vac_res = project_dict['sims'][i]['vacuum_resonant_response_upper']
-    lower_vac_res = project_dict['sims'][i]['vacuum_resonant_response_lower']
+    upper_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_upper']
+    lower_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_lower']
+    upper_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_upper']
+    lower_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_lower']
 
     phasing = phasing/180.*np.pi
     if phase_machine_ntor:
@@ -92,7 +92,7 @@ fig.canvas.draw(); fig.show()
 
 fig,ax = pt.subplots()
 color_fig = ax.pcolor(xnew, ynew, vac_data)
-color_fig.set_clim([0,5])
+#color_fig.set_clim([0,5])
 ax.set_title('vacuum data')
 fig.canvas.draw(); fig.show()
 
