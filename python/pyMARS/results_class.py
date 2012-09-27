@@ -43,9 +43,11 @@ class data():
         self.phi = np.linspace(0,2.*np.pi,self.Nchi)
         self.phi.resize(len(self.phi),1)
 
-        file_name = 'RMZM_F'
-        if self.link_RMZM ==1:
-            os.system('ln -f -s ../../cheaserun/RMZM_F RMZM_F')
+        #file_name = 'RMZM_F'
+        #if self.link_RMZM ==1:
+        #    os.system('ln -f -s ../../cheaserun/RMZM_F RMZM_F')
+
+        file_name = '../../cheaserun/RMZM_F'
         self.RM, self.ZM, self.Ns, self.Ns1, self.Ns2, self.Nm0, self.R0EXP, self.B0EXP, self.s = readRMZM(file_name)
         print self.Ns, self.Ns1, self.Ns2
         #print 'R0EXP', self.R0EXP
@@ -67,7 +69,6 @@ class data():
         self.VNORM = calc_VNORM(self.FEEDI, self.B0EXP, I0EXP = self.I0EXP)
         self.VM1, self.VM2, self.VM3, self.DPSIDS, self.T = ReadVPLASMA('VPLASMA',self.Ns, self.Ns1, self.s, VNORM=self.VNORM)
         self.V1,self.V2,self.V3,self.Vn, self.V1m = GetV123(self.VM1,self.VM2,self.VM3,self.R, self.chi, self.dRds, self.dZds, self.dRdchi, self.dZdchi, self.jacobian, self.Mm, self.Nchi, self.s, self.Ns1, self.DPSIDS, self.T)
-        print 'HEELLLLO'
         self.Vr, self.Vz, self.Vphi = MacGetVphys(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.V1,self.V2,self.V3, self.Ns1)
 
     def plot_Bn(self, plot_quantity, axis, start_surface = 0, end_surface = 300, skip = 1,cmap='spectral', wall_grid = 23, plot_coils_switch=0, plot_boundaries = 0):
@@ -132,7 +133,7 @@ class data():
 
     def get_PEST(self, facn = 3.1416/2):
         os.chdir(self.directory) 
-        os.system('ln -f -s ../../cheaserun_PEST/RMZM_F RMZM_F_PEST')
+        #os.system('ln -f -s ../../cheaserun_PEST/RMZM_F RMZM_F_PEST')
         II=np.arange(1,self.Ns1+21,dtype=int)-1
         BnEQAC = copy.deepcopy(self.Bn[II,:])
         R_EQAC = copy.deepcopy(self.R[II,:])
@@ -145,7 +146,8 @@ class data():
         Tg = np.arctan2(Zs-Zc,Rs-Rc)
         BnEDGE = copy.deepcopy(BnEQAC[-1,:])
 
-        file_name = 'RMZM_F_PEST'
+        file_name = '../../cheaserun_PEST/RMZM_F'
+        #file_name = 'RMZM_F_PEST'
         RM, ZM, Ns, Ns1, Ns2, Nm0, R0EXP, B0EXP, s = readRMZM(file_name)
         Nm2 = copy.deepcopy(Nm0)
         R, Z =  GetRZ(RM, ZM, Nm0, Nm2, self.chi, self.phi)
@@ -197,8 +199,9 @@ class data():
 
     def resonant_strength(self, min_s = 0, power = 1):
         os.chdir(self.directory) 
-        os.system('ln -sf PROFEQ.OUT PROFEQ_PEST')
-        file_name = 'PROFEQ_PEST'
+        #os.system('ln -sf PROFEQ.OUT PROFEQ_PEST')
+        #file_name = 'PROFEQ_PEST'
+        file_name = 'PROFEQ.OUT'
         n = 2
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=2)
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
@@ -222,8 +225,9 @@ class data():
         #self.q_profile_s
         #self.mk, self.ss, self.BnPEST
         os.chdir(self.directory) 
-        os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
-        file_name = 'PROFEQ_PEST'
+        #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
+        #file_name = 'PROFEQ_PEST'
+        file_name = 'PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         self.qn = qn
         self.sq = sq
@@ -247,8 +251,9 @@ class data():
 
     def plot1(self,title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):
         os.chdir(self.directory) 
-        os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
-        file_name = 'PROFEQ_PEST'
+        #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
+        #file_name = 'PROFEQ_PEST'
+        file_name = 'PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         self.q_profile = q
         self.q_profile_s = s
