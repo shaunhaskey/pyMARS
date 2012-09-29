@@ -200,6 +200,16 @@ if start_from_step == 1:
     overall_start = time.time()
     project_dict['sims']={}
     project_dict['details'] = cont_funcs.generate_master_dir(project_dict['details'],project_dict)
+
+    if multiple_times == 1:
+        time_list, gfile_list = cont_funcs.find_relevant_efit_files(project_dict['details']['efit_master'], project_dict['details']['profiles_master'])
+        print 'efit times :', time_list
+        project_dict['details']['multiple_efit'] = []
+        for i in time_list:
+            project_dict['details']['multiple_efit'].append(project_dict['details']['efit_dir'] + '/' + str(i))
+            os.mkdir(project_dict['details']['multiple_efit'][-])
+
+'''            
     os.system('cp ' + project_dict['details']['efit_master'] + '* ' + project_dict['details']['efit_dir'])
     dir_list = os.listdir(project_dict['details']['efit_dir'])
 
@@ -387,3 +397,4 @@ if start_from_step <=8 and end_at_step>=8:
     #project_dict = cont_funcs.coil_outputs_B(project_dict,serial_list)
     pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_processing_PEST.pickle')
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
+'''

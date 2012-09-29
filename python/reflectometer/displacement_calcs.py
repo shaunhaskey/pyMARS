@@ -24,10 +24,7 @@ I_coil_freq = 10.
 shot = 146398; start_time = 3200; end_time = 3620
 #start_time = 3010; end_time = 3980
 #start_time = 3010; end_time = 3970
-shot = 146380; start_time = 2400; end_time = 3200
-shot = 146382; start_time = 2400; end_time = 5100
-shot = 146386; start_time = 2500; end_time = 4900
-shot = 146388; start_time = 2980; end_time = 5100
+
 shot = 146392; start_time = 2990; end_time = 4700
 shot = 146397; start_time = 3030; end_time = 4800
 #shot = 146398; start_time = 3200; end_time = 3620

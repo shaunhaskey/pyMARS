@@ -12,12 +12,13 @@ import matplotlib.pyplot as pt
 import PythonMARS_funcs as pyMARS
 from scipy.interpolate import griddata
 import pickle
+import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146382_scan/shot146382_scan_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
-facn = 1.0; psi = 0.92
+facn = 1.0; psi = 0.96
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
@@ -33,27 +34,27 @@ plot_type = 'best_harmonic'
 #plot_type = 'normalised_average'
 #plot_type = 'standard_average'
 
-
 project_dict = pickle.load(file(file_name,'r'))
 phasing = 0.
+#phasing = np.arange(0.,360.,1)
+print phasing
+phasing = phasing/180.*np.pi
+print phasing
 q95_list = []; Bn_Li_list = []
 phase_machine_ntor = 0
-amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]
+amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
-
     relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
     relevant_values_lower_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_lower']
     relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
     relevant_values_lower_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_lower']
-
+    mk_list.append(project_dict['sims'][i]['responses'][str(psi)]['mk'])
     upper_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_upper']
     lower_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_lower']
     upper_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_upper']
     lower_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_lower']
-
-    phasing = phasing/180.*np.pi
     if phase_machine_ntor:
         phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
     else:
@@ -63,14 +64,32 @@ for i in project_dict['sims'].keys():
     amps_tot_comp.append(relevant_values_upper_tot + relevant_values_lower_tot*phasor)
     amps_plas_comp.append(relevant_values_upper_tot-relevant_values_upper_vac + (relevant_values_lower_tot-relevant_values_lower_vac)*phasor)
 
-plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
-for i in range(0,len(amps_vac_comp)):
-    plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
-    plot_quantity_plas.append(np.sum(np.abs(amps_plas_comp[i])**2)/len(amps_vac_comp[i]))
-    plot_quantity_tot.append(np.sum(np.abs(amps_tot_comp[i])**2)/len(amps_vac_comp[i]))
 
-xnew = np.linspace(2.5,5.5,50)
-ynew = np.linspace(2.,3.8,50)
+
+
+plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
+plot_quantity = 'max'
+max_loc_list = []
+mode_list = []
+for i in range(0,len(amps_vac_comp)):
+    if plot_quantity == 'average':
+        plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
+        plot_quantity_plas.append(np.sum(np.abs(amps_plas_comp[i])**2)/len(amps_vac_comp[i]))
+        plot_quantity_tot.append(np.sum(np.abs(amps_tot_comp[i])**2)/len(amps_vac_comp[i]))
+    elif plot_quantity == 'max':
+        
+        max_loc = np.argmax(np.abs(amps_plas_comp[i]))
+        max_loc_list.append(max_loc)
+        mode_list.append(mk_list[i][max_loc])
+        plot_quantity_vac.append(np.abs(amps_vac_comp[i][max_loc]))
+        plot_quantity_plas.append(np.abs(amps_plas_comp[i][max_loc]))
+        plot_quantity_tot.append(np.abs(amps_tot_comp[i][max_loc]))
+
+        
+
+
+xnew = np.linspace(2.,7.,200)
+ynew = np.linspace(0.75,3.5,200)
 xnew_grid, ynew_grid = np.meshgrid(xnew,ynew)
 q95_Bn_array = np.zeros((len(q95_list),2),dtype=float)
 q95_Bn_array[:,0] = q95_list[:]
@@ -80,27 +99,91 @@ q95_Bn_new = np.zeros((len(xnew),2),dtype=float)
 q95_Bn_new[:,0] = xnew[:]
 q95_Bn_new[:,1] = ynew[:]
 
-plas_data = griddata(q95_Bn_array, plot_quantity_plas, (xnew_grid, ynew_grid))
-vac_data = griddata(q95_Bn_array, plot_quantity_vac, (xnew_grid, ynew_grid))
-tot_data = griddata(q95_Bn_array, plot_quantity_tot, (xnew_grid, ynew_grid))
+plas_data = griddata(q95_Bn_array, plot_quantity_plas, (xnew_grid, ynew_grid),method = 'cubic')
+vac_data = griddata(q95_Bn_array, plot_quantity_vac, (xnew_grid, ynew_grid), method = 'cubic')
+tot_data = griddata(q95_Bn_array, plot_quantity_tot, (xnew_grid, ynew_grid), method = 'cubic')
+mode_data = griddata(q95_Bn_array, mode_list, (xnew_grid, ynew_grid), method = 'cubic')
 
-fig,ax = pt.subplots()
-color_fig = ax.pcolor(xnew, ynew, plas_data)
-color_fig.set_clim([0,5])
-ax.set_title('plasma data')
-fig.canvas.draw(); fig.show()
 
-fig,ax = pt.subplots()
-color_fig = ax.pcolor(xnew, ynew, vac_data)
-#color_fig.set_clim([0,5])
-ax.set_title('vacuum data')
-fig.canvas.draw(); fig.show()
+for interp_meth in ['linear', 'cubic']:
+    q95_single = np.linspace(3.,5.5,1000)
+    Bn_Li_value = 1.83
+    plas_data_single = griddata(q95_Bn_array, plot_quantity_plas, (q95_single, q95_single*0.+Bn_Li_value),method = interp_meth)
+    vac_data_single = griddata(q95_Bn_array, plot_quantity_vac, (q95_single, q95_single*0.+Bn_Li_value), method = interp_meth)
+    tot_data_single = griddata(q95_Bn_array, plot_quantity_tot, (q95_single, q95_single*0.+Bn_Li_value), method = interp_meth)
+    mode_data_single = griddata(q95_Bn_array, mode_list, (q95_single, q95_single*0.+Bn_Li_value), method = interp_meth)
+
+    fig,ax = pt.subplots()
+    ax.plot(q95_single, plas_data_single, '.-', label='plas')
+    ax.plot(q95_single, vac_data_single, '.-', label='vac')
+    ax.plot(q95_single, tot_data_single, '.-', label='tot')
+    ax.plot(q95_single, mode_data_single, '.-', label='m')
+    ax.legend(loc='best')
+    ax.set_title('Bn_Li:%.2f, %s interpolation, sqrt(psi)=%.2f'%(Bn_Li_value,interp_meth,psi))
+    ax.set_xlabel('q95')
+    ax.set_ylim([0,14])
+    ax.set_ylabel('amplitude or mode number')
+    fig.suptitle(file_name,fontsize=8)
+    fig.canvas.draw(); fig.show()
+
 
 fig,ax = pt.subplots()
 color_fig = ax.pcolor(xnew, ynew, tot_data)
-color_fig.set_clim([0,5])
+if plot_quantity=='average':
+    color_fig.set_clim([0,7])
+elif plot_quantity=='max':
+    color_fig.set_clim([0,7])
+
 ax.set_title('total data')
+fig.suptitle(file_name,fontsize=8)
 fig.canvas.draw(); fig.show()
+
+fig,ax = pt.subplots()
+color_fig = ax.pcolor(xnew, ynew, np.ma.array(mode_data, mask=np.isnan(mode_data)))
+color_fig.set_clim([5,15])
+pt.colorbar(color_fig, ax=ax)
+ax.plot(q95_list, Bn_Li_list,'k.')
+ax.set_title('Max mode number, sqrt(psi)=%.2f'%(psi))
+ax.set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+ax.set_xlabel(r'$q_{95}$', fontsize = 14)
+fig.suptitle(file_name,fontsize=8)
+fig.canvas.draw(); fig.show()
+
+
+color_map = 'jet'
+fig,ax = pt.subplots(nrows = 2,sharex = 1, sharey = 1)
+color_fig_plas = ax[0].pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map)#, cmap = cmap)
+#color_fig = ax[0].pcolor(xnew, ynew, plas_data)
+pt.colorbar(color_fig_plas, ax = ax[0])
+if plot_quantity=='average':
+    color_fig_plas.set_clim([0,7])
+elif plot_quantity=='max':
+    color_fig_plas.set_clim([0,7])
+ax[0].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+ax[0].set_title('Plasma, sqrt(psi)=%.2f'%(psi))
+ax[0].plot(q95_list, Bn_Li_list,'k.')
+#fig.canvas.draw(); fig.show()
+
+#fig,ax = pt.subplots()
+#import matplotlib.cm as cm
+#cmap = cm.jet
+#cmap.set_bad('w',1.)
+
+color_fig_vac = ax[1].pcolor(xnew, ynew, np.ma.array(vac_data, mask=np.isnan(vac_data)),cmap=color_map)#, cmap = cmap)
+if plot_quantity=='average':
+    color_fig_vac.set_clim([0,0.2])
+elif plot_quantity=='max':
+    color_fig_vac.set_clim([0,0.5])
+
+pt.colorbar(color_fig_vac, ax = ax[1])
+ax[1].set_title('Vacuum, sqrt(psi)=%.2f'%(psi))
+ax[1].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+ax[1].set_xlabel(r'$q_{95}$', fontsize = 14)
+ax[1].plot(q95_list, Bn_Li_list,'k.')
+#ax[1].set_ylim([2,3])
+fig.suptitle(file_name,fontsize=8)
+fig.canvas.draw(); fig.show()
+
 
 '''
 if plot_type == 'best_harmonic':

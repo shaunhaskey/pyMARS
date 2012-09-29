@@ -21,6 +21,23 @@ def generate_master_dir(master, project_dict):
 
 
 
+def find_relevant_efit_files(efit_directory, profile_directory):
+    directory_listing = os.listdir(efit_directory)
+    print directory_listing
+    time_list = []
+    gfile_list = []
+    for i in directory_listing:
+        if i[0]=='g' and i.find('.') == 7:
+            time_list.append(int(i.split('.')[1]))
+            gfile_list.append(i)
+        else:
+    for i in gfile_list:
+        pass
+    #Make sure all the files we want exist!
+
+    return time_list, gfile_list
+
+
 
 ######################################################
 ############## CORSICA FUNCTIONS ###############
