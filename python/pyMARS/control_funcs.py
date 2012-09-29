@@ -30,7 +30,6 @@ def find_relevant_efit_files(efit_directory, profile_directory):
         if i[0]=='g' and i.find('.') == 7:
             time_list.append(int(i.split('.')[1]))
             gfile_list.append(i)
-        else:
     for i in gfile_list:
         pass
     #Make sure all the files we want exist!
@@ -62,7 +61,7 @@ def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
 
     #make all the changes
     for i in settings.keys():
-        print i, settings[i]
+        #print i, settings[i]
         template_text = template_text.replace(i,str(settings[i]))
 
     template_file = open('sspqi_sh_this_dir.bas','w')
@@ -76,6 +75,7 @@ def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1):
     for input_data in input_list:#len(list)):
         running_dir = base_dir + input_data[0]
         script += 'cd ' + running_dir + '\n'
+        script += 'pwd\n'
         command = '/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt > caltrans_out.log'
         script += 'sleep %d\n'%(sleep_time)
         script += command + '\n'
@@ -138,6 +138,7 @@ def corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers
     #os.system('rm -r ' +corsica_base_dir)
 
 
+
 def corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1):
     worker_list = []
     proportion = int(round(len(corsica_list)/workers))
@@ -159,6 +160,15 @@ def corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1)
         print 'copying files across'
         os.system('cp ' + corsica_base_dir + i[0] + '/EXPEQ* stab_setup* ' + project_dict['details']['efit_dir'])
     #os.system('rm -r ' +corsica_base_dir)
+
+
+def corsica_multiple_efits(efit_time, project_dict, corsica_base_dir):
+    script_file = 'corsica_script'+str(efit_time)+'.sh'
+    run_corsica_file(corsica_base_dir, [[efit_time]], script_file, sleep_time = 1)
+    os.system('source ' + corsica_base_dir + script_file)
+    os.system('cp ' + corsica_base_dir + '/'+str(efit_time) + '/EXPEQ* ' + project_dict['details']['efit_dir']+'/'+efit_time+'/')
+    os.system('cp ' + corsica_base_dir + '/'+str(efit_time) + '/stab_setup_results.dat ' + project_dict['details']['efit_dir']+'/'+efit_time+'/')
+
 
 def corsica_qmult_pmult():
     p_list = []
