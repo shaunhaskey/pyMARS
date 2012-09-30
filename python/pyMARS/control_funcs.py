@@ -251,11 +251,15 @@ def remove_certain_values(project_dict, q95_range, Bn_Div_Li_range, filter_WTOTN
     return project_dict
 
 
-def generate_directories_func(project_dict, base_dir):
+def generate_directories_func(project_dict, base_dir, multiple_efits = 0):
+    print multiple_efits
     for i in project_dict['sims'].keys():
         print 'generate_directories serial : ', i
         project_dict['sims'][i]['shot']=project_dict['details']['shot']
-        project_dict['sims'][i]['shot_time']=project_dict['details']['shot_time']
+        if multiple_efits!=0:
+            pass
+        else:
+            project_dict['sims'][i]['shot_time']=project_dict['details']['shot_time']
         project_dict['sims'][i]['EXPEQ_name']='EXPEQ_%d.%.5d_p%d_q%d'%(project_dict['sims'][i]['shot'], project_dict['sims'][i]['shot_time'],int(round(project_dict['sims'][i]['PMULT']*1000)),int(round(project_dict['sims'][i]['QMULT']*1000)))
 
         project_dict['sims'][i]['ICOIL_FREQ'] = project_dict['details']['ICOIL_FREQ']
@@ -266,7 +270,7 @@ def generate_directories_func(project_dict, base_dir):
         project_dict['sims'][i]['MARS_settings'] = copy.deepcopy(project_dict['details']['MARS_settings'])
         project_dict['sims'][i]['corsica_settings'] = copy.deepcopy(project_dict['details']['corsica_settings'])
         project_dict['sims'][i]['I-coils'] = project_dict['details']['I-coils']
-        project_dict['sims'][i] = pyMARS.generate_directories(project_dict['sims'][i],base_dir)
+        project_dict['sims'][i] = pyMARS.generate_directories(project_dict['sims'][i],base_dir, multiple_efits = multiple_efits)
 
     return project_dict
 
@@ -315,6 +319,7 @@ def chease_setup_run(project_dict, job_num_filename, CHEASE_execution_script,CHE
             pyMARS.fxin_create(tmp['dir_dict']['chease_dir_PEST'], tmp['MARS_settings']['<<M1>>'],tmp['MARS_settings']['<<M2>>'],project_dict['sims'][i]['R0EXP'], project_dict['sims'][i]['B0EXP'])
             
         pyMARS.generate_chease_job_file(project_dict['sims'][i], CHEASE_execution_script, PEST = PEST, fxrun = fxrun, id_string = identifier_string,rm_files = rm_files)
+
 
     #This is the step that launches the batch job
     if cluster_job == 0:
@@ -410,14 +415,18 @@ def RMZM_func_matlab(project_dict, matlab_RZplot_files, main_template):
 
 ###################################################################
 #step 5
-def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN_template'):
+def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN_template', multiple_efits = 0):
     for i in project_dict['sims'].keys():
         print i
         #Extract required values from CHEASE log file
         project_dict['sims'][i] = pyMARS.extract_NW(project_dict['sims'][i])
 
         #Link required files
-        pyMARS.mars_setup_files(project_dict['sims'][i], upper_and_lower = upper_and_lower)
+        if multiple_efits:
+            special_dir = str(project_dict['sims'][i]['shot_time'])
+        else:
+            special_dir = ''
+        pyMARS.mars_setup_files(project_dict['sims'][i], upper_and_lower = upper_and_lower, special_dir = special_dir)
         #pyMARS.mars_setup_files(project_dict['sims'][i], vac = 0, upper_and_lower = upper_and_lower)
 
         #Calculate the values that need to be normalised to something to do with Alfven speed/frequency

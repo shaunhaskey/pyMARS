@@ -213,15 +213,23 @@ def modify_input_file(filename, search_text, replacement):
 
 
 #--------- Create working directories ---------------
-def generate_directories(master, base_dir):
+def generate_directories(master, base_dir, multiple_efits = 0):
+    print multiple_efits
     dir_dict = {}    
     #dir_dict['shot_dir'] =  base_dir + 'shot' + str(master['shot']) +'/'
     dir_dict['shot_dir'] =  base_dir
     #dir_dict['thetac_dir'] = dir_dict['shot_dir'] + 'tc_%03d/'%(master['thetac']*1000)
     dir_dict['thetac_dir'] = dir_dict['shot_dir']
-    dir_dict['efit_dir'] =  dir_dict['thetac_dir'] + 'efit/'
-    dir_dict['q_dir'] = dir_dict['thetac_dir'] + 'qmult%.3f/'%master['QMULT']
-    dir_dict['exp_dir'] = dir_dict['q_dir'] + 'exp%.3f/'%master['PMULT']
+    if multiple_efits:
+        dir_dict['efit_dir'] =  base_dir + 'efit/'+str(master['shot_time']) +'/'
+    else:
+        dir_dict['efit_dir'] =  base_dir + 'efit/'
+    if multiple_efits:
+        dir_dict['q_dir'] = dir_dict['thetac_dir'] + '/times/' + str(master['shot_time']) + '/'
+        dir_dict['exp_dir'] = dir_dict['q_dir']
+    else:
+        dir_dict['q_dir'] = dir_dict['thetac_dir'] + 'qmult%.3f/'%master['QMULT']
+        dir_dict['exp_dir'] = dir_dict['q_dir'] + 'exp%.3f/'%master['PMULT']
     dir_dict['mars_dir'] =  dir_dict['exp_dir'] + 'marsrun/'
     dir_dict['chease_dir'] = dir_dict['exp_dir'] + 'cheaserun/'
     dir_dict['chease_dir_PEST'] = dir_dict['exp_dir'] + 'cheaserun_PEST'
@@ -349,10 +357,14 @@ def RMZM_post_matlab(master):
     return master
 
 
-def mars_link_files(directory):
+def mars_link_files(directory, special_dir = ''):
     os.chdir(directory)
-    os.system('ln -sf ../../../../efit/PROFDEN PROFDEN')
-    os.system('ln -sf ../../../../efit/PROFROT PROFROT')
+    #if special_dir == '':
+    os.system('ln -sf ../../../../efit/' + special_dir + '/PROFDEN PROFDEN')
+    os.system('ln -sf ../../../../efit/' + special_dir + '/PROFROT PROFROT')
+    #else:
+    #os.system('ln -sf ../../../efit/' + special_dir + '/PROFDEN PROFDEN')
+    #os.system('ln -sf ../../../efit/' + special_dir + '/PROFROT PROFROT')
     os.system('ln -sf ../../cheaserun/OUTRMAR OUTRMAR')
     os.system('ln -sf ../../cheaserun/OUTVMAR OUTVMAR')
     os.system('ln -sf ../../cheaserun/RMZM_F RMZM_F')
@@ -360,7 +372,7 @@ def mars_link_files(directory):
 
 #--------- Mars Vacuum : setup -------------------
 #Link the PROFDEN, PROFROT, and chease outputs into the mars directory
-def mars_setup_files(master, upper_and_lower = 0):
+def mars_setup_files(master, special_dir = '', upper_and_lower = 0):
     if upper_and_lower==1:
         master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.p'
         master['dir_dict']['mars_lower_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.p'
@@ -370,13 +382,13 @@ def mars_setup_files(master, upper_and_lower = 0):
         os.system('mkdir ' + master['dir_dict']['mars_lower_plasma_dir'])
         os.system('mkdir ' + master['dir_dict']['mars_lower_vacuum_dir'])
         os.system('mkdir ' + master['dir_dict']['mars_upper_vacuum_dir'])
-        mars_link_files(master['dir_dict']['mars_upper_plasma_dir'])
-        mars_link_files(master['dir_dict']['mars_lower_plasma_dir'])
-        mars_link_files(master['dir_dict']['mars_lower_vacuum_dir'])
-        mars_link_files(master['dir_dict']['mars_upper_vacuum_dir'])
+        mars_link_files(master['dir_dict']['mars_upper_plasma_dir'], special_dir = special_dir)
+        mars_link_files(master['dir_dict']['mars_lower_plasma_dir'], special_dir = special_dir)
+        mars_link_files(master['dir_dict']['mars_lower_vacuum_dir'], special_dir = special_dir)
+        mars_link_files(master['dir_dict']['mars_upper_vacuum_dir'], special_dir = special_dir)
     else:
-        mars_link_files(master['dir_dict']['mars_plasma_dir'])
-        mars_link_files(master['dir_dict']['mars_vac_dir'])
+        mars_link_files(master['dir_dict']['mars_plasma_dir'], special_dir = special_dir)
+        mars_link_files(master['dir_dict']['mars_vac_dir'], special_dir = special_dir)
 
 
 

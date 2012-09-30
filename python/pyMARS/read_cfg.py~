@@ -17,6 +17,7 @@ parser.read(config_filename)
 start_from_step = int(parser.get('process_control', 'start_from_step'))
 end_at_step = int(parser.get('process_control', 'end_at_step'))
 include_chease_PEST_run = int(parser.get('process_control', 'include_chease_PEST_run'))
+multiple_efits = int(parser.get('process_control', 'multiple_efits'))
 
 #directory details
 project_name = parser.get('directory_details', 'project_name')
@@ -24,6 +25,8 @@ base_directory = parser.get('directory_details', 'base_directory')
 efit_file_location = parser.get('directory_details', 'efit_file_location')
 template_directory = parser.get('directory_details', 'template_directory')
 post_proc_script = parser.get('directory_details', 'post_proc_script')
+post_proc_script_PEST = parser.get('directory_details', 'post_proc_script_PEST')
+profile_file_location = parser.get('directory_details', 'profile_file_location')
 
 #execution_scripts
 MARS_execution_script = parser.get('execution_scripts', 'MARS_execution_script')
@@ -166,6 +169,7 @@ print 'script file copied across for record keeping'
 
 project_dict['details']['template_dir'] = template_directory
 project_dict['details']['efit_master'] = efit_file_location
+project_dict['details']['profile_master'] = profile_file_location
 project_dict['details']['CHEASE_settings'] = CHEASE_settings
 project_dict['details']['CHEASE_settings_PEST'] = CHEASE_settings
 project_dict['details']['MARS_settings'] = MARS_settings
@@ -201,31 +205,48 @@ if start_from_step == 1:
     project_dict['sims']={}
     project_dict['details'] = cont_funcs.generate_master_dir(project_dict['details'],project_dict)
 
-    multiple_times = 1
-    if multiple_times == 1:
-        time_list, gfile_list = cont_funcs.find_relevant_efit_files(project_dict['details']['efit_master'], project_dict['details']['profiles_master'])
+    if multiple_efits == 1:
+        time_list, gfile_list = cont_funcs.find_relevant_efit_files(project_dict['details']['efit_master'], project_dict['details']['profile_master'])
         print 'efit times :', time_list
         project_dict['details']['multiple_efit'] = []
-        for i in time_list:
-            project_dict['details']['multiple_efit'].append(project_dict['details']['efit_dir'] + '/' + str(i))
-            os.mkdir(project_dict['details']['multiple_efit'][-])
+        for i,time_tmp in enumerate(time_list):
+            project_dict['details']['multiple_efit'].append(project_dict['details']['efit_dir'] + '/' + str(time_tmp) + '/')
+            try:
+                os.mkdir(project_dict['details']['multiple_efit'][-1])
+            except OSError, e:
+                print e
+            #copy across the efit files
+            for efit_file_type in ['a','g','k','m']:
+                os.system('cp ' + project_dict['details']['efit_master'] + '/' + efit_file_type + gfile_list[i][1:] + ' ' + project_dict['details']['multiple_efit'][-1])
+            #copy across the rotation files
+            os.system('cp ' + project_dict['details']['profile_master'] + '/' + efit_file_type + gfile_list[i][1:] + ' ' + project_dict['details']['multiple_efit'][-1])
+            #copy across the rotation files
+            density_filename = 'dne'+gfile_list[i][1:]+'.dat'
+            rotation_filename = 'dpr' + gfile_list[i].split('.')[0][1:] + '.' + str(time_tmp) + '_Er_RBpol.dat'
+            os.system('cp ' + project_dict['details']['profile_master'] + '/' + density_filename + ' ' + project_dict['details']['multiple_efit'][-1])
+            os.system('cp ' + project_dict['details']['profile_master'] + '/' + rotation_filename + ' ' + project_dict['details']['multiple_efit'][-1])
+            os.system('cp ' + project_dict['details']['profile_master'] + '/' + density_filename + ' ' + project_dict['details']['multiple_efit'][-1] +'/PROFDEN')
+            os.system('cp ' + project_dict['details']['profile_master'] + '/' + rotation_filename + ' ' + project_dict['details']['multiple_efit'][-1] + '/PROFROT')
+            shot_number = gfile_list[i][1:]
 
-'''            
-    os.system('cp ' + project_dict['details']['efit_master'] + '* ' + project_dict['details']['efit_dir'])
-    dir_list = os.listdir(project_dict['details']['efit_dir'])
+        project_dict['details']['shot'] = shot_number
+        project_dict['details']['shot_time'] = time_list
+    else:
+        os.system('cp ' + project_dict['details']['efit_master'] + '* ' + project_dict['details']['efit_dir'])
+        dir_list = os.listdir(project_dict['details']['efit_dir'])
 
-    #get shot number and time from the efit filename
-    for i in range(0,len(dir_list)):
-        if dir_list[i].find('.') == 7 and dir_list[i][0]=='g':
-            shot_number = int(dir_list[i][1:7])
-            if dir_list[i].find('_')== -1:
-                shot_time = int(dir_list[i][8:])
-            else:
-                shot_time = int(dir_list[i][8:dir_list[i].find('_')])
-            print shot_number, shot_time
+        #get shot number and time from the efit filename
+        for i in range(0,len(dir_list)):
+            if dir_list[i].find('.') == 7 and dir_list[i][0]=='g':
+                shot_number = int(dir_list[i][1:7])
+                if dir_list[i].find('_')== -1:
+                    shot_time = int(dir_list[i][8:])
+                else:
+                    shot_time = int(dir_list[i][8:dir_list[i].find('_')])
+                print shot_number, shot_time
 
-    project_dict['details']['shot'] = shot_number
-    project_dict['details']['shot_time'] = shot_time
+        project_dict['details']['shot'] = shot_number
+        project_dict['details']['shot_time'] = shot_time
 
     #Output data structure for the next step
     pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_initial_setup.pickle')
@@ -237,12 +258,20 @@ if start_from_step == 1:
     #p_string,q_string,len_p_list = cont_funcs.corsica_qmult_pmult()
 
     #creating lots of directories for the various runs of CORSICA
-    for i in range(0,len(corsica_list)):
-        cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, corsica_list[i], corsica_settings[0])
-    print 'finished corsica setup, starting corsica runs'
-                  
-    cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
-    #cont_funcs.corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
+
+    if multiple_efits == 1:
+        for i in range(0, len(project_dict['details']['shot_time'])):
+            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['multiple_efit'][i], project_dict['details']['template_dir'] + CORSICA_template_name, [str(project_dict['details']['shot_time'][i])], corsica_settings[0])
+        for i in range(0, len(project_dict['details']['shot_time'])):
+            cont_funcs.corsica_multiple_efits(str(project_dict['details']['shot_time'][i]), project_dict, corsica_base_dir)
+    else:
+        for i in range(0,len(corsica_list)):
+            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, corsica_list[i], corsica_settings[0])
+        print 'finished corsica setup, starting corsica runs'
+
+
+        cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
+        #cont_funcs.corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
 
 
 print '#####################################################################'
@@ -390,12 +419,12 @@ if start_from_step <=8 and end_at_step>=8:
         project_dict = pyMARS.read_data(project_dir + project_name + '_post_processing.pickle')
 
     #serial_list = project_dict['sims'].keys()
-    post_proc_script = '/u/haskeysr/code/NAMP_analysis/python/pyMARS/post_proc_script_PEST.py'
+    #post_proc_script = '/u/haskeysr/code/NAMP_analysis/python/pyMARS/post_proc_script_PEST.py'
     working_directory = 'post_proc_tmp2/'
     os.system('mkdir ' + project_dir + working_directory)
-    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, directory = working_directory, upper_and_lower = upper_and_lower, cluster_job = cluster_job)
+    project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script_PEST, directory = working_directory, upper_and_lower = upper_and_lower, cluster_job = cluster_job)
 
     #project_dict = cont_funcs.coil_outputs_B(project_dict,serial_list)
     pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_processing_PEST.pickle')
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
-'''
+
