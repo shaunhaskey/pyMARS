@@ -14,11 +14,12 @@ from scipy.interpolate import griddata
 import pickle
 import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146382_scan/shot146382_scan_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_fine_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
-facn = 1.0; psi = 0.96
+facn = 1.0; psi = 0.92
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
@@ -42,7 +43,7 @@ phasing = phasing/180.*np.pi
 print phasing
 q95_list = []; Bn_Li_list = []
 phase_machine_ntor = 0
-amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []
+amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; pmult_list = []; qmult_list = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
@@ -55,6 +56,9 @@ for i in project_dict['sims'].keys():
     lower_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_lower']
     upper_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_upper']
     lower_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_lower']
+    pmult_list.append(project_dict['sims'][i]['PMULT'])
+    qmult_list.append(project_dict['sims'][i]['QMULT'])
+
     if phase_machine_ntor:
         phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
     else:
@@ -68,6 +72,8 @@ for i in project_dict['sims'].keys():
 
 
 plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
+plot_quantity_vac_phase=[];plot_quantity_plas_phase=[];plot_quantity_tot_phase=[];
+
 plot_quantity = 'max'
 max_loc_list = []
 mode_list = []
@@ -84,6 +90,9 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_vac.append(np.abs(amps_vac_comp[i][max_loc]))
         plot_quantity_plas.append(np.abs(amps_plas_comp[i][max_loc]))
         plot_quantity_tot.append(np.abs(amps_tot_comp[i][max_loc]))
+        plot_quantity_vac_phase.append(np.angle(amps_vac_comp[i][max_loc], deg = True))
+        plot_quantity_plas_phase.append(np.angle(amps_plas_comp[i][max_loc], deg= True))
+        plot_quantity_tot_phase.append(np.angle(amps_tot_comp[i][max_loc], deg = True))
 
         
 
@@ -183,6 +192,33 @@ ax[1].plot(q95_list, Bn_Li_list,'k.')
 #ax[1].set_ylim([2,3])
 fig.suptitle(file_name,fontsize=8)
 fig.canvas.draw(); fig.show()
+
+pmult_based_dict = {}
+
+pmult_values = [0.9, 0.95, 1.0, 1.05, 1.1]
+pmult_values = [1.0]
+pmult_array = np.array(pmult_list)
+fig, ax = pt.subplots(nrows = 2, sharex = 1)
+for i in pmult_values:
+    xaxis = np.ma.array(q95_list, mask = (pmult_array!=i))
+    yaxis = np.ma.array(plot_quantity_plas, mask = (pmult_array!=i))
+    pmult_axis = np.ma.array(pmult_array, mask = (pmult_array!=i))
+    ax[0].plot(xaxis, yaxis, '.', label = 'pmult=%s'%(str(i)))
+    yaxis = np.ma.array(mode_list, mask = (pmult_array!=i))
+    ax[0].plot(xaxis, yaxis, 'o', label = 'm')
+    yaxis = np.ma.array(plot_quantity_plas_phase, mask = (pmult_array!=i))
+    ax[1].plot(xaxis, yaxis, '.', label = 'pmult=%s'%(str(i)))
+ax[1].grid(b=True)
+ax[0].grid(b=True)
+ax[0].set_title('PlasmaResponse, sqrt(psi)=%.2f'%(psi))
+ax[0].set_ylabel('Amplitude', fontsize = 14)
+ax[1].set_ylabel('Phase', fontsize = 14)
+ax[1].set_xlabel(r'$q_{95}$', fontsize = 14)
+fig.suptitle(file_name,fontsize=8)
+leg = ax[0].legend(loc='best')
+leg.get_frame().set_alpha(0.5)
+fig.canvas.draw(); fig.show()
+
 
 
 '''

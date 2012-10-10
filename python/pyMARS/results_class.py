@@ -301,18 +301,80 @@ class data():
             #image2 = ax_tmp[1].pcolor(mk,(ss)**2,np.abs(BnPEST),cmap=tmp_cmap,clim=clim_value)
             image2 = ax_tmp[1].pcolor(mk,(ss[:ss_plas_edge]),np.abs(BnPEST[:ss_plas_edge,:]),cmap='hot')#clim_value)
             ax_tmp[1].set_title('MARS-F, max:%.2f'%(np.max(np.abs(BnPEST[:ss_plas_edge,:]))))
-            image2.set_clim([0,1.6])
+            image2.set_clim([0, np.max(np.abs(BnPEST[:ss_plas_edge,:]))])
             #image1 = ax_tmp[0].imshow(zdat[min_loc:max_loc+1,:].transpose(),cmap = tmp_cmap, interpolation='bicubic',aspect='auto',extent = [-30,30,0,1],origin='lower',clim=clim_value)
             image1 = ax_tmp[0].pcolor(xdat,ydat,zdat,cmap = 'hot')
             ax_tmp[0].set_title('SURFMN, max:%.2f'%(np.max(np.abs(zdat))))
-            image1.set_clim([0,1.6])
-            for ax_tmp1 in ax_tmp:
-                ax_tmp1.plot(mq,sq,'wo')
-                ax_tmp1.plot(mq,sq**2,'yo')
-                ax_tmp1.plot(q*n,s,'w--') 
-                ax_tmp1.plot(q*n,s**2,'y--') 
-                ax_tmp1.set_xlim([-30,30])
-                ax_tmp1.set_ylim([0,1])
+            image1.set_clim([0,np.max(np.abs(zdat))])
+            pt.colorbar(mappable=image1, ax = ax_tmp[0])
+            pt.colorbar(mappable=image2, ax = ax_tmp[1])
+            
+            fig_tmp10, ax_tmp10 = pt.subplots()
+            for tmp_psi in [0.92]:
+                tmp_SURFMN_loc = np.argmin(np.abs(ydat[0,:]-tmp_psi))
+                tmp_MARSF_loc = np.argmin(np.abs(ss[:ss_plas_edge] - tmp_psi))
+                print tmp_SURFMN_loc, tmp_MARSF_loc, ydat[0,tmp_SURFMN_loc],ss[tmp_MARSF_loc]
+                ax_tmp10.plot(xdat[:,tmp_SURFMN_loc], zdat[:,tmp_SURFMN_loc],'bx-', label = 'SURFMN s=%.2f'%(tmp_psi))
+                print mk.shape, np.abs(BnPEST[tmp_MARSF_loc, : ]).shape
+                ax_tmp10.plot(mk.flatten(), np.abs(BnPEST[tmp_MARSF_loc, : ]), 'kx-', label = 'MARS-F s=%.2f'%(tmp_psi))
+            ax_tmp10.legend(loc='best')
+            ax_tmp10.set_ylabel('mode amplitude')
+            ax_tmp10.set_xlabel('m')
+            fig_tmp10.canvas.draw(); fig_tmp10.show()
+
+            fig_tmp10, ax_tmp10 = pt.subplots(nrows = 2, sharex = 1)
+            start_mode = 0
+            end_mode = 25
+            colormap = pt.cm.jet
+            tmp_color = ax_tmp10[0].pcolor(np.array([[start_mode,end_mode],[start_mode,end_mode]]),cmap=colormap)
+            ax_tmp10[0].cla()
+            tmp_cbar = pt.colorbar(mappable = tmp_color, ax=ax_tmp10[0])
+            tmp_cbar.ax.set_title('m')
+            tmp_cbar = pt.colorbar(mappable = tmp_color, ax=ax_tmp10[1])
+            tmp_cbar.ax.set_title('m')
+
+            ax_tmp10[1].set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, start_mode + (end_mode))])
+            ax_tmp10[0].set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, start_mode + (end_mode))])
+            del tmp_color
+
+            for tmp_m in range(start_mode,end_mode):
+                tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
+                tmp_MARSF_loc = np.argmin(np.abs(mk.flatten() - tmp_m))
+                print tmp_SURFMN_loc, tmp_MARSF_loc, xdat[tmp_SURFMN_loc, 0],mk.flatten()[tmp_MARSF_loc]
+                ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:], label = 'SURFMN s=%.2f'%(tmp_m))
+                print mk.shape, np.abs(BnPEST[tmp_MARSF_loc, : ]).shape
+                ax_tmp10[1].plot(ss[:ss_plas_edge].flatten(), np.abs(BnPEST[:ss_plas_edge,tmp_MARSF_loc]), label = 'MARS-F s=%.2f'%(tmp_m))
+
+            for tmp_m in range(start_mode,end_mode):
+                tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
+                tmp_MARSF_loc = np.argmin(np.abs(mk.flatten() - tmp_m))
+                for j in range(0,len(ydat[tmp_SURFMN_loc,:]), 5):
+                    ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j], str(tmp_m), fontsize = 8.5)
+                for j in range(0,len(ss[:ss_plas_edge]), 5):
+                    ax_tmp10[1].text(ss[j].flatten(), np.abs(BnPEST[j,tmp_MARSF_loc]), str(tmp_m), fontsize = 8.5)
+
+            #ax_tmp10.legend(loc='best')
+
+            ax_tmp10[1].set_ylabel('mode amplitude')
+            ax_tmp10[0].set_ylabel('mode amplitude')
+            ax_tmp10[1].set_title('MARS-F')
+            ax_tmp10[0].set_title('SURFMN')
+            ax_tmp10[1].set_xlabel('s')
+            fig_tmp10.canvas.draw(); fig_tmp10.show()
+            
+
+
+            #print zdat.shape, BnPEST[:ss_plasma_edge,:].shape, np.min(xdat), np.max(xdat), np.min(mk), np.max(mk)
+            #tmp_min_loc = np.argmin(np.abs(xdat - np.min(mk)))
+            #tmp_min_loc = np.argmin(np.abs(xdat - np.max(mk)))
+            #fig_tmp10, ax_tmp10 = pt.subplots()
+            # for ax_tmp1 in ax_tmp:
+            #     ax_tmp1.plot(mq,sq,'wo')
+            #     ax_tmp1.plot(mq,sq**2,'yo')
+            #     ax_tmp1.plot(q*n,s,'w--') 
+            #     ax_tmp1.plot(q*n,s**2,'y--') 
+            #     ax_tmp1.set_xlim([-30,30])
+            #     ax_tmp1.set_ylim([0,1])
             fig_tmp.canvas.draw(); fig_tmp.show()
             #MATLAB PART
             RZ_dir = '/home/srh112/Desktop/Test_Case/matlab_outputs/'

@@ -19,7 +19,7 @@ file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
-facn = 1.0; psi = 0.96
+facn = 1.0; psi = 0.94
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
@@ -43,7 +43,7 @@ phasing = phasing/180.*np.pi
 print phasing
 q95_list = []; Bn_Li_list = []
 phase_machine_ntor = 0
-amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []
+amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; time_list = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
@@ -56,6 +56,8 @@ for i in project_dict['sims'].keys():
     lower_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_lower']
     upper_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_upper']
     lower_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_lower']
+    time_list.append(project_dict['sims'][i]['shot_time'])
+
     if phase_machine_ntor:
         phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
     else:
@@ -69,6 +71,8 @@ for i in project_dict['sims'].keys():
 
 
 plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
+plot_quantity_vac_phase=[];plot_quantity_plas_phase=[];plot_quantity_tot_phase=[];
+
 plot_quantity = 'max'
 max_loc_list = []
 mode_list = []
@@ -77,6 +81,7 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
         plot_quantity_plas.append(np.sum(np.abs(amps_plas_comp[i])**2)/len(amps_vac_comp[i]))
         plot_quantity_tot.append(np.sum(np.abs(amps_tot_comp[i])**2)/len(amps_vac_comp[i]))
+        mode_list.append(np.average(mk_list[i][:]))
     elif plot_quantity == 'max':
         
         max_loc = np.argmax(np.abs(amps_plas_comp[i]))
@@ -86,11 +91,28 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_plas.append(np.abs(amps_plas_comp[i][max_loc]))
         plot_quantity_tot.append(np.abs(amps_tot_comp[i][max_loc]))
 
+        mode_list.append(mk_list[i][max_loc])
+        plot_quantity_vac_phase.append(np.angle(amps_vac_comp[i][max_loc], deg = True))
+        plot_quantity_plas_phase.append(np.angle(amps_plas_comp[i][max_loc], deg= True))
+        plot_quantity_tot_phase.append(np.angle(amps_tot_comp[i][max_loc], deg = True))
+
+
+# plot_quantity_tot_dummy = copy.deepcopy(plot_quantity_tot)
+# plot_quantity_plas_dummy = copy.deepcopy(plot_quantity_plas)
+# plot_quantity_vac_dummy = copy.deepcopy(plot_quantity_vac)
+# q95_dummy = copy.deepcopy(q95_list)
+# Bn_Li_dummy = copy.deepcopy(Bn_Li_list)
+# mode_list_dummy = copy.deepcopy(mode_list)
+
 plot_quantity_plas_arranged = []
 plot_quantity_tot_arranged = []
 plot_quantity_vac_arranged = []
+plot_quantity_plas_phase_arranged = []
+plot_quantity_tot_phase_arranged = []
+plot_quantity_vac_phase_arranged = []
 q95_list_arranged = []
-Bn_Li_list_arranged = []
+Bn_Li_list_arranged = []; mode_list_arranged = []
+time_list_arranged = []
 for i in range(0,len(q95_list)):
     cur_loc = np.argmin(q95_list)
     print cur_loc
@@ -99,18 +121,64 @@ for i in range(0,len(q95_list)):
     plot_quantity_plas_arranged.append(plot_quantity_plas.pop(cur_loc))
     plot_quantity_vac_arranged.append(plot_quantity_vac.pop(cur_loc))
     plot_quantity_tot_arranged.append(plot_quantity_tot.pop(cur_loc))
+    plot_quantity_plas_phase_arranged.append(plot_quantity_plas_phase.pop(cur_loc))
+    plot_quantity_vac_phase_arranged.append(plot_quantity_vac_phase.pop(cur_loc))
+    plot_quantity_tot_phase_arranged.append(plot_quantity_tot_phase.pop(cur_loc))
+    mode_list_arranged.append(mode_list.pop(cur_loc))
+    time_list_arranged.append(time_list.pop(cur_loc))
+    
+fig, ax = pt.subplots(ncols = 2, nrows = 2)
+ax[0,0].plot(q95_list_arranged, plot_quantity_plas_arranged, 'o-', label = 'plasma')
+ax[0,0].plot(q95_list_arranged, plot_quantity_vac_arranged, 'o-', label = 'vacuum')
+ax[0,0].plot(q95_list_arranged, plot_quantity_tot_arranged, 'o-',label = 'total')
+#ax_m = ax[0,0].twinx()
+#ax_m.legend(loc='best')
+ax[0,0].plot(q95_list_arranged, np.array(mode_list_arranged)/2., 'x-',label = 'm/2')
+#ax_m.set_ylim([0,12])
+#mode_list_arranged.append(mode_list.pop(cur_loc))
+#ax[0,0].plot(q95_list_arranged, mode_list_arranged, 'o-',label = 'm')
+leg = ax[0,0].legend(loc='best', fancybox=True)
+leg.get_frame().set_alpha(0.5)
+#ax[0,0].set_xlim([3.0,5.5])
+#ax[0,0].set_xlabel('q95')
+ax[0,0].set_ylabel('mode amplitude')
+ax[0,0].set_title('sqrt(psi)=%.2f'%(psi))
+ax[0,1].plot(time_list_arranged, plot_quantity_plas_arranged, 'o', label = 'plasma')
+ax[0,1].plot(time_list_arranged, plot_quantity_vac_arranged, 'o', label = 'vacuum')
+ax[0,1].plot(time_list_arranged, plot_quantity_tot_arranged, 'o',label = 'total')
+#ax[0,1].set_xlabel('time (ms)')
+#fig.canvas.draw()
+#fig.show()
 
-fig, ax = pt.subplots()
-ax.plot(q95_list_arranged, plot_quantity_plas_arranged, 'o-', label = 'plasma')
-ax.plot(q95_list_arranged, plot_quantity_vac_arranged, 'o-', label = 'vacuum')
-ax.plot(q95_list_arranged, plot_quantity_tot_arranged, 'o-',label = 'total')
-ax.legend(loc='best')
-ax.set_xlim([3.0,5.5])
+
+ax[1,0].plot(q95_list_arranged, plot_quantity_plas_phase_arranged, 'o-', label = 'plasma')
+ax[1,0].plot(q95_list_arranged, plot_quantity_vac_phase_arranged, 'o-', label = 'vacuum')
+ax[1,0].plot(q95_list_arranged, plot_quantity_tot_phase_arranged, 'o-',label = 'total')
+#ax[1,0].plot(q95_list_arranged, mode_list_arranged, 'o-',label = 'm')
+leg = ax[1,0].legend(loc='best', fancybox = True)
+leg.get_frame().set_alpha(0.5)
+#ax[1,0].set_xlim([3.0,5.5])
+ax[1,0].set_xlabel('q95')
+ax[1,0].set_ylabel('phase (deg)')
+ax[1,1].plot(time_list_arranged, plot_quantity_plas_phase_arranged, 'o', label = 'plasma')
+ax[1,1].plot(time_list_arranged, plot_quantity_vac_phase_arranged, 'o', label = 'vacuum')
+ax[1,1].plot(time_list_arranged, plot_quantity_tot_phase_arranged, 'o',label = 'total')
+ax[1,1].set_xlabel('time (ms)')
+fig.suptitle(file_name,fontsize=8)
 fig.canvas.draw()
 fig.show()
 
-fig, ax = pt.subplots()
-ax.plot(q95_list_arranged, Bn_Li_list_arranged, 'o-')
+
+
+fig, ax = pt.subplots(ncols = 2, sharey=1)
+ax[0].plot(q95_list_arranged, Bn_Li_list_arranged, 'o-')
+ax[0].set_xlabel('q95')
+ax[0].set_ylabel('Bn/Li')
+ax[0].set_ylim([0,2.2])
+ax[1].plot(time_list_arranged, Bn_Li_list_arranged, 'o')
+ax[1].set_xlabel('time (ms)')
+fig.suptitle(file_name,fontsize=8)
+
 fig.canvas.draw(); fig.show()
 
 '''
