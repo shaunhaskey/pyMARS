@@ -43,9 +43,10 @@ phasing = phasing/180.*np.pi
 print phasing
 q95_list = []; Bn_Li_list = []
 phase_machine_ntor = 0
-amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; pmult_list = []; qmult_list = []
+amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; pmult_list = []; qmult_list = []; serial_list = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
+    serial_list.append(i)
     Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
     relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
     relevant_values_lower_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_lower']
@@ -112,6 +113,8 @@ plas_data = griddata(q95_Bn_array, plot_quantity_plas, (xnew_grid, ynew_grid),me
 vac_data = griddata(q95_Bn_array, plot_quantity_vac, (xnew_grid, ynew_grid), method = 'cubic')
 tot_data = griddata(q95_Bn_array, plot_quantity_tot, (xnew_grid, ynew_grid), method = 'cubic')
 mode_data = griddata(q95_Bn_array, mode_list, (xnew_grid, ynew_grid), method = 'cubic')
+plas_data_phase = griddata(q95_Bn_array, plot_quantity_plas_phase, (xnew_grid, ynew_grid), method = 'linear')
+vac_data_phase = griddata(q95_Bn_array, plot_quantity_vac_phase, (xnew_grid, ynew_grid), method = 'linear')
 
 
 for interp_meth in ['linear', 'cubic']:
@@ -147,9 +150,37 @@ ax.set_title('total data')
 fig.suptitle(file_name,fontsize=8)
 fig.canvas.draw(); fig.show()
 
+fig,ax = pt.subplots(nrows = 2,sharex = 1, sharey = 1)
+plas_data_phase[plas_data_phase<=-40]+=360
+color_fig = ax[0].pcolor(xnew, ynew, np.ma.array(plas_data_phase, mask=np.isnan(mode_data)))
+color_fig.set_clim([-40,-40+360])
+pt.colorbar(color_fig, ax=ax[0])
+ax[0].plot(q95_list, Bn_Li_list,'k.')
+ax[0].set_title('Plasma phase')
+vac_data_phase[plas_data_phase<=-40]+=360
+color_fig = ax[1].pcolor(xnew, ynew, np.ma.array(vac_data_phase, mask=np.isnan(mode_data)))
+color_fig.set_clim([-40,-40+360])
+ax[1].set_title('Vacuum phase')
+ax[1].plot(q95_list, Bn_Li_list,'k.')
+pt.colorbar(color_fig, ax=ax[1])
+include_text = 0
+if include_text:
+    for ax_tmp in ax:
+        for i in range(0,len(q95_list)):
+            print 'ehllo'
+            ax_tmp.text(q95_list[i], Bn_Li_list[i], str(serial_list[i]), fontsize = 7.5)
+print_phases = 1
+if print_phases:
+    for i in range(0,len(q95_list)):
+        print 'serial %d : phase %.2f deg'%(serial_list[i],plot_quantity_plas_phase[i])
+    
+fig.canvas.draw(); fig.show()
+
+
 fig,ax = pt.subplots()
 color_fig = ax.pcolor(xnew, ynew, np.ma.array(mode_data, mask=np.isnan(mode_data)))
 color_fig.set_clim([5,15])
+
 pt.colorbar(color_fig, ax=ax)
 ax.plot(q95_list, Bn_Li_list,'k.')
 ax.set_title('Max mode number, sqrt(psi)=%.2f'%(psi))
@@ -208,6 +239,15 @@ for i in pmult_values:
     ax[0].plot(xaxis, yaxis, 'o', label = 'm')
     yaxis = np.ma.array(plot_quantity_plas_phase, mask = (pmult_array!=i))
     ax[1].plot(xaxis, yaxis, '.', label = 'pmult=%s'%(str(i)))
+    include_text_line = 1
+    if include_text_line:
+        for j in range(0, len(q95_list)):
+            if pmult_array[j]==i:
+                ax[0].text(q95_list[j], plot_quantity_plas[j], str(serial_list[j]),fontsize=8)
+                ax[1].text(q95_list[j], plot_quantity_plas_phase[j], str(serial_list[j]),fontsize=8)
+                
+
+            
 ax[1].grid(b=True)
 ax[0].grid(b=True)
 ax[0].set_title('PlasmaResponse, sqrt(psi)=%.2f'%(psi))

@@ -336,20 +336,34 @@ class data():
             ax_tmp10[1].set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, start_mode + (end_mode))])
             ax_tmp10[0].set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, start_mode + (end_mode))])
             del tmp_color
+            
+            #tmp hack trying to see difference between SURFMN and MARS-F
+            self.DPSIDS_1 = np.loadtxt('OUT.dat')
+            print 'DPSIDS shape', self.DPSIDS_1.shape
+            print 'ydat shape', ydat[1,:].shape
+            self.SURFMN_ydat = ydat
+            self.SURFMN_xdat = xdat
+            self.SURFMN_zdat = zdat
+            self.SURFMN_DPSIDS = griddata(self.ss[:181],self.DPSIDS_1, self.SURFMN_ydat[0,:],method='linear')
+            
+            #d.ss[:181]
 
             for tmp_m in range(start_mode,end_mode):
                 tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
                 tmp_MARSF_loc = np.argmin(np.abs(mk.flatten() - tmp_m))
                 print tmp_SURFMN_loc, tmp_MARSF_loc, xdat[tmp_SURFMN_loc, 0],mk.flatten()[tmp_MARSF_loc]
-                ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:], label = 'SURFMN s=%.2f'%(tmp_m))
+                #ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:], label = 'SURFMN s=%.2f'%(tmp_m))
+                ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:]*self.SURFMN_DPSIDS, label = 'SURFMN s=%.2f'%(tmp_m))
                 print mk.shape, np.abs(BnPEST[tmp_MARSF_loc, : ]).shape
                 ax_tmp10[1].plot(ss[:ss_plas_edge].flatten(), np.abs(BnPEST[:ss_plas_edge,tmp_MARSF_loc]), label = 'MARS-F s=%.2f'%(tmp_m))
+                ax_tmp10[1].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:]*self.SURFMN_DPSIDS*2.2, 'k-', label = 'SURFMN s=%.2f'%(tmp_m))
 
             for tmp_m in range(start_mode,end_mode):
                 tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
                 tmp_MARSF_loc = np.argmin(np.abs(mk.flatten() - tmp_m))
                 for j in range(0,len(ydat[tmp_SURFMN_loc,:]), 5):
-                    ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j], str(tmp_m), fontsize = 8.5)
+                    #ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j], str(tmp_m), fontsize = 8.5)
+                    ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j]*self.SURFMN_DPSIDS[j], str(tmp_m), fontsize = 8.5)
                 for j in range(0,len(ss[:ss_plas_edge]), 5):
                     ax_tmp10[1].text(ss[j].flatten(), np.abs(BnPEST[j,tmp_MARSF_loc]), str(tmp_m), fontsize = 8.5)
 
