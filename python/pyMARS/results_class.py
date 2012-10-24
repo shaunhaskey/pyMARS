@@ -341,31 +341,38 @@ class data():
             self.DPSIDS_1 = np.loadtxt('OUT.dat')
             print 'DPSIDS shape', self.DPSIDS_1.shape
             print 'ydat shape', ydat[1,:].shape
+
+            
+            dchi = self.chi[0,1]-self.chi[0,0]
+            self.A = 2.*np.pi*np.sum(self.jacobian * dchi, axis = 1)
+            
             self.SURFMN_ydat = ydat
             self.SURFMN_xdat = xdat
             self.SURFMN_zdat = zdat
             self.SURFMN_DPSIDS = griddata(self.ss[:181],self.DPSIDS_1, self.SURFMN_ydat[0,:],method='linear')
+            self.SURFMN_A = griddata(self.ss[:181],self.A.flatten()[:181], self.SURFMN_ydat[0,:],method='linear')
             
-            #d.ss[:181]
-
             for tmp_m in range(start_mode,end_mode):
                 tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
                 tmp_MARSF_loc = np.argmin(np.abs(mk.flatten() - tmp_m))
+                SURFMN_plot_quantity = zdat[tmp_SURFMN_loc,:]#*self.SURFMN_A/(4*np.pi*np.pi)/self.SURFMN_DPSIDS
                 print tmp_SURFMN_loc, tmp_MARSF_loc, xdat[tmp_SURFMN_loc, 0],mk.flatten()[tmp_MARSF_loc]
                 #ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:], label = 'SURFMN s=%.2f'%(tmp_m))
-                ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:]*self.SURFMN_DPSIDS, label = 'SURFMN s=%.2f'%(tmp_m))
+                #ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:]*self.SURFMN_DPSIDS, label = 'SURFMN s=%.2f'%(tmp_m))
+                ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], SURFMN_plot_quantity, label = 'SURFMN s=%.2f'%(tmp_m))
                 print mk.shape, np.abs(BnPEST[tmp_MARSF_loc, : ]).shape
-                ax_tmp10[1].plot(ss[:ss_plas_edge].flatten(), np.abs(BnPEST[:ss_plas_edge,tmp_MARSF_loc]), label = 'MARS-F s=%.2f'%(tmp_m))
-                ax_tmp10[1].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:]*self.SURFMN_DPSIDS*2.2, 'k-', label = 'SURFMN s=%.2f'%(tmp_m))
+                ax_tmp10[1].plot(ss[:ss_plas_edge].flatten()**2, np.abs(BnPEST[:ss_plas_edge,tmp_MARSF_loc]), label = 'MARS-F s=%.2f'%(tmp_m))
+                ax_tmp10[1].plot(ydat[tmp_SURFMN_loc,:], SURFMN_plot_quantity*0.4/1.4*0.4/0.5*1.33, 'k-', label = 'SURFMN s=%.2f'%(tmp_m))
 
             for tmp_m in range(start_mode,end_mode):
                 tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
                 tmp_MARSF_loc = np.argmin(np.abs(mk.flatten() - tmp_m))
+                SURFMN_plot_quantity = zdat[tmp_SURFMN_loc,:]#*self.SURFMN_A/(4*np.pi*np.pi)/self.SURFMN_DPSIDS
                 for j in range(0,len(ydat[tmp_SURFMN_loc,:]), 5):
                     #ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j], str(tmp_m), fontsize = 8.5)
-                    ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j]*self.SURFMN_DPSIDS[j], str(tmp_m), fontsize = 8.5)
+                    ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], SURFMN_plot_quantity[j], str(tmp_m), fontsize = 8.5)
                 for j in range(0,len(ss[:ss_plas_edge]), 5):
-                    ax_tmp10[1].text(ss[j].flatten(), np.abs(BnPEST[j,tmp_MARSF_loc]), str(tmp_m), fontsize = 8.5)
+                    ax_tmp10[1].text(ss[j].flatten()**2, np.abs(BnPEST[j,tmp_MARSF_loc]), str(tmp_m), fontsize = 8.5)
 
             #ax_tmp10.legend(loc='best')
 
