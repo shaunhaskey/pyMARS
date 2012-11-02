@@ -37,8 +37,8 @@ def return_grid_data(q95_values, Bn_Div_Li_values,q95_array, Bn_Div_Li_array, re
     ynew = num.linspace(Bn_Div_Li_values[0], Bn_Div_Li_values[1],100)
     resonant_grid_data = griddata(q95_array, Bn_Div_Li_array, resonant_array, xnew, ynew, interp = 'linear')
     return resonant_grid_data
-
-name = 'test_output.pickle'
+name = '/home/srh112/NAMP_datafiles/test_output.pickle'
+#name = 'test_output.pickle'
 project_dict = pickle.load(open(name))
 print len(project_dict['sims'].keys())
 project_dict, q95_array, Bn_Div_Li_array, resonant_array = return_resonant_values(project_dict)

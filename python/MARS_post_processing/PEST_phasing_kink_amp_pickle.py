@@ -44,6 +44,8 @@ print phasing
 q95_list = []; Bn_Li_list = []
 phase_machine_ntor = 0
 amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; pmult_list = []; qmult_list = []; serial_list = []
+amps_plas_comp_upper = []; amps_plas_comp_lower = []
+amps_vac_comp_upper = []; amps_vac_comp_lower = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     serial_list.append(i)
@@ -68,8 +70,10 @@ for i in project_dict['sims'].keys():
     amps_vac_comp.append(relevant_values_upper_vac + relevant_values_lower_vac*phasor)
     amps_tot_comp.append(relevant_values_upper_tot + relevant_values_lower_tot*phasor)
     amps_plas_comp.append(relevant_values_upper_tot-relevant_values_upper_vac + (relevant_values_lower_tot-relevant_values_lower_vac)*phasor)
-
-
+    amps_plas_comp_upper.append(relevant_values_upper_tot-relevant_values_upper_vac)
+    amps_plas_comp_lower.append(relevant_values_lower_tot-relevant_values_lower_vac)
+    amps_vac_comp_upper.append(relevant_values_upper_vac)
+    amps_vac_comp_lower.append(relevant_values_lower_vac)
 
 
 plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
@@ -78,6 +82,10 @@ plot_quantity_vac_phase=[];plot_quantity_plas_phase=[];plot_quantity_tot_phase=[
 plot_quantity = 'max'
 max_loc_list = []
 mode_list = []
+upper_values_plasma = []
+lower_values_plasma = []
+upper_values_vac = []
+lower_values_vac = []
 for i in range(0,len(amps_vac_comp)):
     if plot_quantity == 'average':
         plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
@@ -95,6 +103,10 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_plas_phase.append(np.angle(amps_plas_comp[i][max_loc], deg= True))
         plot_quantity_tot_phase.append(np.angle(amps_tot_comp[i][max_loc], deg = True))
 
+        upper_values_plasma.append(amps_plas_comp_upper[i][max_loc])
+        lower_values_plasma.append(amps_plas_comp_lower[i][max_loc])
+        upper_values_vac.append(amps_vac_comp_upper[i][max_loc])
+        lower_values_vac.append(amps_vac_comp_lower[i][max_loc])
         
 
 
@@ -191,7 +203,7 @@ fig.canvas.draw(); fig.show()
 
 
 color_map = 'jet'
-fig,ax = pt.subplots(nrows = 2,sharex = 1, sharey = 1)
+fig,ax = pt.subplots(nrows = 3,sharex = 1, sharey = 1)
 color_fig_plas = ax[0].pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map)#, cmap = cmap)
 #color_fig = ax[0].pcolor(xnew, ynew, plas_data)
 pt.colorbar(color_fig_plas, ax = ax[0])
@@ -210,6 +222,9 @@ ax[0].plot(q95_list, Bn_Li_list,'k.')
 #cmap.set_bad('w',1.)
 
 color_fig_vac = ax[1].pcolor(xnew, ynew, np.ma.array(vac_data, mask=np.isnan(vac_data)),cmap=color_map)#, cmap = cmap)
+color_fig_relative = ax[2].pcolor(xnew, ynew, np.ma.array(plas_data/vac_data, mask=np.isnan(vac_data)),cmap=color_map)#, cmap = cmap)
+color_fig_relative.set_clim([0,10])
+pt.colorbar(color_fig_relative, ax = ax[2])
 if plot_quantity=='average':
     color_fig_vac.set_clim([0,0.2])
 elif plot_quantity=='max':
@@ -218,8 +233,11 @@ elif plot_quantity=='max':
 pt.colorbar(color_fig_vac, ax = ax[1])
 ax[1].set_title('Vacuum, sqrt(psi)=%.2f'%(psi))
 ax[1].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
-ax[1].set_xlabel(r'$q_{95}$', fontsize = 14)
+ax[2].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+ax[-1].set_xlabel(r'$q_{95}$', fontsize = 14)
 ax[1].plot(q95_list, Bn_Li_list,'k.')
+ax[2].plot(q95_list, Bn_Li_list,'k.')
+ax[2].set_title('Plasma Amplification')
 #ax[1].set_ylim([2,3])
 fig.suptitle(file_name,fontsize=8)
 fig.canvas.draw(); fig.show()
@@ -229,7 +247,7 @@ pmult_based_dict = {}
 pmult_values = [0.9, 0.95, 1.0, 1.05, 1.1]
 pmult_values = [1.0]
 pmult_array = np.array(pmult_list)
-fig, ax = pt.subplots(nrows = 2, sharex = 1)
+fig, ax = pt.subplots(nrows = 3, sharex = 1)
 for i in pmult_values:
     xaxis = np.ma.array(q95_list, mask = (pmult_array!=i))
     yaxis = np.ma.array(plot_quantity_plas, mask = (pmult_array!=i))
@@ -258,6 +276,53 @@ fig.suptitle(file_name,fontsize=8)
 leg = ax[0].legend(loc='best')
 leg.get_frame().set_alpha(0.5)
 fig.canvas.draw(); fig.show()
+
+
+phasing_array = np.linspace(-180,180,360)
+fig, ax = pt.subplots(nrows =2 , sharex = 1, sharey = 1)
+pmult_values = [1.0]
+pmult_array = np.array(pmult_list)
+q95_array = np.array(q95_list)
+rel_q95_vals = q95_array[pmult_array==pmult_values[0]]
+
+rel_lower_vals_plasma = np.array(lower_values_plasma)[pmult_array==pmult_values[0]]
+rel_upper_vals_plasma = np.array(upper_values_plasma)[pmult_array==pmult_values[0]]
+rel_lower_vals_vac = np.array(lower_values_vac)[pmult_array==pmult_values[0]]
+rel_upper_vals_vac = np.array(upper_values_vac)[pmult_array==pmult_values[0]]
+
+plot_array_plasma = np.ones((phasing_array.shape[0], rel_q95_vals.shape[0]),dtype=float)
+plot_array_vac = np.ones((phasing_array.shape[0], rel_q95_vals.shape[0]),dtype=float)
+for i, curr_phase in enumerate(phasing_array):
+    phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
+    plot_array_plasma[i,:] = np.abs(rel_upper_vals_plasma + rel_lower_vals_plasma*phasor)
+    plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
+color_plot = ax[0].pcolor(rel_q95_vals, phasing_array, plot_array_plasma, cmap='hot')
+color_plot2 = ax[1].pcolor(rel_q95_vals, phasing_array, plot_array_vac, cmap='hot')
+#color_plot.set_clim()
+ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
+ax[0].set_ylabel('Phasing (deg)')
+ax[1].set_ylabel('Phasing (deg)')
+ax[0].set_title('Kink Amplitude - Plasma')
+ax[1].set_title('Kink Amplitude - Vacuum')
+ax[0].set_xlim([2.2,5.8])
+ax[0].set_ylim([-180,180])
+color_plot.set_clim([0.002, 3])
+pt.colorbar(color_plot, ax = ax[0])
+pt.colorbar(color_plot, ax = ax[1])
+fig.canvas.draw(); fig.show()
+            
+# ax[1].grid(b=True)
+# ax[0].grid(b=True)
+# ax[0].set_title('PlasmaResponse, sqrt(psi)=%.2f'%(psi))
+# ax[0].set_ylabel('Amplitude', fontsize = 14)
+# ax[1].set_ylabel('Phase', fontsize = 14)
+# ax[1].set_xlabel(r'$q_{95}$', fontsize = 14)
+# fig.suptitle(file_name,fontsize=8)
+# leg = ax[0].legend(loc='best')
+# leg.get_frame().set_alpha(0.5)
+# fig.canvas.draw(); fig.show()
+
+
 
 
 
