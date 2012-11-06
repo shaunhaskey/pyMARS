@@ -5,7 +5,7 @@ components in PEST co-ordinates
 
 '''
 
-import results_class
+import results_class, copy
 from RZfuncs import I0EXP_calc
 import numpy as np
 import matplotlib.pyplot as pt
@@ -16,10 +16,11 @@ import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146382_scan/shot146382_scan_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
-facn = 1.0; psi = 0.94
+facn = 1.0; psi = 0.92
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
@@ -44,9 +45,11 @@ print phasing
 q95_list = []; Bn_Li_list = []
 phase_machine_ntor = 0
 amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; time_list = []
+amps_plas_comp_upper = []; amps_plas_comp_lower = []
+amps_vac_comp_upper = []; amps_vac_comp_lower = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
-    Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
+    Bn_Li_list.append(project_dict['sims'][i]['BETAN']/project_dict['sims'][i]['LI'])
     relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
     relevant_values_lower_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_lower']
     relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
@@ -67,8 +70,12 @@ for i in project_dict['sims'].keys():
     amps_tot_comp.append(relevant_values_upper_tot + relevant_values_lower_tot*phasor)
     amps_plas_comp.append(relevant_values_upper_tot-relevant_values_upper_vac + (relevant_values_lower_tot-relevant_values_lower_vac)*phasor)
 
+    amps_plas_comp_upper.append(relevant_values_upper_tot-relevant_values_upper_vac)
+    amps_plas_comp_lower.append(relevant_values_lower_tot-relevant_values_lower_vac)
+    amps_vac_comp_upper.append(relevant_values_upper_vac)
+    amps_vac_comp_lower.append(relevant_values_lower_vac)
 
-
+q95_list_copy = copy.deepcopy(q95_list)
 
 plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
 plot_quantity_vac_phase=[];plot_quantity_plas_phase=[];plot_quantity_tot_phase=[];
@@ -76,6 +83,10 @@ plot_quantity_vac_phase=[];plot_quantity_plas_phase=[];plot_quantity_tot_phase=[
 plot_quantity = 'max'
 max_loc_list = []
 mode_list = []
+upper_values_plasma = []
+lower_values_plasma = []
+upper_values_vac = []
+lower_values_vac = []
 for i in range(0,len(amps_vac_comp)):
     if plot_quantity == 'average':
         plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
@@ -95,6 +106,11 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_vac_phase.append(np.angle(amps_vac_comp[i][max_loc], deg = True))
         plot_quantity_plas_phase.append(np.angle(amps_plas_comp[i][max_loc], deg= True))
         plot_quantity_tot_phase.append(np.angle(amps_tot_comp[i][max_loc], deg = True))
+
+        upper_values_plasma.append(amps_plas_comp_upper[i][max_loc])
+        lower_values_plasma.append(amps_plas_comp_lower[i][max_loc])
+        upper_values_vac.append(amps_vac_comp_upper[i][max_loc])
+        lower_values_vac.append(amps_vac_comp_lower[i][max_loc])
 
 
 # plot_quantity_tot_dummy = copy.deepcopy(plot_quantity_tot)
@@ -180,6 +196,45 @@ ax[1].set_xlabel('time (ms)')
 fig.suptitle(file_name,fontsize=8)
 
 fig.canvas.draw(); fig.show()
+
+
+
+
+phasing_array = np.linspace(-180,180,360)
+fig, ax = pt.subplots(nrows =2 , sharex = 1, sharey = 1)
+q95_array = np.array(q95_list_copy)
+
+
+rel_lower_vals_plasma = np.array(lower_values_plasma)
+rel_upper_vals_plasma = np.array(upper_values_plasma)
+rel_lower_vals_vac =  np.array(lower_values_vac)
+rel_upper_vals_vac =  np.array(upper_values_vac)
+
+plot_array_plasma = np.ones((phasing_array.shape[0], q95_array.shape[0]),dtype=float)
+plot_array_vac = np.ones((phasing_array.shape[0], q95_array.shape[0]),dtype=float)
+
+
+for i, curr_phase in enumerate(phasing_array):
+    phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
+    plot_array_plasma[i,:] = np.abs(rel_upper_vals_plasma + rel_lower_vals_plasma*phasor)
+    plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
+color_plot = ax[0].pcolor(q95_array, phasing_array, plot_array_plasma, cmap='hot')
+color_plot2 = ax[1].pcolor(q95_array, phasing_array, plot_array_vac, cmap='hot')
+#color_plot.set_clim()
+ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
+ax[0].set_ylabel('Phasing (deg)')
+ax[1].set_ylabel('Phasing (deg)')
+ax[0].set_title('Kink Amplitude - Plasma')
+ax[1].set_title('Kink Amplitude - Vacuum')
+ax[0].set_xlim([2.2,5.8])
+ax[0].set_ylim([-180,180])
+color_plot.set_clim([0.002, 3])
+pt.colorbar(color_plot, ax = ax[0])
+pt.colorbar(color_plot, ax = ax[1])
+fig.canvas.draw(); fig.show()
+
+
+
 
 '''
 xnew = np.linspace(2.,7.,200)

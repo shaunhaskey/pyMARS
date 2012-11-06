@@ -14,6 +14,10 @@ b = 0
 a = qedge-qmin
 qprofile = a * psibar**2 + b * psibar + c
 
+dataq = num.loadtxt(open('PROFEQ.OUT','r'))
+psibar = dataq[:,0]
+qprofile = dataq[:,1]
+
 fig = pt.figure()
 ax = fig.add_subplot(111)
 ax.plot(psibar,qprofile,label='original')
