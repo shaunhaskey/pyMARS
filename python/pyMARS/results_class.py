@@ -407,7 +407,7 @@ class data():
                 tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
                 plot_quantity = zdat[tmp_SURFMN_loc,:]*self.SURFMN_A/((2*np.pi)**2)#*self.SURFMN_DPSIDS
                 ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], plot_quantity, label = 'SURFMN s=%.2f'%(tmp_m))
-                ax_tmp10[1].plot(ydat[tmp_SURFMN_loc,:], plot_quantity/5, 'k-',label = 'SURFMN s=%.2f'%(tmp_m))
+                ax_tmp10[1].plot(ydat[tmp_SURFMN_loc,:], plot_quantity, 'k-',label = 'SURFMN s=%.2f'%(tmp_m))
                 for j in range(0,len(ydat[tmp_SURFMN_loc,:]), 5):
                     #ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j], str(tmp_m), fontsize = 8.5)
                     ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], plot_quantity[j], str(tmp_m), fontsize = 8.5)

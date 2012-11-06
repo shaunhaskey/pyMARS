@@ -16,6 +16,7 @@ import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146382_scan/shot146382_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_fine_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/equal_spacing/equal_spacing_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
@@ -111,7 +112,7 @@ for i in range(0,len(amps_vac_comp)):
 
 
 xnew = np.linspace(2.,7.,200)
-ynew = np.linspace(0.75,3.5,200)
+ynew = np.linspace(0.75,4.5,200)
 xnew_grid, ynew_grid = np.meshgrid(xnew,ynew)
 q95_Bn_array = np.zeros((len(q95_list),2),dtype=float)
 q95_Bn_array[:,0] = q95_list[:]
@@ -210,7 +211,7 @@ pt.colorbar(color_fig_plas, ax = ax[0])
 if plot_quantity=='average':
     color_fig_plas.set_clim([0,7])
 elif plot_quantity=='max':
-    color_fig_plas.set_clim([0,7])
+    color_fig_plas.set_clim([0,2])
 ax[0].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
 ax[0].set_title('Plasma, sqrt(psi)=%.2f'%(psi))
 ax[0].plot(q95_list, Bn_Li_list,'k.')
@@ -285,19 +286,37 @@ pmult_array = np.array(pmult_list)
 q95_array = np.array(q95_list)
 rel_q95_vals = q95_array[pmult_array==pmult_values[0]]
 
+
 rel_lower_vals_plasma = np.array(lower_values_plasma)[pmult_array==pmult_values[0]]
 rel_upper_vals_plasma = np.array(upper_values_plasma)[pmult_array==pmult_values[0]]
 rel_lower_vals_vac = np.array(lower_values_vac)[pmult_array==pmult_values[0]]
 rel_upper_vals_vac = np.array(upper_values_vac)[pmult_array==pmult_values[0]]
 
+Bn_Li_value = 2.2
+q95_single = np.linspace(2.8,6,100)
+rel_lower_vals_plasma = griddata(q95_Bn_array, np.array(lower_values_plasma), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+rel_upper_vals_plasma = griddata(q95_Bn_array, np.array(upper_values_plasma), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+rel_lower_vals_vac = griddata(q95_Bn_array, np.array(lower_values_vac), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+rel_upper_vals_vac = griddata(q95_Bn_array, np.array(upper_values_vac), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+
+
+
 plot_array_plasma = np.ones((phasing_array.shape[0], rel_q95_vals.shape[0]),dtype=float)
+plot_array_plasma = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
+
+
 plot_array_vac = np.ones((phasing_array.shape[0], rel_q95_vals.shape[0]),dtype=float)
+plot_array_vac = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
+
+
 for i, curr_phase in enumerate(phasing_array):
     phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
     plot_array_plasma[i,:] = np.abs(rel_upper_vals_plasma + rel_lower_vals_plasma*phasor)
     plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
-color_plot = ax[0].pcolor(rel_q95_vals, phasing_array, plot_array_plasma, cmap='hot')
-color_plot2 = ax[1].pcolor(rel_q95_vals, phasing_array, plot_array_vac, cmap='hot')
+#color_plot = ax[0].pcolor(rel_q95_vals, phasing_array, plot_array_plasma, cmap='hot')
+#color_plot2 = ax[1].pcolor(rel_q95_vals, phasing_array, plot_array_vac, cmap='hot')
+color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_plasma, cmap='hot')
+color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_vac, cmap='hot')
 #color_plot.set_clim()
 ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
 ax[0].set_ylabel('Phasing (deg)')

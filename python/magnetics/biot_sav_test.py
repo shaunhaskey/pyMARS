@@ -44,6 +44,7 @@ print Ns, Ns1, Ns2
 Nm2 = Nm0
 R, Z =  GetRZ(RM,ZM,Nm0,Nm2,chi,phi)
 FEEDI = get_FEEDI('FEEDI')
+I0EXP = 2.*3./(2.*num.pi)*1.e3
 BNORM = calc_BNORM(FEEDI, R0EXP, I0EXP = I0EXP)
 last_calc_surf = 250#int(Ns1+1)
 last_calc_surf = 300
