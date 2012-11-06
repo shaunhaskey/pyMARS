@@ -6,6 +6,7 @@ relevant_data = ['betan', 'q95', 'LI']
 shots = [146392, 146398, 146397, 146388, 146382, 148765]
 start_times= [3000,3000,3000,3000,2387,2392]
 end_times = [4123,3906,4258,4454,4862,5288]
+'''
 answers = {}
 for loc, shot in enumerate(shots):
     answers[shot]={}
@@ -26,44 +27,30 @@ ax.set_xlabel('q95')
 ax.set_ylabel('Beta_n/L_i')
 ax.set_title('Experimental dataset')
 fig.canvas.draw(); fig.show()
-
 '''
 
 
+lower_array_list = ['IL30', 'IL90','IL150','IL210','IL270','IL330','IU30', 'IU90','IU150','IU210','IU270','IU330']
+loc = 0
+for loc in range(0,len(shots)):
+    print '============== %d ================'%(shots[loc])
+    for j,i in enumerate(lower_array_list):
+        shot = shots[loc]
+        new_time_axis = np.arange(start_times[loc]+10,end_times[loc]-10,0.5)
+        new_time_axis = np.arange(3050,3850,0.5)
+        pickup_data = data.Data(i, shot)
+        new_data = np.interp(new_time_axis, np.array(pickup_data.x).flatten(), np.array(pickup_data.y).flatten())
+        new_data_fft = 2.*np.fft.fft(new_data)/len(new_data)
+        fft_freqs = np.fft.fftfreq(len(new_data),d=(new_time_axis[2]-new_time_axis[1])/1000.)
+        max_loc = np.argmax(np.abs(new_data_fft[0:len(fft_freqs)/2]))
+        if j == 0:
+            ref_phase = np.angle(new_data_fft[max_loc],deg=True)
+            phase_answer = 0
+        else:
+            phase_answer = np.angle(new_data_fft[max_loc],deg=True) - ref_phase
+            if phase_answer<0.: phase_answer += 360.
+            if phase_answer<0.: phase_answer += 360.
+            if phase_answer>360.: phase_answer -= 360.
 
+        print 'freq : %8.2fHz, amp : %8.2f, phase : %8.2f, cos(phase): %8.2f'%(fft_freqs[max_loc], np.abs(new_data_fft[max_loc]), phase_answer, np.cos(phase_answer/180.*np.pi))
 
-
-
-
-
-
-
-
-q95_const = [3.75, 3.77, 3.6]
-Bn = [2.02, 2.22, 2.1]
-
-fig, ax = pt.subplots()
-ax.plot(q95_const, Bn, 'x', label='const shots')
-
-Bn_range = np.arange(2,2.3,0.1)
-q95_range = Bn_range*0+3.3
-
-ax.plot(q95_range, Bn_range, '.-', label='Bn ramp1 146398')
-
-Bn_range = np.arange(2,2.4,0.1)
-q95_range = Bn_range*0+3.75
-
-ax.plot(q95_range, Bn_range, '.-', label='Bn ramp2 148765')
-
-q95_range = np.linspace(4,3.5,10)
-Bn_range = np.linspace(2.1,1.9,10)
-
-ax.plot(q95_range, Bn_range, '.-', label='q95,Bn ramp2 146382')
-leg = ax.legend(loc='best',fancybox=True)
-ax.set_xlabel('q95')
-ax.set_ylabel('beta_n')
-
-ax.set_xlim(2,7)
-ax.set_ylim(1,5)
-fig.canvas.draw(); fig.show()
-'''
