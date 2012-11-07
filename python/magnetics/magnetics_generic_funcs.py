@@ -5,6 +5,7 @@
 import h5py, copy
 import numpy as num
 import scipy.signal as signal
+import scipy.signal as scipy_signal
 try:
     import data
 except:
@@ -196,23 +197,27 @@ def get_hdf5values(f, sensor_name, coil_name, nd, debug=0):
         print 'sk:', ['%.2e'%(i_tmp) for i_tmp in sk]
     return sk, sp, sz, Afit, Bfit, np, nz
 
-def sfft(ref_signal, signal, time, length, fs=1000., ax=None, label=None):
-    complex=[]
-    time_values = []
+def sfft(ref_signal, signal, time, length, fs=1000., phase_ax=None, amp_ax=None, label=None,i_coil_freq = 10., window='boxcar'):
+    complex_list=[]; time_values = []; ref_list = []
     length=int(length)
+    window = getattr(scipy_signal, window)
+    window_func = window(length)
     for i in range(0,len(signal)-length):
-        sfft = num.fft.fft(signal[i:i+length])
-        sfft_ref = num.fft.fft(ref_signal[i:i+length])
+        sfft = 2.*10000.*num.fft.fft(signal[i:i+length]*window_func)/length
+        sfft_ref = 2.*num.fft.fft(ref_signal[i:i+length]*window_func)/length
         sfft_freqs = num.fft.fftfreq(len(sfft),1./fs)
-        index = num.argmin(num.abs(sfft_freqs-10))
-        #print index, sfft_freqs[index],
-        complex.append(sfft[index]/sfft_ref[index])
+        index = num.argmin(num.abs(sfft_freqs-i_coil_freq))
+        #print index, sfft_freqs[index], num.max(num.abs(sfft_ref)),num.abs(sfft_ref[index])
+        complex_list.append(sfft[index]/sfft_ref[index])
         time_values.append(num.mean(time[i:i+length]))
-    complex_array = num.array(complex)
+        ref_list.append(sfft_ref[index])
+    complex_array = num.array(complex_list)
     phase_array = num.angle(complex_array,deg=True)
     amp_array = num.abs(complex_array)
-    if ax!= None:
-        ax.plot(time_values, phase_array,label=label, linewidth=3.5)
+    if phase_ax!= None:
+        phase_ax.plot(time_values, phase_array, 'x',label=label,linewidth=3.5)
+    if amp_ax!= None:
+        amp_ax.plot(time_values, num.abs(amp_array)*1000., 'x',label=label, linewidth=3.5)
     return complex_array, phase_array, amp_array
 
 def hilbert_func(I_coil_output, pickup_output, time, freq_band, ax=None, label=None):
@@ -296,7 +301,7 @@ def return_trans_func(f, sensor_name, coil_name, sample_rate, nd=16, debug=0):
         return 0, 0, 0
 
     #convert zero-pole-gain representation to polynomial representation
-    b_s, a_s = signal.zpk2tf(sz,sp,sk)
+    b_s, a_s = scipy_signal.zpk2tf(sz,sp,sk)
     if debug==1:
         print 'b_s:', ['%.2e'%(i_tmp) for i_tmp in b_s]
         print 'a_s:', ['%.2e'%(i_tmp) for i_tmp in a_s]
@@ -304,7 +309,7 @@ def return_trans_func(f, sensor_name, coil_name, sample_rate, nd=16, debug=0):
 
     #convert from s-domain -> z-domain using bilinear transform
     #note this uses a modified version of the scipy function
-    #b_z, a_z = signal.bilinear(b_s, a_s,fs=sample_rate)
+    #b_z, a_z = scipy_signal.bilinear(b_s, a_s,fs=sample_rate)
     b_z, a_z = bilinear(b_s, a_s, fs=sample_rate)
     if debug==1:
         print 'b_z:', ['%.2e'%(i_tmp) for i_tmp in b_z]
@@ -322,7 +327,7 @@ def return_coupling(a_z, b_z, shot, time,coil_name, existing_signals):
     print 'obtained I-coil signal'
 
     #calculate the signal that is coupled to the I_coil
-    new_signal = signal.lfilter(b_z, a_z, I_coil_current)
+    new_signal = scipy_signal.lfilter(b_z, a_z, I_coil_current)
     return new_signal, I_coil_RMS
 
 
@@ -333,7 +338,7 @@ def fft_contribs(plasma_component, vacuum_contributions, sample_rate, time, I_co
     value at the perturbation frequency
     '''
     fft_list = []
-    window = getattr(signal, window)
+    window = getattr(scipy_signal, window)
     window_func = window(len(plasma_component))
     fft_freqs = num.fft.fftfreq(len(plasma_component), 1./sample_rate)
     fft_list.append(2.*10000.*num.fft.fft(plasma_component*window_func)/len(plasma_component)) #in Gauss
@@ -352,8 +357,8 @@ def fft_contribs(plasma_component, vacuum_contributions, sample_rate, time, I_co
         if plot_filtered_signal == 1:
             fs = 1./((time[1]-time[0])/1000.)
             cutoff = 100.
-            b_butter,a_butter = signal.butter(6,cutoff/fs)
-            time_ax.plot(time, signal.lfilter(b_butter, a_butter, plasma_component))
+            b_butter,a_butter = scipy_signal.butter(6,cutoff/fs)
+            time_ax.plot(time, scipy_signal.lfilter(b_butter, a_butter, plasma_component))
     sra_answer = sra_analysis(time, I_coil_freq, plasma_component, time_ax)
     #multiply sra_answer by 10000 to brinag change it to G
     return fft_freqs, fft_list, plasma_component, sra_answer*10000.
@@ -512,4 +517,3 @@ def array_details(pickup_name, shot, time, number_of_samples):
         fig.canvas.draw()
         fig.show()
     return F, fft_list, output_list
-

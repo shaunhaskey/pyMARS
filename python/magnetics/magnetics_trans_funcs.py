@@ -39,8 +39,8 @@ import matplotlib.pyplot as pt
 
 sensor_array_name = 'Bp_probes_R0_working'
 #sensor_array_name = 'Br_probes_R0_working'
-sensor_array_name = 'Br_probes_R0'
-sensor_array_name = 'Br_probes_R2'
+#sensor_array_name = 'Br_probes_R0'
+#sensor_array_name = 'Br_probes_R2'
 icoil_name =  'I_coils_upper'
 bulk_read = 0
 jeremy_idl_compare = 0
@@ -58,7 +58,7 @@ remove_mean = 0
 remove_trend = 1
 timer_start = timer_module.time()
 nd = 16
-coil_name_list_upper = ['IU30','IU90','IU150','IU210','IU270','IU330','IL30','IL90','IL150','IL210','IL270','IL330']
+coupling_coils = ['IU30','IU90','IU150','IU210','IU270','IU330','IL30','IL90','IL150','IL210','IL270','IL330']
 
 I_coil_plots = 0
 include_svd_plot_pickups = 1
@@ -66,11 +66,13 @@ include_svd_plot_coils = 0
 
 #These give good SNR
 shot = 146382;start_time = 2500; end_time = 4500 # this gives good SNR!
-shot = 146388;start_time = 3020; end_time = 4400 #This gives a pretty good signal
-shot = 146392;start_time = 3080; end_time = 4100 #gives pretty good signal
-shot = 146397;start_time = 3100; end_time = 4300 #gives pretty good signal
-shot = 146398;start_time = 3100; end_time = 3900 #gives pretty good signal
+#shot = 146388;start_time = 3020; end_time = 4400 #This gives a pretty good signal
+#shot = 146392;start_time = 3080; end_time = 4100 #gives pretty good signal
+#shot = 146397;start_time = 3100; end_time = 4300 #gives pretty good signal
+#shot = 146398;start_time = 3100; end_time = 3900 #gives pretty good signal
+#shot = 146398;start_time = 3400; end_time = 3800 #gives pretty good signal
 #shot = 148765;start_time = 2800; end_time = 4800 #gives pretty good signal
+shot = 148765;start_time = 2800; end_time = 5300 #gives pretty good signal
 
 #shot = 146382;start_time = 2500; end_time = 4500 # this gives good SNR!
 #shot = 146382;start_time = 3200; end_time = 3600
@@ -123,10 +125,10 @@ if bulk_read == 1:
         tmp_dict['name'] = tmp_array_name
         tmp_dict['pickup_names'] = mag_details.pickups.names(tmp_array_name)
         tmp_dict['phi'] = mag_details.pickups.phi(tmp_array_name)
-        tmp_dict = mag_funcs.extract_data(tmp_dict, shot, interp_time, vac_coupling, coil_name_list_upper, sample_rate, i_coil_freq, existing_signals, plotting=1, ax_ylim = [0,1.e-3], remove_mean = remove_mean, remove_trend = remove_trend)
+        tmp_dict = mag_funcs.extract_data(tmp_dict, shot, interp_time, vac_coupling, coupling_coils, sample_rate, i_coil_freq, existing_signals, plotting=1, ax_ylim = [0,1.e-3], remove_mean = remove_mean, remove_trend = remove_trend)
         del tmp_dict
 
-sensor_dict = mag_funcs.extract_data(sensor_dict, shot, interp_time, vac_coupling, coil_name_list_upper, sample_rate, i_coil_freq, existing_signals, plotting=1, ax_ylim = [0,20], remove_mean = remove_mean, remove_trend = remove_trend)
+sensor_dict = mag_funcs.extract_data(sensor_dict, shot, interp_time, vac_coupling, coupling_coils, sample_rate, i_coil_freq, existing_signals, plotting=1, ax_ylim = [0,20], remove_mean = remove_mean, remove_trend = remove_trend)
 icoil_dict = mag_funcs.extract_data(icoil_dict, shot, interp_time, vac_coupling, [], sample_rate, i_coil_freq, existing_signals, plotting=I_coil_plots, ax_ylim = None, remove_mean = 0, remove_trend = 0, plot_all=1)
 
 if jeremy_idl_compare == 1:
@@ -247,3 +249,12 @@ if write_pickle == 1:
     file_obj.close()
 
 print 'time to finish: %.2fs'%(timer_module.time() - timer_start)
+
+
+fig, ax = pt.subplots(nrows=2)
+n_cycles = 3
+length = n_cycles * 0.1*1000.
+for i in range(0,len(sensor_dict['comp_signals'])):
+    mag_funcs.sfft(icoil_dict['comp_signals'][0], sensor_dict['comp_signals'][i], interp_time, length, fs=1000., phase_ax=ax[0], amp_ax=ax[1], label=str(i), i_coil_freq = 10.,window='hanning')
+fig.suptitle('shot : %d, cycles = %d'%(shot, n_cycles))
+fig.canvas.draw();fig.show()

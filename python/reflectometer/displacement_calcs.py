@@ -45,7 +45,7 @@ shot = 146397; start_time = 3030; end_time = 4800
 
 reg_grid_pts = 100
 rad_thresh = 208
-include_MARS = 0
+include_MARS = 1
 perform_interp = 1
 density_interp_range = [0.1e19, 6.e19]
 radius_interp_range = [2.1, 2.35]
