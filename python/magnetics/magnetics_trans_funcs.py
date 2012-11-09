@@ -55,7 +55,7 @@ n_range = [3,15]
 #n_list = [0,2,4]
 n_list = [0,1,2,3,4]
 remove_mean = 0
-remove_trend = 1
+remove_trend = 0
 timer_start = timer_module.time()
 nd = 16
 coupling_coils = ['IU30','IU90','IU150','IU210','IU270','IU330','IL30','IL90','IL150','IL210','IL270','IL330']
@@ -64,20 +64,32 @@ I_coil_plots = 0
 include_svd_plot_pickups = 1
 include_svd_plot_coils = 0
 
+shot = 146382;start_time = 1000; end_time = 5500 # before and after I-coils
+#shot = 146388;start_time = 1000; end_time = 5000 #before and after I-coils
+#shot = 146392;start_time = 1000; end_time = 4500 # before and after I-coils
+#shot = 146397;start_time = 1000; end_time = 4500 #before and after I-coils
+#shot = 146398;start_time = 1000; end_time = 3950 #gives pretty good signal
+#shot = 148765;start_time = 1000; end_time = 6000 #gives pretty good signal
+
+
 #These give good SNR
-shot = 146382;start_time = 2500; end_time = 4500 # this gives good SNR!
+#shot = 146382;start_time = 2500; end_time = 4500 # this gives good SNR!
 #shot = 146388;start_time = 3020; end_time = 4400 #This gives a pretty good signal
 #shot = 146392;start_time = 3080; end_time = 4100 #gives pretty good signal
+
 #shot = 146397;start_time = 3100; end_time = 4300 #gives pretty good signal
+
 #shot = 146398;start_time = 3100; end_time = 3900 #gives pretty good signal
+
 #shot = 146398;start_time = 3400; end_time = 3800 #gives pretty good signal
 #shot = 148765;start_time = 2800; end_time = 4800 #gives pretty good signal
-shot = 148765;start_time = 2800; end_time = 5300 #gives pretty good signal
+#shot = 148765;start_time = 2800; end_time = 5300 #gives pretty good signal
 
 #shot = 146382;start_time = 2500; end_time = 4500 # this gives good SNR!
 #shot = 146382;start_time = 3200; end_time = 3600
 #shot = 146382;start_time = 3000; end_time = 3600
 #shot = 146388;start_time = 3020; end_time = 4400 #This gives a pretty good signal
+
 #shot = 146388;start_time = 3100; end_time = 3600
 #shot = 146392;start_time = 3400; end_time = 3800#3800#4300
 #shot = 146392;start_time = 3080; end_time = 4100 #gives pretty good signal
@@ -251,21 +263,27 @@ if write_pickle == 1:
 print 'time to finish: %.2fs'%(timer_module.time() - timer_start)
 
 
-fig, ax = pt.subplots(nrows=4, sharex = 1)
+fig, ax = pt.subplots(nrows=5, sharex = 1)
 n_cycles = 5
 length = n_cycles * 0.1*1000.
 for i in range(0,len(sensor_dict['comp_signals'])):
-    mag_funcs.sfft(icoil_dict['comp_signals'][0], sensor_dict['comp_signals'][i], interp_time, length, fs=1000., phase_ax=ax[0], amp_ax=ax[1], label=str(i), i_coil_freq = 10.,window='hanning')
+    mag_funcs.sfft(icoil_dict['comp_signals'][0], sensor_dict['comp_signals'][i], interp_time, length, fs=1000., phase_ax=ax[0], amp_ax=ax[1], label=str(i), i_coil_freq = 10.,window='blackman')
+    #mag_funcs.sfft(icoil_dict['comp_signals'][0], icoil_dict['comp_signals'][i], interp_time, length, fs=1000., phase_ax=ax[0], amp_ax=ax[1], label=str(i), i_coil_freq = 10.,window='boxcar')
 details_file = pickle.load(file('/home/srh112/NAMP_datafiles/%d_details.pickle'%(shot),'r'))
 
 tmp_q95 = num.interp(interp_time, details_file['q95']['x'],details_file['q95']['y'])
 tmp_betan = num.interp(interp_time, details_file['betan']['x'],details_file['betan']['y'])
 tmp_LI = num.interp(interp_time, details_file['LI']['x'],details_file['LI']['y'])
-ax[2].plot(interp_time, tmp_q95,'-.')
-ax[3].plot(interp_time, tmp_betan/tmp_LI, '-.')
-y_labels = ['phase', 'amp', 'q95','beta_n/li']
+ax[2].plot(interp_time, tmp_q95,'-')
+ax[3].plot(interp_time, tmp_betan/tmp_LI, '-')
+y_labels = ['phase', 'amp', 'q95','beta_n/li', 'I-coil']
+y_lims = [[-180,180],None,[2,5],[1.5,3.5],[-4000,4000]]
 for i in range(0,len(y_labels)):
     ax[i].set_ylabel(y_labels[i])
+    if y_lims[i]!=None:
+        ax[i].set_ylim(y_lims[i])
+    ax[i].grid()
 #interp_time
+ax[4].plot(interp_time,icoil_dict['comp_signals'][0])
 fig.suptitle('shot : %d, cycles = %d, %s'%(shot, n_cycles, sensor_array_name))
 fig.canvas.draw();fig.show()

@@ -208,16 +208,16 @@ def sfft(ref_signal, signal, time, length, fs=1000., phase_ax=None, amp_ax=None,
         sfft_freqs = num.fft.fftfreq(len(sfft),1./fs)
         index = num.argmin(num.abs(sfft_freqs-i_coil_freq))
         #print index, sfft_freqs[index], num.max(num.abs(sfft_ref)),num.abs(sfft_ref[index])
-        complex_list.append(sfft[index]/sfft_ref[index])
+        complex_list.append(sfft[index])#/sfft_ref[index])
         time_values.append(num.mean(time[i:i+length]))
         ref_list.append(sfft_ref[index])
     complex_array = num.array(complex_list)
-    phase_array = num.angle(complex_array,deg=True)
+    phase_array = num.angle(complex_array/num.array(ref_list),deg=True)
     amp_array = num.abs(complex_array)
     if phase_ax!= None:
-        phase_ax.plot(time_values, phase_array, 'x',label=label,linewidth=3.5)
+        phase_ax.plot(time_values, phase_array, '-',label=label,linewidth=1)
     if amp_ax!= None:
-        amp_ax.plot(time_values, num.abs(amp_array)*1000., 'x',label=label, linewidth=3.5)
+        amp_ax.plot(time_values, num.abs(amp_array)*1000., '-',label=label, linewidth=1)
     return complex_array, phase_array, amp_array
 
 def hilbert_func(I_coil_output, pickup_output, time, freq_band, ax=None, label=None):
