@@ -17,6 +17,7 @@ import matplotlib.cm as cm
 file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
+file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
@@ -222,26 +223,50 @@ pt.colorbar(color_plot, ax = ax[1])
 fig.canvas.draw(); fig.show()
 
 
-
-for i in [1,2]:#key_list_arranged:
-    'mars_upper_plasma_dir'
-    file_loc = project_dict['sims'][199]['dir_dict'][dir_type]
-
+plot_quantity = 'total'
+for i in key_list_arranged:
     N = 6; n = 2; I = np.array([1.,-1.,0.,1,-1.,0.])
     I0EXP = I0EXP_calc(N,n,I)
     facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
 
-    I0EXP = 1.0e+3*3./(2.*np.pi)
-    print I0EXP, 1.0e+3 * 3./np.pi
-    upper = results_class.data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/', I0EXP=I0EXP)
-    lower = results_class.data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/', I0EXP=I0EXP)
+    print '===========',i,'==========='
+    if plot_quantity=='total' or plot_quantity=='plasma':
+        upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
+        lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
+    elif plot_quantity=='vacuum':
+        upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
+        lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
+    elif plot_qauantity=='plasma':
+        upper_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
+        lower_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
+        upper_file_loc_plasma = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
+        lower_file_loc_plasma = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
+
+    upper = results_class.data(upper_file_loc, I0EXP=I0EXP)
+    lower = results_class.data(lower_file_loc, I0EXP=I0EXP)
     upper.get_PEST(facn = facn)
     lower.get_PEST(facn = facn)
+    tmp_R, tmp_Z, upper.B1, upper.B2, upper.B3, upper.Bn, upper.BMn, upper.BnPEST = results_class.combine_data(upper, lower, 0)
 
-    tmp_R, tmp_Z, upper.B1, upper.B2, upper.B3, upper.Bn, upper.BMn, upper.BnPEST = combine_data(upper, lower, 0)
-    
-    upper.plot1(inc_phase=0, clim_value=[0,0.6], ss_squared = 0)
-    #def plot1(self,title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):
+    if plot_quantity=='plasma':
+        upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
+        lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
+        upper_vac = results_class.data(upper_file_loc, I0EXP=I0EXP)
+        lower_vac = results_class.data(lower_file_loc, I0EXP=I0EXP)
+        upper_vac.get_PEST(facn = facn)
+        lower_vac.get_PEST(facn = facn)
+        tmp_R, tmp_Z, upper_vac.B1, upper_vac.B2, upper_vac.B3, upper_vac.Bn, upper_vac.BMn, upper_vac.BnPEST = results_class.combine_data(upper_vac, lower_vac, 0)
+
+        upper.B1 = upper.B1 - upper_vac.B1
+        upper.B2 = upper.B2 - upper_vac.B2
+        upper.B3 = upper.B3 - upper_vac.B3
+        upper.Bn = upper.Bn - upper_vac.Bn
+        upper.BMn = upper.BMn - upper_vac.BMn
+        upper.BnPEST = upper.BnPEST - upper_vac.BnPEST
+
+    print plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i]
+    suptitle = '%s key: %d, q95: %.2f, max_amp: %.2f, psi: %.2f, m_max: %d'%(plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i])
+    upper.plot1(suptitle = suptitle,inc_phase=0, clim_value=[0,2], ss_squared = 0, fig_show=0,fig_name='/u/haskeysr/%03d_q95_scan.png'%(i))
 
 
 '''

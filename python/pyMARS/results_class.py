@@ -287,7 +287,7 @@ class data():
         return self.mk.flatten()[lower_bound:upper_bound_new], self.ss[s_loc],relevant_values
 
 
-    def plot1(self,title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):
+    def plot1(self,suptitle='',title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):
         os.chdir(self.directory) 
         #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
         #file_name = 'PROFEQ_PEST'
@@ -519,7 +519,7 @@ class data():
             print 'not ss_squared'
             color_ax = ax.pcolor(mk,ss,np.abs(BnPEST),cmap='hot')#tmp_cmap)
             ax.plot(mq,sq,'wo')
-            ax.plot(tmp_mk_range, tmp_mk_range*0+tmp_ss,'ko')
+            #ax.plot(tmp_mk_range, tmp_mk_range*0+tmp_ss,'ko')
             #tmp_relevant_values = self.kink_amp(0.92, [2,4])
             ax.plot(q*n,s,'w--') 
 
@@ -599,12 +599,15 @@ class data():
                 ax4.set_xlim([lower_limit*180./np.pi,upper_limit*180./np.pi])
                 ax4.set_ylim([0,1])
 
+        fig.suptitle(suptitle)
         if fig_show==1:
             fig.canvas.draw()
             fig.show()
         if fig_name != '':
             print 'saving figure'
             fig.savefig(fig_name, dpi=200)
+            fig.clf()
+            pt.close('all')
 
 class results():
     def __init__(self,directory_v,directory_p):
