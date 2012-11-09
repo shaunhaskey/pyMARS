@@ -24,12 +24,12 @@ facn = 1.0; psi = 0.92
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
-phasing_range = [-90.,90.]
-phase_machine_ntor = 1
+phase_machine_ntor = 0
 make_animations = 0
 include_discrete_comparison = 0
 seperate_res_plot = 0
 include_vert_lines = 0
+plot_text = 1
 
 plot_type = 'best_harmonic'
 #plot_type = 'normalised'
@@ -43,11 +43,12 @@ print phasing
 phasing = phasing/180.*np.pi
 print phasing
 q95_list = []; Bn_Li_list = []
-phase_machine_ntor = 0
 amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; time_list = []
 amps_plas_comp_upper = []; amps_plas_comp_lower = []
 amps_vac_comp_upper = []; amps_vac_comp_lower = []
-for i in project_dict['sims'].keys():
+key_list = project_dict['sims'].keys()
+#extract the relevant data from the pickle file and put it into lists
+for i in key_list:
     q95_list.append(project_dict['sims'][i]['Q95'])
     Bn_Li_list.append(project_dict['sims'][i]['BETAN']/project_dict['sims'][i]['LI'])
     relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
@@ -75,28 +76,30 @@ for i in project_dict['sims'].keys():
     amps_vac_comp_upper.append(relevant_values_upper_vac)
     amps_vac_comp_lower.append(relevant_values_lower_vac)
 
-q95_list_copy = copy.deepcopy(q95_list)
 
-plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
-plot_quantity_vac_phase=[];plot_quantity_plas_phase=[];plot_quantity_tot_phase=[];
+plot_quantity_vac=[]; plot_quantity_plas=[]; plot_quantity_tot=[];
+plot_quantity_vac_phase=[]; plot_quantity_plas_phase=[]; plot_quantity_tot_phase=[];
 
+#Get the plot quantities out of the lists from the previous section
 plot_quantity = 'max'
-max_loc_list = []
-mode_list = []
-upper_values_plasma = []
-lower_values_plasma = []
-upper_values_vac = []
-lower_values_vac = []
+max_loc_list = []; mode_list = []
+upper_values_plasma = []; lower_values_plasma = []
+upper_values_vac = []; lower_values_vac = []
 for i in range(0,len(amps_vac_comp)):
     if plot_quantity == 'average':
         plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
         plot_quantity_plas.append(np.sum(np.abs(amps_plas_comp[i])**2)/len(amps_vac_comp[i]))
         plot_quantity_tot.append(np.sum(np.abs(amps_tot_comp[i])**2)/len(amps_vac_comp[i]))
         mode_list.append(np.average(mk_list[i][:]))
+
+        plot_quantity_vac_phase.append(0)
+        plot_quantity_plas_phase.append(0)
+        plot_quantity_tot_phase.append(0)
+
     elif plot_quantity == 'max':
-        
         max_loc = np.argmax(np.abs(amps_plas_comp[i]))
         max_loc_list.append(max_loc)
+
         mode_list.append(mk_list[i][max_loc])
         plot_quantity_vac.append(np.abs(amps_vac_comp[i][max_loc]))
         plot_quantity_plas.append(np.abs(amps_plas_comp[i][max_loc]))
@@ -113,25 +116,15 @@ for i in range(0,len(amps_vac_comp)):
         lower_values_vac.append(amps_vac_comp_lower[i][max_loc])
 
 
-# plot_quantity_tot_dummy = copy.deepcopy(plot_quantity_tot)
-# plot_quantity_plas_dummy = copy.deepcopy(plot_quantity_plas)
-# plot_quantity_vac_dummy = copy.deepcopy(plot_quantity_vac)
-# q95_dummy = copy.deepcopy(q95_list)
-# Bn_Li_dummy = copy.deepcopy(Bn_Li_list)
-# mode_list_dummy = copy.deepcopy(mode_list)
-
-plot_quantity_plas_arranged = []
-plot_quantity_tot_arranged = []
-plot_quantity_vac_arranged = []
-plot_quantity_plas_phase_arranged = []
-plot_quantity_tot_phase_arranged = []
-plot_quantity_vac_phase_arranged = []
-q95_list_arranged = []
-Bn_Li_list_arranged = []; mode_list_arranged = []
+#arange the answers based on q95 value, there is a better way to do this.... using zip
+plot_quantity_plas_arranged = []; plot_quantity_tot_arranged = []; plot_quantity_vac_arranged = []
+plot_quantity_plas_phase_arranged = []; plot_quantity_tot_phase_arranged = []; plot_quantity_vac_phase_arranged = []
+q95_list_arranged = []; Bn_Li_list_arranged = []; mode_list_arranged = []
 time_list_arranged = []
+q95_list_copy = copy.deepcopy(q95_list)
+key_list_arranged = []
 for i in range(0,len(q95_list)):
     cur_loc = np.argmin(q95_list)
-    print cur_loc
     q95_list_arranged.append(q95_list.pop(cur_loc))
     Bn_Li_list_arranged.append(Bn_Li_list.pop(cur_loc))
     plot_quantity_plas_arranged.append(plot_quantity_plas.pop(cur_loc))
@@ -142,38 +135,33 @@ for i in range(0,len(q95_list)):
     plot_quantity_tot_phase_arranged.append(plot_quantity_tot_phase.pop(cur_loc))
     mode_list_arranged.append(mode_list.pop(cur_loc))
     time_list_arranged.append(time_list.pop(cur_loc))
-    
+    key_list_arranged.append(key_list.pop(cur_loc))
+
+#amplitude and phase versus q95 and time
 fig, ax = pt.subplots(ncols = 2, nrows = 2)
 ax[0,0].plot(q95_list_arranged, plot_quantity_plas_arranged, 'o-', label = 'plasma')
 ax[0,0].plot(q95_list_arranged, plot_quantity_vac_arranged, 'o-', label = 'vacuum')
 ax[0,0].plot(q95_list_arranged, plot_quantity_tot_arranged, 'o-',label = 'total')
-#ax_m = ax[0,0].twinx()
-#ax_m.legend(loc='best')
 ax[0,0].plot(q95_list_arranged, np.array(mode_list_arranged)/2., 'x-',label = 'm/2')
-#ax_m.set_ylim([0,12])
-#mode_list_arranged.append(mode_list.pop(cur_loc))
-#ax[0,0].plot(q95_list_arranged, mode_list_arranged, 'o-',label = 'm')
+if plot_text ==1:
+    for i in range(0,len(key_list_arranged)):
+        ax[0,0].text(q95_list_arranged[i], plot_quantity_plas_arranged[i], str(key_list_arranged[i]), fontsize = 8.5)
+
+
 leg = ax[0,0].legend(loc='best', fancybox=True)
 leg.get_frame().set_alpha(0.5)
-#ax[0,0].set_xlim([3.0,5.5])
-#ax[0,0].set_xlabel('q95')
 ax[0,0].set_ylabel('mode amplitude')
 ax[0,0].set_title('sqrt(psi)=%.2f'%(psi))
 ax[0,1].plot(time_list_arranged, plot_quantity_plas_arranged, 'o', label = 'plasma')
 ax[0,1].plot(time_list_arranged, plot_quantity_vac_arranged, 'o', label = 'vacuum')
 ax[0,1].plot(time_list_arranged, plot_quantity_tot_arranged, 'o',label = 'total')
-#ax[0,1].set_xlabel('time (ms)')
-#fig.canvas.draw()
-#fig.show()
 
 
 ax[1,0].plot(q95_list_arranged, plot_quantity_plas_phase_arranged, 'o-', label = 'plasma')
 ax[1,0].plot(q95_list_arranged, plot_quantity_vac_phase_arranged, 'o-', label = 'vacuum')
 ax[1,0].plot(q95_list_arranged, plot_quantity_tot_phase_arranged, 'o-',label = 'total')
-#ax[1,0].plot(q95_list_arranged, mode_list_arranged, 'o-',label = 'm')
 leg = ax[1,0].legend(loc='best', fancybox = True)
 leg.get_frame().set_alpha(0.5)
-#ax[1,0].set_xlim([3.0,5.5])
 ax[1,0].set_xlabel('q95')
 ax[1,0].set_ylabel('phase (deg)')
 ax[1,1].plot(time_list_arranged, plot_quantity_plas_phase_arranged, 'o', label = 'plasma')
@@ -184,26 +172,22 @@ fig.suptitle(file_name,fontsize=8)
 fig.canvas.draw()
 fig.show()
 
-
-
+#plot q95 versus Bn/Li
 fig, ax = pt.subplots(ncols = 2, sharey=1)
 ax[0].plot(q95_list_arranged, Bn_Li_list_arranged, 'o-')
 ax[0].set_xlabel('q95')
 ax[0].set_ylabel('Bn/Li')
-ax[0].set_ylim([0,2.2])
+ax[0].set_ylim([0,3.5])
 ax[1].plot(time_list_arranged, Bn_Li_list_arranged, 'o')
 ax[1].set_xlabel('time (ms)')
 fig.suptitle(file_name,fontsize=8)
-
 fig.canvas.draw(); fig.show()
 
 
-
-
+#Work on the phasing as a function of q95
 phasing_array = np.linspace(-180,180,360)
-fig, ax = pt.subplots(nrows =2 , sharex = 1, sharey = 1)
+fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1)
 q95_array = np.array(q95_list_copy)
-
 
 rel_lower_vals_plasma = np.array(lower_values_plasma)
 rel_upper_vals_plasma = np.array(upper_values_plasma)
@@ -215,7 +199,11 @@ plot_array_vac = np.ones((phasing_array.shape[0], q95_array.shape[0]),dtype=floa
 
 
 for i, curr_phase in enumerate(phasing_array):
-    phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
+    phasing = curr_phase/180.*np.pi
+    if phase_machine_ntor:
+        phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
+    else:
+        phasor = (np.cos(phasing)+1j*np.sin(phasing))
     plot_array_plasma[i,:] = np.abs(rel_upper_vals_plasma + rel_lower_vals_plasma*phasor)
     plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
 color_plot = ax[0].pcolor(q95_array, phasing_array, plot_array_plasma, cmap='hot')
@@ -234,6 +222,26 @@ pt.colorbar(color_plot, ax = ax[1])
 fig.canvas.draw(); fig.show()
 
 
+
+for i in [1,2]:#key_list_arranged:
+    'mars_upper_plasma_dir'
+    file_loc = project_dict['sims'][199]['dir_dict'][dir_type]
+
+    N = 6; n = 2; I = np.array([1.,-1.,0.,1,-1.,0.])
+    I0EXP = I0EXP_calc(N,n,I)
+    facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
+
+    I0EXP = 1.0e+3*3./(2.*np.pi)
+    print I0EXP, 1.0e+3 * 3./np.pi
+    upper = results_class.data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/', I0EXP=I0EXP)
+    lower = results_class.data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/', I0EXP=I0EXP)
+    upper.get_PEST(facn = facn)
+    lower.get_PEST(facn = facn)
+
+    tmp_R, tmp_Z, upper.B1, upper.B2, upper.B3, upper.Bn, upper.BMn, upper.BnPEST = combine_data(upper, lower, 0)
+    
+    upper.plot1(inc_phase=0, clim_value=[0,0.6], ss_squared = 0)
+    #def plot1(self,title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):
 
 
 '''

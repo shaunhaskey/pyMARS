@@ -251,10 +251,21 @@ if write_pickle == 1:
 print 'time to finish: %.2fs'%(timer_module.time() - timer_start)
 
 
-fig, ax = pt.subplots(nrows=2)
-n_cycles = 3
+fig, ax = pt.subplots(nrows=4, sharex = 1)
+n_cycles = 5
 length = n_cycles * 0.1*1000.
 for i in range(0,len(sensor_dict['comp_signals'])):
     mag_funcs.sfft(icoil_dict['comp_signals'][0], sensor_dict['comp_signals'][i], interp_time, length, fs=1000., phase_ax=ax[0], amp_ax=ax[1], label=str(i), i_coil_freq = 10.,window='hanning')
-fig.suptitle('shot : %d, cycles = %d'%(shot, n_cycles))
+details_file = pickle.load(file('/home/srh112/NAMP_datafiles/%d_details.pickle'%(shot),'r'))
+
+tmp_q95 = num.interp(interp_time, details_file['q95']['x'],details_file['q95']['y'])
+tmp_betan = num.interp(interp_time, details_file['betan']['x'],details_file['betan']['y'])
+tmp_LI = num.interp(interp_time, details_file['LI']['x'],details_file['LI']['y'])
+ax[2].plot(interp_time, tmp_q95,'-.')
+ax[3].plot(interp_time, tmp_betan/tmp_LI, '-.')
+y_labels = ['phase', 'amp', 'q95','beta_n/li']
+for i in range(0,len(y_labels)):
+    ax[i].set_ylabel(y_labels[i])
+#interp_time
+fig.suptitle('shot : %d, cycles = %d, %s'%(shot, n_cycles, sensor_array_name))
 fig.canvas.draw();fig.show()
