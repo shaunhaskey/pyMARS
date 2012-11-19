@@ -17,8 +17,8 @@ import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_fine_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
-#file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
-N = 6; n = 2
+file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
+N = 6; n = 4
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
 I0EXP = 1.0e+3*0.528 #PMZ n4 real
@@ -51,6 +51,9 @@ phase_machine_ntor = 0
 amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; pmult_list = []; qmult_list = []; serial_list = []
 amps_plas_comp_upper = []; amps_plas_comp_lower = []
 amps_vac_comp_upper = []; amps_vac_comp_lower = []
+#upper_tot_res = []; lower_tot_res = []
+#upper_vac_res = []; lower_vac_res = []
+res_vac = []; res_tot = []; res_plas = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     serial_list.append(i)
@@ -60,10 +63,12 @@ for i in project_dict['sims'].keys():
     relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
     relevant_values_lower_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_lower']
     mk_list.append(project_dict['sims'][i]['responses'][str(psi)]['mk'])
+
     upper_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_upper']
-    lower_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_lower']
-    upper_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_upper']
-    lower_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_lower']
+    lower_tot_res = (project_dict['sims'][i]['responses']['total_resonant_response_lower'])
+    upper_vac_res = (project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
+    lower_vac_res = (project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
+
     pmult_list.append(project_dict['sims'][i]['PMULT'])
     qmult_list.append(project_dict['sims'][i]['QMULT'])
 
@@ -71,6 +76,10 @@ for i in project_dict['sims'].keys():
         phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
     else:
         phasor = (np.cos(phasing)+1j*np.sin(phasing))
+
+    res_vac.append(np.sum(np.abs(upper_vac_res + lower_vac_res*phasor)))
+    res_tot.append(np.sum(np.abs(upper_tot_res + lower_tot_res*phasor)))
+    res_plas.append(np.sum(np.abs(upper_tot_res-upper_vac_res + (lower_tot_res-lower_vac_res)*phasor)))
 
     amps_vac_comp.append(relevant_values_upper_vac + relevant_values_lower_vac*phasor)
     amps_tot_comp.append(relevant_values_upper_tot + relevant_values_lower_tot*phasor)
@@ -85,12 +94,9 @@ plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
 plot_quantity_vac_phase=[];plot_quantity_plas_phase=[];plot_quantity_tot_phase=[];
 
 plot_quantity = 'max'
-max_loc_list = []
-mode_list = []
-upper_values_plasma = []
-lower_values_plasma = []
-upper_values_vac = []
-lower_values_vac = []
+max_loc_list = []; mode_list = []
+upper_values_plasma = []; lower_values_plasma = []
+upper_values_vac = []; lower_values_vac = []
 for i in range(0,len(amps_vac_comp)):
     if plot_quantity == 'average':
         plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
@@ -129,6 +135,11 @@ q95_Bn_new[:,1] = ynew[:]
 plas_data = griddata(q95_Bn_array, plot_quantity_plas, (xnew_grid, ynew_grid),method = 'cubic')
 vac_data = griddata(q95_Bn_array, plot_quantity_vac, (xnew_grid, ynew_grid), method = 'cubic')
 tot_data = griddata(q95_Bn_array, plot_quantity_tot, (xnew_grid, ynew_grid), method = 'cubic')
+
+plas_data_res = griddata(q95_Bn_array, res_plas, (xnew_grid, ynew_grid),method = 'cubic')
+vac_data_res = griddata(q95_Bn_array, res_vac, (xnew_grid, ynew_grid), method = 'cubic')
+tot_data_res = griddata(q95_Bn_array, res_tot, (xnew_grid, ynew_grid), method = 'cubic')
+
 mode_data = griddata(q95_Bn_array, mode_list, (xnew_grid, ynew_grid), method = 'cubic')
 plas_data_phase = griddata(q95_Bn_array, plot_quantity_plas_phase, (xnew_grid, ynew_grid), method = 'linear')
 vac_data_phase = griddata(q95_Bn_array, plot_quantity_vac_phase, (xnew_grid, ynew_grid), method = 'linear')
@@ -155,6 +166,21 @@ for interp_meth in ['linear', 'cubic']:
     fig.suptitle(file_name,fontsize=8)
     fig.canvas.draw(); fig.show()
 
+fig,ax = pt.subplots(nrows = 3, sharex = 1, sharey = 1)
+color_fig = ax[0].pcolor(xnew, ynew, vac_data_res)
+color_fig.set_clim([0,7])
+pt.colorbar(color_fig, ax = ax[0])
+ax[0].set_title('vac')
+color_fig = ax[1].pcolor(xnew, ynew, plas_data_res)
+color_fig.set_clim([0,7])
+pt.colorbar(color_fig, ax = ax[1])
+ax[1].set_title('plas')
+color_fig = ax[2].pcolor(xnew, ynew, tot_data_res)
+color_fig.set_clim([0,7])
+pt.colorbar(color_fig, ax = ax[2])
+ax[2].set_title('tot')
+fig.canvas.draw(); fig.show()
+
 
 fig,ax = pt.subplots()
 color_fig = ax.pcolor(xnew, ynew, tot_data)
@@ -162,6 +188,10 @@ if plot_quantity=='average':
     color_fig.set_clim([0,7])
 elif plot_quantity=='max':
     color_fig.set_clim([0,7])
+
+
+
+
 
 ax.set_title('total data')
 fig.suptitle(file_name,fontsize=8)

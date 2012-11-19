@@ -546,6 +546,13 @@ def increase_grid(x, y, z, number=100):
     return x_out, y_out, z_out
 
 def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
+    '''
+    SH : 19 Nov 2012
+    read in q as a function of s (which is part of the output)
+    (mq, sq) are the locations of the m=nq surfaces
+    qn is the q value of the rational surface
+    Not entirely sure how this function is working....
+    '''
     #return the q profile
     dataq = np.loadtxt(open(file_name,'r'))
     s = dataq[:,0]
@@ -567,7 +574,7 @@ def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
                     yn.append(yy[k])
         return np.array(xn),np.array(yn)
 
-    sq,qn = FindX(s,q,qq)
+    sq, qn = FindX(s,q,qq)
     mq = qn*np.abs(n)
 
     return np.array(qn), np.array(sq), np.array(q), np.array(s),np.array(mq)

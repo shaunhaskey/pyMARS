@@ -14,8 +14,11 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
         project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
         Nchi = project_dict['sims'][i]['CHEASE_settings']['<<NCHI>>']
         I0EXP = project_dict['sims'][i]['I0EXP']
+
         print 'working on serial : ', i
         n = num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>'])
+        I0EXP = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
+
         if upper_and_lower == 1:
             directory = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
             upper_data_tot = results_class.data(directory, I0EXP=I0EXP)
@@ -33,18 +36,23 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
             lower_data_vac.get_PEST(facn = facn)
 
             print 'getting resonant_strength data'
-            a, upper_vac_res = upper_data_vac.resonant_strength()
-            a, lower_vac_res = lower_data_vac.resonant_strength()
-            a, upper_tot_res = upper_data_tot.resonant_strength()
-            a, lower_tot_res = lower_data_tot.resonant_strength()
+            upper_vac_res_integral, upper_vac_res_discrete = upper_data_vac.resonant_strength(n = n)
+            lower_vac_res_integral, lower_vac_res_discrete = lower_data_vac.resonant_strength(n = n)
+            upper_tot_res_integral, upper_tot_res_discrete = upper_data_tot.resonant_strength(n = n)
+            lower_tot_res_integral, lower_tot_res_discrete = lower_data_tot.resonant_strength(n = n)
 
             project_dict['sims'][i]['responses']={}
 
             #record the vacuum results (psi independent)
-            project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'] = copy.deepcopy(upper_vac_res)
-            project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'] = copy.deepcopy(lower_vac_res)
-            project_dict['sims'][i]['responses']['total_resonant_response_upper'] = copy.deepcopy(upper_tot_res)
-            project_dict['sims'][i]['responses']['total_resonant_response_lower'] = copy.deepcopy(lower_tot_res)
+            project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'] = copy.deepcopy(upper_vac_res_discrete)
+            project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'] = copy.deepcopy(lower_vac_res_discrete)
+            project_dict['sims'][i]['responses']['total_resonant_response_upper'] = copy.deepcopy(upper_tot_res_discrete)
+            project_dict['sims'][i]['responses']['total_resonant_response_lower'] = copy.deepcopy(lower_tot_res_discrete)
+            project_dict['sims'][i]['responses']['vacuum_resonant_response_upper_integral'] = copy.deepcopy(upper_vac_res_integral)
+            project_dict['sims'][i]['responses']['vacuum_resonant_response_lower_integral'] = copy.deepcopy(lower_vac_res_integral)
+            project_dict['sims'][i]['responses']['total_resonant_response_upper_integral'] = copy.deepcopy(upper_tot_res_integral)
+            project_dict['sims'][i]['responses']['total_resonant_response_lower_integral'] = copy.deepcopy(lower_tot_res_integral)
+
             project_dict['sims'][i]['responses']['resonant_response_mq'] = copy.deepcopy(upper_data_tot.mq)
             project_dict['sims'][i]['responses']['resonant_response_qn'] = copy.deepcopy(upper_data_tot.qn)
 
@@ -64,8 +72,6 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
                 project_dict['sims'][i]['responses'][current_label]['total_kink_response_lower'] = copy.deepcopy(relevant_values_lower_tot)
                 project_dict['sims'][i]['responses'][current_label]['mk'] = copy.deepcopy(mk_upper)
                 project_dict['sims'][i]['responses'][current_label]['ss'] = copy.deepcopy(ss_upper)
-
-
 
         else:
             #print 'hello2'

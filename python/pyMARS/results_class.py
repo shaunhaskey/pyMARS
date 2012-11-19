@@ -287,13 +287,12 @@ class data():
         self.A = np.array(new_area)
 
 
-    def resonant_strength(self, min_s = 0, power = 1):
+    def resonant_strength(self, min_s = 0, power = 1, n=2):
         os.chdir(self.directory) 
         #os.system('ln -sf PROFEQ.OUT PROFEQ_PEST')
         #file_name = 'PROFEQ_PEST'
         file_name = 'PROFEQ.OUT'
-        n = 2
-        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=2)
+        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         qn_grid, s_grid = np.meshgrid(q*n, self.s.flatten())
         temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(q*n, s.flatten()),method='linear')
