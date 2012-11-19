@@ -16,8 +16,16 @@ I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
 facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
 
-I0EXP = 1.0e+3*3./(2.*np.pi)
+#I0EXP = 1.0e+3*3.**1.5/(2.*np.pi)
+#I0EXP = 1.0e+3*0.954 #PMZ ideal
+I0EXP = 1.0e+3*0.863 #PMZ real
+#I0EXP = 1.0e+3*0.827 #MPM ideal
+#I0EXP = 1.0e+3*0.748 #MPM real
+#I0EXP = 1.0e+3*0.412 #MPM n4 real
+#I0EXP = 1.0e+3*0.528 #PMZ n4 real
+
 print I0EXP, 1.0e+3 * 3./np.pi
+
 #a = data('/home/srh112/code/pyMARS/shot146388_single2/qmult1.000/exp1.000/marsrun/RUNrfa.p',I0EXP = I0EXP)
 #a.plot_Bn(start_surface = 0,end_surface = a.Ns1+24,skip=1)
 #a.amp_plot.set_clim([0,20])
@@ -27,7 +35,14 @@ print I0EXP, 1.0e+3 * 3./np.pi
 #d = data('/home/srh112/NAMP_datafiles/mars/shot146382_single2/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
 #d = data('/home/srh112/Desktop/Test_Case/PEST_files/marsrun/RUNrfa.p', I0EXP=I0EXP)
 #d = data('/home/srh112/NAMP_datafiles/mars/shot146398_0deg/qmult1.000/exp1.000/amarsrun/RUNrfa.vac', I0EXP=I0EXP)
-d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/', I0EXP=I0EXP)
+
+
+#d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.p/', I0EXP=I0EXP)
+
+#d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_lower.p',I0EXP=I0EXP)
+d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+
+#d = data('/home/srh112/NAMP_datafiles/mars/shot146382_single_n4/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
 #d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/', I0EXP=I0EXP)
 
 #d = data('/home/srh112/NAMP_datafiles/mars/shot146398_0_MARS_SURFMN/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
@@ -46,7 +61,9 @@ d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/
 #c.plot1(inc_phase=0,clim_value=[0,1.2], surfmn_file = None)#'/home/srh112/code/python/NAMP_analysis/spectral_info.h5',ss_squared = 1)
 
 d.get_PEST(facn = facn)
-d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/spectral_info.h5', ss_squared = 0)
+#d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/spectral_info_pmz.h5', ss_squared = 0)
+
+d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/SURF146382.03230.ph000.pmz/surfmn.out.idl3d', ss_squared = 0, n=2)
 
 
 

@@ -1,3 +1,9 @@
+'''
+SH : 09/11/2012
+This compares the displacement output from various MARS runs. 
+In this example, its two different times from plain EFITS, and one from a kinetic efit
+
+'''
 import matplotlib.pyplot as pt
 import numpy as np
 from  results_class import *

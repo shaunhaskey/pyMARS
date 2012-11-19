@@ -16,10 +16,14 @@ import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146382_scan/shot146382_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_fine_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/equal_spacing/equal_spacing_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
+I0EXP = 1.0e+3*0.528 #PMZ n4 real
+
+
 facn = 1.0; psi = 0.92
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
@@ -211,6 +215,7 @@ pt.colorbar(color_fig_plas, ax = ax[0])
 if plot_quantity=='average':
     color_fig_plas.set_clim([0,7])
 elif plot_quantity=='max':
+    #pass
     color_fig_plas.set_clim([0,2])
 ax[0].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
 ax[0].set_title('Plasma, sqrt(psi)=%.2f'%(psi))
@@ -293,7 +298,7 @@ rel_lower_vals_vac = np.array(lower_values_vac)[pmult_array==pmult_values[0]]
 rel_upper_vals_vac = np.array(upper_values_vac)[pmult_array==pmult_values[0]]
 
 Bn_Li_value = 2.2
-q95_single = np.linspace(2.8,6,100)
+q95_single = np.linspace(2.6,6,100)
 rel_lower_vals_plasma = griddata(q95_Bn_array, np.array(lower_values_plasma), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 rel_upper_vals_plasma = griddata(q95_Bn_array, np.array(upper_values_plasma), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 rel_lower_vals_vac = griddata(q95_Bn_array, np.array(lower_values_vac), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
@@ -315,19 +320,27 @@ for i, curr_phase in enumerate(phasing_array):
     plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
 #color_plot = ax[0].pcolor(rel_q95_vals, phasing_array, plot_array_plasma, cmap='hot')
 #color_plot2 = ax[1].pcolor(rel_q95_vals, phasing_array, plot_array_vac, cmap='hot')
-color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_plasma, cmap='hot')
-color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_vac, cmap='hot')
+color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_plasma, cmap='hot', rasterized=True)
+color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_vac, cmap='hot', rasterized=True)
 #color_plot.set_clim()
+ax[0].plot(q95_single, phasing_array[np.argmax(plot_array_plasma,axis=0)],'k.')
+ax[1].plot(q95_single, phasing_array[np.argmax(plot_array_vac,axis=0)],'k.')
+ax[0].plot(q95_single, phasing_array[np.argmin(plot_array_plasma,axis=0)],'b.')
+ax[1].plot(q95_single, phasing_array[np.argmin(plot_array_vac,axis=0)],'b.')
+
 ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
 ax[0].set_ylabel('Phasing (deg)')
 ax[1].set_ylabel('Phasing (deg)')
 ax[0].set_title('Kink Amplitude - Plasma')
 ax[1].set_title('Kink Amplitude - Vacuum')
-ax[0].set_xlim([2.2,5.8])
+ax[0].set_xlim([np.min(q95_single),np.max(q95_single)])
 ax[0].set_ylim([-180,180])
-color_plot.set_clim([0.002, 3])
-pt.colorbar(color_plot, ax = ax[0])
-pt.colorbar(color_plot, ax = ax[1])
+color_plot.set_clim([0, 2])
+color_plot2.set_clim([0, 1])
+cb = pt.colorbar(color_plot, ax = ax[0])
+cb.ax.set_ylabel('Amp G/kA')
+cb = pt.colorbar(color_plot2, ax = ax[1])
+cb.ax.set_ylabel('Amp G/kA')
 fig.canvas.draw(); fig.show()
             
 # ax[1].grid(b=True)

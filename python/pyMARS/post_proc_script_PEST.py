@@ -108,7 +108,6 @@ project_dict = pickle.load(pickle_file)
 pickle_file.close()
 psi_list = [0.90, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99]
 project_dict = kink_resonant_response(project_dict, upper_and_lower = upper_and_lower, psi_list = psi_list)
-
 output_name = project_name + 'output'
 pickle_file = open(output_name,'w')
 pickle.dump(project_dict, pickle_file)

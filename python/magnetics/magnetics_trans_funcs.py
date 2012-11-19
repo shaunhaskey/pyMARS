@@ -65,11 +65,11 @@ include_svd_plot_pickups = 1
 include_svd_plot_coils = 0
 
 shot = 146382;start_time = 1000; end_time = 5500 # before and after I-coils
-#shot = 146388;start_time = 1000; end_time = 5000 #before and after I-coils
-#shot = 146392;start_time = 1000; end_time = 4500 # before and after I-coils
-#shot = 146397;start_time = 1000; end_time = 4500 #before and after I-coils
-#shot = 146398;start_time = 1000; end_time = 3950 #gives pretty good signal
-#shot = 148765;start_time = 1000; end_time = 6000 #gives pretty good signal
+shot = 146388;start_time = 1000; end_time = 5000 #before and after I-coils
+shot = 146392;start_time = 1000; end_time = 4500 # before and after I-coils
+shot = 146397;start_time = 1000; end_time = 4500 #before and after I-coils
+shot = 146398;start_time = 1000; end_time = 3950 #gives pretty good signal
+shot = 148765;start_time = 1000; end_time = 6000 #gives pretty good signal
 
 
 #These give good SNR
@@ -277,7 +277,7 @@ tmp_LI = num.interp(interp_time, details_file['LI']['x'],details_file['LI']['y']
 ax[2].plot(interp_time, tmp_q95,'-')
 ax[3].plot(interp_time, tmp_betan/tmp_LI, '-')
 y_labels = ['phase', 'amp', 'q95','beta_n/li', 'I-coil']
-y_lims = [[-180,180],None,[2,5],[1.5,3.5],[-4000,4000]]
+y_lims = [[-180,180],[0,9000],[2,5],[1.5,3.5],[-4000,4000]]
 for i in range(0,len(y_labels)):
     ax[i].set_ylabel(y_labels[i])
     if y_lims[i]!=None:
@@ -286,4 +286,6 @@ for i in range(0,len(y_labels)):
 #interp_time
 ax[4].plot(interp_time,icoil_dict['comp_signals'][0])
 fig.suptitle('shot : %d, cycles = %d, %s'%(shot, n_cycles, sensor_array_name))
+fig.set_size_inches([ 6.513,  8.275])
+fig.savefig('%d_Bp_midplane.png'%(shot))
 fig.canvas.draw();fig.show()

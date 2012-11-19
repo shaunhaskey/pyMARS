@@ -26,7 +26,7 @@ I_coil_freq = 10.
 #start_time = 3010; end_time = 3970
 
 shot = 146392; start_time = 2990; end_time = 4700
-shot = 146397; start_time = 3030; end_time = 4800
+#shot = 146397; start_time = 3030; end_time = 4800
 #shot = 146398; start_time = 3200; end_time = 3620
 
 #shot = 146398; start_time = 3050; end_time = 3950
@@ -68,9 +68,9 @@ elif shot == 146398:
     print 'using new non kinetic shot 146398 MARS run'
     base_dir = '/home/srh112/code/pyMARS/other_scripts/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
     base_dir = '/u/haskeysr/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
-    base_dir = '/home/srh112/mars/shot146398_3515/qmult1.000/exp1.000/marsrun/'
+    base_dir = '/home/srh112/NAMP_datafiles/mars/shot146398_3515/qmult1.000/exp1.000/marsrun/'
 else:
-    base_dir = '/home/srh112/code/pyMARS/other_scripts/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
+    base_dir = '/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
 #for sh_laptop
 
 #plots
@@ -831,6 +831,7 @@ if include_MARS == 1:
         Z_values=R_values * 0
         Vn_values = scipy_griddata((plas_r.flatten(),plas_z.flatten()), plot_quantity.flatten(), (R_values.flatten(),Z_values.flatten()))
         ax_freq[0].plot(R_values*100, np.abs(Vn_values)*100,'k-', label='MARS-Vn')
+        ax_freq[0].plot(R_values*100, np.imag(Vn_values)*100,'k-', label='MARS-Vn')
 
     plot_field = 'Vr'; field_type = 'plas'
     for theta_deg in [0]:

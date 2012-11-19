@@ -17,7 +17,7 @@ import matplotlib.cm as cm
 file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
-file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
+#file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
@@ -209,6 +209,10 @@ for i, curr_phase in enumerate(phasing_array):
     plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
 color_plot = ax[0].pcolor(q95_array, phasing_array, plot_array_plasma, cmap='hot')
 color_plot2 = ax[1].pcolor(q95_array, phasing_array, plot_array_vac, cmap='hot')
+ax[0].plot(q95_array, phasing_array[np.argmax(plot_array_plasma,axis=0)],'k.')
+ax[1].plot(q95_array, phasing_array[np.argmax(plot_array_vac,axis=0)],'k.')
+ax[0].plot(q95_array, phasing_array[np.argmin(plot_array_plasma,axis=0)],'b.')
+ax[1].plot(q95_array, phasing_array[np.argmin(plot_array_vac,axis=0)],'b.')
 #color_plot.set_clim()
 ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
 ax[0].set_ylabel('Phasing (deg)')
@@ -224,49 +228,51 @@ fig.canvas.draw(); fig.show()
 
 
 plot_quantity = 'total'
-for i in key_list_arranged:
-    N = 6; n = 2; I = np.array([1.,-1.,0.,1,-1.,0.])
-    I0EXP = I0EXP_calc(N,n,I)
-    facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
+plot_PEST_pics = 0
+if plot_PEST_pics:
+    for i in key_list_arranged:
+        N = 6; n = 2; I = np.array([1.,-1.,0.,1,-1.,0.])
+        I0EXP = I0EXP_calc(N,n,I)
+        facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
 
-    print '===========',i,'==========='
-    if plot_quantity=='total' or plot_quantity=='plasma':
-        upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
-        lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
-    elif plot_quantity=='vacuum':
-        upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
-        lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
-    elif plot_qauantity=='plasma':
-        upper_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
-        lower_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
-        upper_file_loc_plasma = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
-        lower_file_loc_plasma = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
+        print '===========',i,'==========='
+        if plot_quantity=='total' or plot_quantity=='plasma':
+            upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
+            lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
+        elif plot_quantity=='vacuum':
+            upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
+            lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
+        elif plot_qauantity=='plasma':
+            upper_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
+            lower_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
+            upper_file_loc_plasma = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
+            lower_file_loc_plasma = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
 
-    upper = results_class.data(upper_file_loc, I0EXP=I0EXP)
-    lower = results_class.data(lower_file_loc, I0EXP=I0EXP)
-    upper.get_PEST(facn = facn)
-    lower.get_PEST(facn = facn)
-    tmp_R, tmp_Z, upper.B1, upper.B2, upper.B3, upper.Bn, upper.BMn, upper.BnPEST = results_class.combine_data(upper, lower, 0)
+        upper = results_class.data(upper_file_loc, I0EXP=I0EXP)
+        lower = results_class.data(lower_file_loc, I0EXP=I0EXP)
+        upper.get_PEST(facn = facn)
+        lower.get_PEST(facn = facn)
+        tmp_R, tmp_Z, upper.B1, upper.B2, upper.B3, upper.Bn, upper.BMn, upper.BnPEST = results_class.combine_data(upper, lower, 0)
 
-    if plot_quantity=='plasma':
-        upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
-        lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
-        upper_vac = results_class.data(upper_file_loc, I0EXP=I0EXP)
-        lower_vac = results_class.data(lower_file_loc, I0EXP=I0EXP)
-        upper_vac.get_PEST(facn = facn)
-        lower_vac.get_PEST(facn = facn)
-        tmp_R, tmp_Z, upper_vac.B1, upper_vac.B2, upper_vac.B3, upper_vac.Bn, upper_vac.BMn, upper_vac.BnPEST = results_class.combine_data(upper_vac, lower_vac, 0)
+        if plot_quantity=='plasma':
+            upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
+            lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
+            upper_vac = results_class.data(upper_file_loc, I0EXP=I0EXP)
+            lower_vac = results_class.data(lower_file_loc, I0EXP=I0EXP)
+            upper_vac.get_PEST(facn = facn)
+            lower_vac.get_PEST(facn = facn)
+            tmp_R, tmp_Z, upper_vac.B1, upper_vac.B2, upper_vac.B3, upper_vac.Bn, upper_vac.BMn, upper_vac.BnPEST = results_class.combine_data(upper_vac, lower_vac, 0)
 
-        upper.B1 = upper.B1 - upper_vac.B1
-        upper.B2 = upper.B2 - upper_vac.B2
-        upper.B3 = upper.B3 - upper_vac.B3
-        upper.Bn = upper.Bn - upper_vac.Bn
-        upper.BMn = upper.BMn - upper_vac.BMn
-        upper.BnPEST = upper.BnPEST - upper_vac.BnPEST
+            upper.B1 = upper.B1 - upper_vac.B1
+            upper.B2 = upper.B2 - upper_vac.B2
+            upper.B3 = upper.B3 - upper_vac.B3
+            upper.Bn = upper.Bn - upper_vac.Bn
+            upper.BMn = upper.BMn - upper_vac.BMn
+            upper.BnPEST = upper.BnPEST - upper_vac.BnPEST
 
-    print plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i]
-    suptitle = '%s key: %d, q95: %.2f, max_amp: %.2f, psi: %.2f, m_max: %d'%(plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i])
-    upper.plot1(suptitle = suptitle,inc_phase=0, clim_value=[0,2], ss_squared = 0, fig_show=0,fig_name='/u/haskeysr/%03d_q95_scan.png'%(i))
+        print plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i]
+        suptitle = '%s key: %d, q95: %.2f, max_amp: %.2f, psi: %.2f, m_max: %d'%(plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i])
+        upper.plot1(suptitle = suptitle,inc_phase=0, clim_value=[0,2], ss_squared = 0, fig_show=0,fig_name='/u/haskeysr/%03d_q95_scan.png'%(i))
 
 
 '''

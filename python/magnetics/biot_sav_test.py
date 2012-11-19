@@ -45,7 +45,8 @@ Nm2 = Nm0
 R, Z =  GetRZ(RM,ZM,Nm0,Nm2,chi,phi)
 FEEDI = get_FEEDI('FEEDI')
 I0EXP = 2.*3./(2.*num.pi)*1.e3
-BNORM = calc_BNORM(FEEDI, R0EXP, I0EXP = I0EXP)
+
+#BNORM = calc_BNORM(FEEDI, R0EXP, I0EXP = I0EXP)
 last_calc_surf = 250#int(Ns1+1)
 last_calc_surf = 300
 #last_calc_surf = int(Ns1+1)
@@ -212,8 +213,8 @@ color_plot.set_clim([0,40])
 fig1.canvas.draw()
 fig1.show()
 '''
-
-
+I0EXP = I0EXP = 1.0e+3*0.863 #PMZ real
+directory = '/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.vac'
 MARS_results = results_class.data(directory,Nchi=513, I0EXP=I0EXP, spline_B23=2)
 results =  pyMARS.coil_responses6(np.sqrt(xyz_X**2+xyz_Y**2),xyz_Z, Bx, Bz, By, probe, probe_type, Rprobe,Zprobe,tprobe,lprobe)
 print results
@@ -264,15 +265,15 @@ def color_plot_fig(R,Z,plot_biot, plot_MARS, title=None, clim = [-15,15], tol = 
     else:
         fig1, ax = pt.subplots(ncols=2, sharey=1, sharex=1)
     color_plot = []
-    color_plot.append(ax[0].pcolor(R, Z, np.real(plot_biot), cmap = cmap)) #,edgecolors='blue')
-    color_plot.append(ax[1].pcolor(R, Z, np.real(plot_MARS), cmap = cmap))#,edgecolors='blue')
+    color_plot.append(ax[0].pcolor(R, Z, np.real(plot_biot), cmap = cmap, rasterized=True)) #,edgecolors='blue')
+    color_plot.append(ax[1].pcolor(R, Z, np.real(plot_MARS), cmap = cmap, rasterized=True))#,edgecolors='blue')
     diff = (np.real(plot_MARS)-np.real(plot_biot))
     ave = np.abs((np.real(plot_MARS)+np.real(plot_biot))/2.)
     ave[np.where(ave<tol)] = tol
     #should this one be included?
     #diff[np.where(np.abs(diff)<tol)] = tol
     if inc_diff:
-        color_plot.append(ax[2].pcolor(R, Z, np.abs(diff)/ave*100., cmap = 'hot'))#,edgecolors='blue')
+        color_plot.append(ax[2].pcolor(R, Z, np.abs(diff)/ave*100., cmap = 'hot', rasterized=True))#,edgecolors='blue')
         ax[2].set_title('% difference - ' + str(title))
         pt.colorbar(color_plot[2], ax=ax[2])
         color_plot[2].set_clim([0,100])
@@ -297,10 +298,21 @@ def color_plot_fig(R,Z,plot_biot, plot_MARS, title=None, clim = [-15,15], tol = 
     print 'plot took (s): ', -plot_start_time+time.time()
 
 
+
+I0EXP = 1.0e+3*0.528 #MPZ n4 real
+MARS_results2 = results_class.data('/home/srh112/NAMP_datafiles/mars/shot146382_single_n4/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
+
 color_plot_fig(R,Z,-Bz, MARS_results.Bz[0:last_calc_surf,:], title='Bz', clim=[-3,3], tol=0.5, inc_diff = 0)
 
 last_calc_surf=Ns1+1
-color_plot_fig(R[0:last_calc_surf,:],Z[0:last_calc_surf,:],np.sqrt(Bz[0:last_calc_surf,:]**2+By[0:last_calc_surf,:]**2+Bx[0:last_calc_surf,:]**2), np.sqrt(MARS_results.Bz[0:last_calc_surf,:]**2+MARS_results.Br[0:last_calc_surf,:]**2+MARS_results.Bphi[0:last_calc_surf,:]**2), title='|B|', clim=[0,9], tol=0.5, inc_diff = 0, cmap = 'jet')
+plot_quant1 = np.sqrt(Bz[0:last_calc_surf,:]**2+By[0:last_calc_surf,:]**2+Bx[0:last_calc_surf,:]**2)
+plot_quant2 = np.sqrt(MARS_results.Bz[0:last_calc_surf,:]**2+MARS_results.Br[0:last_calc_surf,:]**2+MARS_results.Bphi[0:last_calc_surf,:]**2)
+plot_quant3 = np.sqrt(MARS_results2.Bz[0:last_calc_surf,:]**2+MARS_results2.Br[0:last_calc_surf,:]**2+MARS_results2.Bphi[0:last_calc_surf,:]**2)
+plot_quant4 = plot_quant3 + plot_quant2 #effect of n=2 and n=4 ??
+color_plot_fig(R[0:last_calc_surf,:],Z[0:last_calc_surf,:],plot_quant1, plot_quant2, title='|B|', clim=[0,9], tol=0.5, inc_diff = 0, cmap = 'jet')
+
+
+color_plot_fig(R[0:last_calc_surf,:],Z[0:last_calc_surf,:],plot_quant1, plot_quant4, title='|B| inc n=4', clim=[0,9], tol=0.5, inc_diff = 0, cmap = 'jet')
 #color_plot_fig(R,Z,-Bx, MARS_results.Br[0:last_calc_surf,:], title='Br', clim=[-5,5])
 #color_plot_fig(R,Z,By, MARS_results.Bphi[0:last_calc_surf,:], title='Bphi')
 

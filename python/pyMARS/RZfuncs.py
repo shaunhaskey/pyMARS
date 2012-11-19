@@ -1,32 +1,74 @@
-import numpy as num
+import numpy as np
 #import matplotlib.pyplot as pt
 import matplotlib.mlab as mlab
 from scipy.interpolate import *
 from scipy.interpolate import griddata as scipy_griddata
 import os,copy
+import magnetics_details as mag_details
 
 def I0EXP_calc(N,n,I):
     # Calculate I0EXP based on Chu's memo. This provides the conversion between MARS-F
     # and real geometry based on several assumptions, refer to memo for details
-    i = num.arange(0,N,dtype=float)+1.
+    i = np.arange(0,N,dtype=float)+1.
     #N = 6.
     #n = 2.
 
-    ###I = num.array([1.,-0.5,-0.5,1,-0.5,-0.5]) Was using this one
-    #I = num.array([1.,-1.,0.,1,-1.,0.])
-    #I = num.array([1.,-1.,1.,-1.,1.,-1.])
-    #I = num.array([1.,0.5,-0.5,-1.,-0.5,0.5])
+    ###I = np.array([1.,-0.5,-0.5,1,-0.5,-0.5]) Was using this one
+    #I = np.array([1.,-1.,0.,1,-1.,0.])
+    #I = np.array([1.,-1.,1.,-1.,1.,-1.])
+    #I = np.array([1.,0.5,-0.5,-1.,-0.5,0.5])
 
-    answer = 2*num.sin(n*num.pi/N)/(n*num.pi)*num.sum(I*num.cos(2*num.pi*n/N*(i-1)))
+    answer = 2*np.sin(n*np.pi/N)/(n*np.pi)*np.sum(I*np.cos(2*np.pi*n/N*(i-1)))
     I0EXP = answer * 1.e3
     print 'I0EXP :', I0EXP
     return I0EXP
 
+def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0):
+    '''
+    SH : 19Nov2012
+    For given coil currents described by list I, and coil geometry described in
+    mag_details, calculate the Fourier component n in that particular coil configuration
+    '''
+    phi_zero = mag_details.coils.phi('I_coils_upper')/180.*np.pi
+    phi_range = mag_details.coils.width('I_coils_upper')/180.*np.pi
+    phi_tmp = np.linspace(0,2.*np.pi,100000)
+    current_output = phi_tmp * 0
+
+    for i, phi in enumerate(phi_zero):
+        phi_range_list = [phi-phi_range[i]/2., phi+phi_range[i]/2.]
+        curr_range = ((phi_tmp>phi_range_list[0]) * (phi_tmp<phi_range_list[1]))
+        current_output[curr_range] = I[i]
+
+    phi_array = np.array(phi_tmp)
+    current_array = np.array(current_output)
+    current_fft = np.fft.fft(current_array)
+    current_fft_freq = np.fft.fftfreq(len(current_fft),d=(phi_tmp[1]-phi_tmp[0])/(np.pi*2))
+    n_loc = np.argmin(np.abs(current_fft_freq - n))
+    if produce_plot:
+        import matplotlib.pyplot as pt
+        fig, ax = pt.subplots(nrows = 2)
+        ax[0].plot(phi_tmp*180./np.pi, current_array)
+        ax[0].set_ylim([-1.1,1.1])
+        ax[0].set_xlim([0,360])
+        ax[0].set_xlabel(r'$\phi$ (deg)',fontsize = 14)
+        ax[0].set_ylabel('Current (a.u)')
+        
+        ax[1].set_xlabel('Toroidal Mode Number (n)')
+        ax[1].set_ylabel('Current (a.u)')
+        start_loc = np.argmin(np.abs(current_fft_freq-0))
+        end_loc = np.argmin(np.abs(current_fft_freq-10))
+        ax[1].stem(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), '-')
+        ax[1].set_xlim([0,10])
+        ax[1].set_ylim([0,1.1])
+        fig.canvas.draw(); fig.show()
+    return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3
+
+
 
 def Icoil_MARS_grid_details(coilN,RMZMFILE,Nchi):
-    chi = num.linspace(num.pi*-1,num.pi,Nchi)
+    chi = np.linspace(np.pi*-1,np.pi,Nchi)
     chi.resize(1,len(chi))
-    phi = num.linspace(0,2.*num.pi,Nchi)
+    phi = np.linspace(0,2.*np.pi,Nchi)
     phi.resize(len(phi),1)
     RM, ZM, Ns, Ns1, Ns2, Nm0, R0EXP, B0EXP, s = readRMZM(RMZMFILE)
     Nm2 = Nm0*1
@@ -43,8 +85,8 @@ def MacGetRZcoil(RM,ZM,Nm0,Nm2,coil,s,Ns1):
     #Define the coils input for MARS-F
     IFEED = [];
     for k in range(0,coil.shape[0]):
-        smin = num.min(num.abs(s-coil[k,0]),0)
-        II = num.argmin(num.abs(s-coil[k,0]),0)
+        smin = np.min(np.abs(s-coil[k,0]),0)
+        II = np.argmin(np.abs(s-coil[k,0]),0)
         #[smin,II] = min(abs(Mac.s-Mac.coil(k,1)));
         IFEED.append(int(II+1-Ns1+1))  #**is this correct - too many +1??
 
@@ -59,26 +101,26 @@ def MacResetCoil(R,Z,coilN,Ns1,Ns,R0EXP,chi,s):
     for kc in range(0,coilN.shape[0]):
         I0 = []; J0 = []; D0 = [];
         for k in range(int(Ns1)-1,int(Ns)):
-            Ri, Rj = num.meshgrid(R[k,:],R[k,:])
-            Zi, Zj = num.meshgrid(Z[k,:],Z[k,:])
+            Ri, Rj = np.meshgrid(R[k,:],R[k,:])
+            Zi, Zj = np.meshgrid(Z[k,:],Z[k,:])
             Ri = Ri*R0EXP; Rj = Rj*R0EXP; Zi = Zi*R0EXP; Zj = Zj*R0EXP
-            tmp = num.sqrt((Ri-coilN[kc,0])**2 + (Zi-coilN[kc,1])**2) + num.sqrt((Rj-coilN[kc,2])**2 + (Zj-coilN[kc,3])**2)
-            Y = num.min(tmp,0)
-            II = num.argmin(tmp,0)
-            X = num.min(Y,0)
-            JJ = num.argmin(Y,0)
+            tmp = np.sqrt((Ri-coilN[kc,0])**2 + (Zi-coilN[kc,1])**2) + np.sqrt((Rj-coilN[kc,2])**2 + (Zj-coilN[kc,3])**2)
+            Y = np.min(tmp,0)
+            II = np.argmin(tmp,0)
+            X = np.min(Y,0)
+            JJ = np.argmin(Y,0)
             I0.append(II[JJ])
             J0.append(JJ)
             D0.append(X)
-        Dmin = num.min(D0,0)
-        kmin = num.argmin(D0,0)
+        Dmin = np.min(D0,0)
+        kmin = np.argmin(D0,0)
         Imin = I0[kmin]
         Jmin = J0[kmin]
         Dm.append(Dmin)
         km.append(kmin)
         coil[kc,0] = s[Ns1+kmin-1]  #** is this correct?
-        chi1 = chi[0,Jmin]/num.pi
-        chi2 = chi[0,Imin]/num.pi
+        chi1 = chi[0,Jmin]/np.pi
+        chi2 = chi[0,Imin]/np.pi
         if chi1 > 1.0:
             chi1 = chi1 - 2
         if chi2 > 1.0:
@@ -103,8 +145,8 @@ def MacGetBphysC(R,Z,dRds,dZds,dRdchi,dZdchi,jacobian,B1,B2,B3):
 
 def MacGetBphysT(R,Z,dRds,dZds,dRdchi,dZdchi,jacobian,B1,B2,B3,B0EXP):
     #return Brho, Bchi, Bphi based on B1,B2,B3
-    sqrtG11 = num.sqrt(dRds**2 + dZds**2)
-    sqrtG22 = num.sqrt(dRdchi**2 + dZdchi**2)
+    sqrtG11 = np.sqrt(dRds**2 + dZds**2)
+    sqrtG22 = np.sqrt(dRdchi**2 + dZdchi**2)
     sqrtG33 = R
     B0EXP=1.0
     Brho = B1*sqrtG11/jacobian*B0EXP
@@ -118,22 +160,22 @@ def MacGetBphysT(R,Z,dRds,dZds,dRdchi,dZdchi,jacobian,B1,B2,B3,B0EXP):
 
 def readRMZM(file_name):
     #read RMZM from Chease run
-    RMZM = num.loadtxt(open(file_name))
-    Nm0 = num.round(RMZM[0,0])
-    Ns1 = num.round(RMZM[0,1])
-    Ns2 = num.round(RMZM[0,2])
+    RMZM = np.loadtxt(open(file_name))
+    Nm0 = np.round(RMZM[0,0])
+    Ns1 = np.round(RMZM[0,1])
+    Ns2 = np.round(RMZM[0,2])
 
     R0EXP = RMZM[0,3]
     B0EXP = RMZM[1,3]
 
     Ns = Ns1 + Ns2
 
-    s = num.array(RMZM[1:Ns+1,0])
+    s = np.array(RMZM[1:Ns+1,0])
     RM = RMZM[Ns+1:,0] + RMZM[Ns+1:,1]*1j
     ZM = RMZM[Ns+1:,2] + RMZM[Ns+1:,3]*1j
 
-    RM = num.reshape(RM,[Ns,Nm0],order='F')
-    ZM = num.reshape(ZM,[Ns,Nm0],order='F')
+    RM = np.reshape(RM,[Ns,Nm0],order='F')
+    ZM = np.reshape(ZM,[Ns,Nm0],order='F')
 
     RM[:,1:] = 2.*RM[:,1:]
     ZM[:,1:] = 2.*ZM[:,1:]
@@ -143,12 +185,12 @@ def readRMZM(file_name):
 def GetRZ(RM,ZM,Nm0,Nm2,chi,phi):
     #convert RM and ZM into R and Z real space co-ordinates
     Nm2 = Nm0
-    m = num.arange(0,Nm2,1)
+    m = np.arange(0,Nm2,1)
     m.resize(len(m),1)
 
-    expmchi = num.exp(num.dot(m,chi)*1j)
-    R = num.real(num.dot(RM[:,0:Nm2],expmchi))
-    Z = num.real(num.dot(ZM[:,0:Nm2],expmchi))
+    expmchi = np.exp(np.dot(m,chi)*1j)
+    R = np.real(np.dot(RM[:,0:Nm2],expmchi))
+    Z = np.real(np.dot(ZM[:,0:Nm2],expmchi))
     return R,Z
 
 
@@ -157,14 +199,14 @@ def GetRZ(RM,ZM,Nm0,Nm2,chi,phi):
 def ReadVPLASMA(file_name, Ns, Ns1, s, spline_V23=1,VNORM=1.):
     #Read the BPLASMA output file from MARS-F
     #Return BM1, BM2, BM3
-    VPLASMA = num.loadtxt(open(file_name))
+    VPLASMA = np.loadtxt(open(file_name))
  
     Nm1 = VPLASMA[0,0]
     print 'Nm1 ', Nm1
-    n = num.round(VPLASMA[0,2])
+    n = np.round(VPLASMA[0,2])
     print 'VNORM ', VNORM
 
-    Mm = num.round(VPLASMA[1:Nm1+1,0])
+    Mm = np.round(VPLASMA[1:Nm1+1,0])
     Mm.resize([len(Mm),1])
     DPSIDS = VPLASMA[Nm1+1:Nm1+1+Ns1,0]
     T = VPLASMA[Nm1+1:Nm1+1+Ns1,3]
@@ -173,9 +215,9 @@ def ReadVPLASMA(file_name, Ns, Ns1, s, spline_V23=1,VNORM=1.):
     VM2 = VPLASMA[Nm1+1+Ns1:,2] + VPLASMA[Nm1+1+Ns1:,3]*1j
     VM3 = VPLASMA[Nm1+1+Ns1:,4] + VPLASMA[Nm1+1+Ns1:,5]*1j
     print VM1.shape, VM2.shape, VM3.shape
-    VM1 = num.reshape(VM1,[Ns1,Nm1],order='F')*VNORM
-    VM2 = num.reshape(VM2,[Ns1,Nm1],order='F')*VNORM
-    VM3 = num.reshape(VM3,[Ns1,Nm1],order='F')*VNORM
+    VM1 = np.reshape(VM1,[Ns1,Nm1],order='F')*VNORM
+    VM2 = np.reshape(VM2,[Ns1,Nm1],order='F')*VNORM
+    VM3 = np.reshape(VM3,[Ns1,Nm1],order='F')*VNORM
     print VM1.shape, VM2.shape, VM3.shape
     print VM1[100,30],VM2[100,30],VM3[100,30]
 
@@ -210,11 +252,11 @@ def ReadVPLASMA(file_name, Ns, Ns1, s, spline_V23=1,VNORM=1.):
 def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
     #Read the BPLASMA output file from MARS-F
     #Return BM1, BM2, BM3
-    BPLASMA = num.loadtxt(open(file_name))
+    BPLASMA = np.loadtxt(open(file_name))
  
     Nm1 = BPLASMA[0,0]
-    n = num.round(BPLASMA[0,2])
-    Mm = num.round(BPLASMA[1:Nm1+1,0])
+    n = np.round(BPLASMA[0,2])
+    Mm = np.round(BPLASMA[1:Nm1+1,0])
     Mm.resize([len(Mm),1])
 
 
@@ -222,9 +264,9 @@ def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
     BM2 = BPLASMA[Nm1+1:,2] + BPLASMA[Nm1+1:,3]*1j
     BM3 = BPLASMA[Nm1+1:,4] + BPLASMA[Nm1+1:,5]*1j
     print BM1.shape, Ns, Nm1
-    BM1 = num.reshape(BM1,[Ns,Nm1],order='F')
-    BM2 = num.reshape(BM2,[Ns,Nm1],order='F')
-    BM3 = num.reshape(BM3,[Ns,Nm1],order='F')
+    BM1 = np.reshape(BM1,[Ns,Nm1],order='F')
+    BM2 = np.reshape(BM2,[Ns,Nm1],order='F')
+    BM3 = np.reshape(BM3,[Ns,Nm1],order='F')
 
     print 'BNORM used in ReadBPLASMA', BNORM
     BM1 = BM1[0:Ns,:]*BNORM
@@ -260,14 +302,14 @@ def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
 
 def GetV123(VM1,VM2,VM3,R, chi, dRds, dZds, dRdchi, dZdchi, jacobian, Mm, Nchi, s, Ns1, DPSIDS, T):
     #Convert BM1, BM2 and BM3 into B1, B2, B3
-    expmchi = num.exp(num.dot(Mm,chi)*1j)
+    expmchi = np.exp(np.dot(Mm,chi)*1j)
 
-    V1a = num.dot(VM1,expmchi)
-    V2a = num.dot(VM2,expmchi)
-    V3a = num.dot(VM3,expmchi)
+    V1a = np.dot(VM1,expmchi)
+    V2a = np.dot(VM2,expmchi)
+    V3a = np.dot(VM3,expmchi)
 
     V1 = V1a
-    chione = num.ones((1,Nchi))
+    chione = np.ones((1,Nchi))
 
     #ss = s[0:Mac.Ns1]*chione
     #ss[0,:] = ss[1,:]
@@ -278,8 +320,8 @@ def GetV123(VM1,VM2,VM3,R, chi, dRds, dZds, dRdchi, dZdchi, jacobian, Mm, Nchi, 
     DPSIDS = DPSIDS.reshape((DPSIDS.shape[0],1))
     T = T.reshape((T.shape[0],1))
     
-    Bchi = num.dot(DPSIDS,chione)/jacobian[0:Ns1,:]
-    Bphi = num.dot(T,chione)/R[0:Ns1,:]**2;
+    Bchi = np.dot(DPSIDS,chione)/jacobian[0:Ns1,:]
+    Bphi = np.dot(T,chione)/R[0:Ns1,:]**2;
 
     G11  = dRds[0:Ns1,:]**2 + dZds[0:Ns1,:]**2;
     G12  = dRds[0:Ns1,:]*dRdchi[0:Ns1,:] + dZds[0:Ns1,:]*dZdchi[0:Ns1,:]
@@ -290,10 +332,10 @@ def GetV123(VM1,VM2,VM3,R, chi, dRds, dZds, dRdchi, dZdchi, jacobian, Mm, Nchi, 
     V2 = -V1*G12*(Bchi**2)/ B2 + V2a*Bphi*G33/B2 + V3a*Bchi
 
     V3 = -V1*G12*Bchi*Bphi/B2 - V2a*Bchi*G22/B2 + V3a*Bphi
-    Vn = V1a*jacobian[0:Ns1,:]/num.sqrt(G33*G22)
+    Vn = V1a*jacobian[0:Ns1,:]/np.sqrt(G33*G22)
     
-    expmchi = num.exp(num.dot(num.transpose(-chi),num.transpose(Mm)*1j))
-    V1M = num.dot(Vn,expmchi)*(chi[0,1]-chi[0,0])/2./num.pi
+    expmchi = np.exp(np.dot(np.transpose(-chi),np.transpose(Mm)*1j))
+    V1M = np.dot(Vn,expmchi)*(chi[0,1]-chi[0,0])/2./np.pi
 
     return V1,V2,V3,Vn, V1M
 
@@ -319,29 +361,29 @@ def MacGetVphys(R,Z,dRds,dZds,dRdchi,dZdchi,jacobian,V1,V2,V3, Ns1):
 
 def GetB123(BM1,BM2,BM3,R, Mm, chi, dRdchi, dZdchi):
     #Convert BM1, BM2 and BM3 into B1, B2, B3
-    expmchi = num.exp(num.dot(Mm,chi)*1j)
+    expmchi = np.exp(np.dot(Mm,chi)*1j)
 
-    B1 = num.dot(BM1,expmchi)
-    B2 = num.dot(BM2,expmchi)
-    B3 = num.dot(BM3,expmchi)
+    B1 = np.dot(BM1,expmchi)
+    B2 = np.dot(BM2,expmchi)
+    B3 = np.dot(BM3,expmchi)
     G22  = dRdchi**2 + dZdchi**2
     G22[0,:] = G22[1,:]
-    Bn   = B1/num.sqrt(G22)/R
-    expmchi = num.exp(num.dot(-(chi.transpose()), Mm.transpose()*1j))
-    BMn = num.dot(Bn, expmchi)*(chi[0,1]-chi[0,0])/2./num.pi
+    Bn   = B1/np.sqrt(G22)/R
+    expmchi = np.exp(np.dot(-(chi.transpose()), Mm.transpose()*1j))
+    BMn = np.dot(Bn, expmchi)*(chi[0,1]-chi[0,0])/2./np.pi
 
     return B1,B2,B3,Bn, BMn
 
 
 def GetUnitVec_old(R,Z,s,chi):
-    s0 = num.resize(s,[1,len(s)])
+    s0 = np.resize(s,[1,len(s)])
     R0 = R
     chi0 = chi
     Z0 = Z
-    hs = num.min(s0[0,1:]-s0[0,0:-1])/2.
-    hs = num.min([hs,1e-4])
-    hchi = num.min(chi0[0,1:]-chi0[0,0:-1])/2
-    hchi = num.min([hchi,1e-4])
+    hs = np.min(s0[0,1:]-s0[0,0:-1])/2.
+    hs = np.min([hs,1e-4])
+    hchi = np.min(chi0[0,1:]-chi0[0,0:-1])/2
+    hchi = np.min([hchi,1e-4])
     s1 = s0 - hs
     s2 = s0 + hs
     chi1 = chi0 - hchi
@@ -350,13 +392,13 @@ def GetUnitVec_old(R,Z,s,chi):
     R_func = interp.interp1d(s0.flatten(), R0.transpose(), kind='cubic', bounds_error = 0)
     R1 = R_func(s1.flatten())
     R2 = R_func(s2.flatten())
-    dRds = num.transpose((R2-R1)/hs/2)
+    dRds = np.transpose((R2-R1)/hs/2)
 
     # compute dZ/ds using Z(s,chi) and spline
     Z_func = interp.interp1d(s0.flatten(), Z0.transpose(), kind='cubic', bounds_error = 0)
     Z1 = Z_func(s1.flatten())
     Z2 = Z_func(s2.flatten())
-    dZds = num.transpose((Z2-Z1)/hs/2)
+    dZds = np.transpose((Z2-Z1)/hs/2)
 
 
     # compute dR/dchi using R(s,chi) and spline
@@ -387,12 +429,12 @@ def GetUnitVec_old(R,Z,s,chi):
 
 
 def GetUnitVec(R,Z,s,chi):
-    s0 = num.resize(s,[1,len(s)])
+    s0 = np.resize(s,[1,len(s)])
     R0 = R; chi0 = chi; Z0 = Z
-    hs = num.min(s0[0,1:]-s0[0,0:-1])/2.
-    hs = num.min([hs,1e-4]) #grid offset
-    hchi = num.min(chi0[0,1:]-chi0[0,0:-1])/2
-    hchi = num.min([hchi,1e-4]) #grid offset
+    hs = np.min(s0[0,1:]-s0[0,0:-1])/2.
+    hs = np.min([hs,1e-4]) #grid offset
+    hchi = np.min(chi0[0,1:]-chi0[0,0:-1])/2
+    hchi = np.min([hchi,1e-4]) #grid offset
 
     #describe new grid 
     s1 = s0 - hs
@@ -403,17 +445,17 @@ def GetUnitVec(R,Z,s,chi):
     R1 = R0*0; R2 = R0*0; Z1 = Z0*0; Z2 = Z0*0
 
     #Interpolate onto the two new slightly offset grids
-    R1=num.transpose(scipy_griddata(s0.flatten(),R0,s1.flatten(), method='cubic'))
-    R2=num.transpose(scipy_griddata(s0.flatten(),R0,s2.flatten(), method='cubic'))
-    Z1=num.transpose(scipy_griddata(s0.flatten(),Z0,s1.flatten(), method='cubic'))
-    Z2=num.transpose(scipy_griddata(s0.flatten(),Z0,s2.flatten(), method='cubic'))
-    R1_2=num.transpose(scipy_griddata(chi0.flatten(),num.transpose(R0),chi1.flatten(), method='cubic'))
-    R2_2=num.transpose(scipy_griddata(chi0.flatten(),num.transpose(R0),chi2.flatten(), method='cubic'))
-    Z1_2=num.transpose(scipy_griddata(chi0.flatten(),num.transpose(Z0),chi1.flatten(), method='cubic'))
-    Z2_2=num.transpose(scipy_griddata(chi0.flatten(),num.transpose(Z0),chi2.flatten(), method='cubic'))
+    R1=np.transpose(scipy_griddata(s0.flatten(),R0,s1.flatten(), method='cubic'))
+    R2=np.transpose(scipy_griddata(s0.flatten(),R0,s2.flatten(), method='cubic'))
+    Z1=np.transpose(scipy_griddata(s0.flatten(),Z0,s1.flatten(), method='cubic'))
+    Z2=np.transpose(scipy_griddata(s0.flatten(),Z0,s2.flatten(), method='cubic'))
+    R1_2=np.transpose(scipy_griddata(chi0.flatten(),np.transpose(R0),chi1.flatten(), method='cubic'))
+    R2_2=np.transpose(scipy_griddata(chi0.flatten(),np.transpose(R0),chi2.flatten(), method='cubic'))
+    Z1_2=np.transpose(scipy_griddata(chi0.flatten(),np.transpose(Z0),chi1.flatten(), method='cubic'))
+    Z2_2=np.transpose(scipy_griddata(chi0.flatten(),np.transpose(Z0),chi2.flatten(), method='cubic'))
 
-    dRds = num.transpose(((R2-R1)/hs/2.))
-    dZds = num.transpose(((Z2-Z1)/hs/2.))
+    dRds = np.transpose(((R2-R1)/hs/2.))
+    dZds = np.transpose(((Z2-Z1)/hs/2.))
 
     #remove nan's that have been created outside the grid, need to check this - is there a better way?
     #matlab doesn't create as many nan's, instead it seems to extrapolate with griddata doesn't do
@@ -453,32 +495,32 @@ def get_FEEDI(file_name):
     #FEEDI_float = float(FEEDI_string)
     #print imp_line, FEEDI_float
 
-    FEEDI_matrix = num.loadtxt(file_name)
-    FEEDI_1 = num.sqrt(num.sum(FEEDI_matrix[0,:]**2))
-    FEEDI_2 = num.sqrt(num.sum(FEEDI_matrix[1,:]**2))
-    FEEDI_float= num.max([FEEDI_1,FEEDI_2])
+    FEEDI_matrix = np.loadtxt(file_name)
+    FEEDI_1 = np.sqrt(np.sum(FEEDI_matrix[0,:]**2))
+    FEEDI_2 = np.sqrt(np.sum(FEEDI_matrix[1,:]**2))
+    FEEDI_float= np.max([FEEDI_1,FEEDI_2])
     print 'FEEDI :',FEEDI_float
     return FEEDI_float
 
-def calc_VNORM(FEEDI, B0EXP, I0EXP=1.0e+3 * 3./num.pi,phas=0.):
+def calc_VNORM(FEEDI, B0EXP, I0EXP=1.0e+3 * 3./np.pi,phas=0.):
     #calculate BNORM
-    #phas = 0.5*num.pi
+    #phas = 0.5*np.pi
     #phas = 0 #is this correct?
-    #I0EXP = 1.0e+3 * 3./num.pi
-    mu0   = 4.e-7*num.pi
+    #I0EXP = 1.0e+3 * 3./np.pi
+    mu0   = 4.e-7*np.pi
     vfac   = mu0/B0EXP;
     #FEEDI = 1.0;
     #FEEDI = temp_ans
     VNORM  = vfac*I0EXP/FEEDI
     return VNORM
 
-def calc_BNORM(FEEDI, R0EXP, I0EXP=1.0e+3 * 3./num.pi,phas=0.):
+def calc_BNORM(FEEDI, R0EXP, I0EXP=1.0e+3 * 3./np.pi,phas=0.):
     #calculate BNORM
-    #phas = 0.5*num.pi
+    #phas = 0.5*np.pi
     #phas = 0 #is this correct?
-    BNORM = 1.0*num.exp(phas*1j)
-    #I0EXP = 1.0e+3 * 3./num.pi
-    mu0   = 4.e-7*num.pi
+    BNORM = 1.0*np.exp(phas*1j)
+    #I0EXP = 1.0e+3 * 3./np.pi
+    mu0   = 4.e-7*np.pi
     fac   = mu0/R0EXP;
     #FEEDI = 1.0;
     #FEEDI = temp_ans
@@ -487,15 +529,15 @@ def calc_BNORM(FEEDI, R0EXP, I0EXP=1.0e+3 * 3./num.pi,phas=0.):
 
 def increase_grid(x, y, z, number=100):
     #generic use function to re-grid data
-    x_grid,y_grid = num.meshgrid(x,y)
-    input_grid = num.ones([len(x_grid.flatten()),2],dtype=float)
+    x_grid,y_grid = np.meshgrid(x,y)
+    input_grid = np.ones([len(x_grid.flatten()),2],dtype=float)
     input_grid[:,0]=x_grid.flatten()
     input_grid[:,1]=y_grid.flatten()
 
-    x_out = num.linspace(min(x),max(x),num=number)
+    x_out = np.linspace(min(x),max(x),num=number)
     y_out = y
-    x_grid_output, y_grid_output = num.meshgrid(x_out,y_out)
-    output_grid = num.ones([len(x_grid_output.flatten()),2],dtype=float)
+    x_grid_output, y_grid_output = np.meshgrid(x_out,y_out)
+    output_grid = np.ones([len(x_grid_output.flatten()),2],dtype=float)
     output_grid[:,0]=x_grid_output.flatten()
     output_grid[:,1]=y_grid_output.flatten()
 
@@ -505,10 +547,10 @@ def increase_grid(x, y, z, number=100):
 
 def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
     #return the q profile
-    dataq = num.loadtxt(open(file_name,'r'))
+    dataq = np.loadtxt(open(file_name,'r'))
     s = dataq[:,0]
     q = dataq[:,1]
-    mq = num.arange(num.ceil(num.min(q)*abs(n)),max(mk.flatten())+1)
+    mq = np.arange(np.ceil(np.min(q)*abs(n)),max(mk.flatten())+1)
     qq = mq/abs(n)
 
     def FindX(x,y,yy):
@@ -516,19 +558,19 @@ def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
         yn = []
 
         for k in range(0,len(yy)):
-            I = num.nonzero((y[0:-2]-yy[k])*(y[1:-1]-yy[k]) <= 0);
+            I = np.nonzero((y[0:-2]-yy[k])*(y[1:-1]-yy[k]) <= 0);
 
             for m in range(0,len(I)):
                 J = I[m]
                 if len(J)>=1:
                     xn.append(x[J] + (x[J+1]-x[J])*(yy[k]-y[J])/(y[J+1]-y[J]))
                     yn.append(yy[k])
-        return num.array(xn),num.array(yn)
+        return np.array(xn),np.array(yn)
 
     sq,qn = FindX(s,q,qq)
-    mq = qn*num.abs(n)
+    mq = qn*np.abs(n)
 
-    return num.array(qn), num.array(sq), num.array(q), num.array(s),num.array(mq)
+    return np.array(qn), np.array(sq), np.array(q), np.array(s),np.array(mq)
 
 
 
@@ -537,10 +579,10 @@ def pest_plot(directory, fig_name,title):
     os.chdir(directory)
     print directory
     Nchi = 513
-    chi = num.linspace(num.pi*-1,num.pi,Nchi)
+    chi = np.linspace(np.pi*-1,np.pi,Nchi)
     chi.resize(1,len(chi))
 
-    phi = num.linspace(0,2.*num.pi,Nchi)
+    phi = np.linspace(0,2.*np.pi,Nchi)
     phi.resize(len(phi),1)
 
     file_name = 'RMZM_F_EQAC'
@@ -560,24 +602,24 @@ def pest_plot(directory, fig_name,title):
 #    B1,B2,B3,Bn,BMn = GetB123(BM1, BM2, BM3, R, Mm, chi, dRdchi, dZdchi)
 
     R,Z,B1,B2,B3,Bn,BMn = extract_data_temp(directory)
-#    print num.sum(num.abs(R_upper-R))
-#    print num.sum(num.abs(Z_upper-Z))
-#    print num.sum(num.abs(B1_upper-B1))
-#    print num.sum(num.abs(B2_upper-B2))
-#    print num.sum(num.abs(B3_upper-B3))
-#    print num.sum(num.abs(Bn_upper-Bn))
-#    print num.sum(num.abs(BMn_upper-BMn))
+#    print np.sum(np.abs(R_upper-R))
+#    print np.sum(np.abs(Z_upper-Z))
+#    print np.sum(np.abs(B1_upper-B1))
+#    print np.sum(np.abs(B2_upper-B2))
+#    print np.sum(np.abs(B3_upper-B3))
+#    print np.sum(np.abs(Bn_upper-Bn))
+#    print np.sum(np.abs(BMn_upper-BMn))
 
-    II=num.arange(1,Ns1+21,dtype=int)-1
+    II=np.arange(1,Ns1+21,dtype=int)-1
     BnEQAC = Bn[II,:]
     R_EQAC = R[II,:]
     Z_EQAC = Z[II,:]
 
     Rs = R_EQAC[-1,:]
     Zs = Z_EQAC[-1,:]
-    Rc = (num.min(Rs)+num.max(Rs))/2
-    Zc = (num.min(Zs)+num.max(Zs))/2
-    Tg = num.arctan2(Zs-Zc,Rs-Rc)
+    Rc = (np.min(Rs)+np.max(Rs))/2
+    Zc = (np.min(Zs)+np.max(Zs))/2
+    Tg = np.arctan2(Zs-Zc,Rs-Rc)
     BnEDGE = BnEQAC[-1,:]
 
     file_name = 'RMZM_F_PEST'
@@ -595,27 +637,27 @@ def pest_plot(directory, fig_name,title):
 
     G22_PEST[0,:] = G22_PEST[1,:]
 
-    R_Z_EQAC = num.ones([len(R_EQAC.flatten()),2],dtype='float')
+    R_Z_EQAC = np.ones([len(R_EQAC.flatten()),2],dtype='float')
     R_Z_EQAC[:,0] = R_EQAC.flatten()
     R_Z_EQAC[:,1] = Z_EQAC.flatten()
 
-    R_Z_PEST = num.ones([len(R_EQAC.flatten()),2],dtype='float')
+    R_Z_PEST = np.ones([len(R_EQAC.flatten()),2],dtype='float')
     R_Z_PEST[:,0] = R_PEST.flatten()
     R_Z_PEST[:,1] = Z_PEST.flatten()
 
     BnPEST  = griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
     BnPEST.resize(BnEQAC.shape)
-    BnPEST = BnPEST*num.sqrt(G22_PEST)*R_PEST 
+    BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST 
 
-    mk = num.arange(-29,29+1,dtype=int)
+    mk = np.arange(-29,29+1,dtype=int)
     mk.resize(1,len(mk))
 
-    expmchi = num.exp(num.dot(-chi.transpose(),mk)*1j)
-    BMnPEST = num.dot(BnPEST,expmchi)*(chi[0,1]-chi[0,0])/2./num.pi
+    expmchi = np.exp(np.dot(-chi.transpose(),mk)*1j)
+    BMnPEST = np.dot(BnPEST,expmchi)*(chi[0,1]-chi[0,0])/2./np.pi
 
 
-    mm = num.arange(-29,29+1,dtype=int)
-    mm2 = num.arange(-29,29+1,dtype=int)
+    mm = np.arange(-29,29+1,dtype=int)
+    mm2 = np.arange(-29,29+1,dtype=int)
 
     II = mm - mk[0,0] + 1 - 1
     II.resize(len(II),1)
@@ -623,7 +665,7 @@ def pest_plot(directory, fig_name,title):
     mk = mk[0,II]
 
     mk.resize(1,len(mk))
-    facn = num.pi/2.
+    facn = np.pi/2.
 
     BnPEST  = BMnPEST[:,II.flatten()]/facn
 
@@ -633,8 +675,8 @@ def pest_plot(directory, fig_name,title):
 
     fig = pt.figure()
     ax = fig.add_subplot(111) 
-    II=num.arange(1,Ns1+1,dtype=int)
-    ax.plot(s[II],num.real(BMn[II,:]))
+    II=np.arange(1,Ns1+1,dtype=int)
+    ax.plot(s[II],np.real(BMn[II,:]))
     ax.set_ylabel('Re[B_n^{(m)}]')
     ax.set_xlabel('\psi_p^{1/2}')
 #    fig.savefig('hello_pic1.png')
@@ -642,7 +684,7 @@ def pest_plot(directory, fig_name,title):
     #fig.show()
 
 
-    MM = num.arange(-15-Mm[0]+1,15+1+1-Mm[0],dtype=int)# - Mm[0] + 1;
+    MM = np.arange(-15-Mm[0]+1,15+1+1-Mm[0],dtype=int)# - Mm[0] + 1;
     x = Mm[MM]
     y = s[II]
     z = abs(BMn[II,:][:,MM])
@@ -696,9 +738,9 @@ def extract_data_temp(directory):
     #Probably obsolete
     os.chdir(directory)
     Nchi = 513
-    chi = num.linspace(num.pi*-1,num.pi,Nchi)
+    chi = np.linspace(np.pi*-1,np.pi,Nchi)
     chi.resize(1,len(chi))
-    phi = num.linspace(0,2.*num.pi,Nchi)
+    phi = np.linspace(0,2.*np.pi,Nchi)
     phi.resize(len(phi),1)
 
     file_name = 'RMZM_F'
@@ -718,20 +760,20 @@ def extract_data_temp(directory):
 def combine_data(directory_upper, directory_lower,phasing):
     R_upper,Z_upper,B1_upper,B2_upper,B3_upper,Bn_upper,BMn_upper = extract_data_temp(directory_upper)
     R_lower,Z_lower,B1_lower,B2_lower,B3_lower,Bn_lower,BMn_lower = extract_data_temp(directory_lower)
-    phasing = phasing/180.*num.pi
+    phasing = phasing/180.*np.pi
     print '**********I-coil Phasing******************'
     print phasing
-    print num.sum(num.abs(R_upper-R_lower)), num.max(num.abs(R_upper-R_lower))
-    print num.sum(num.abs(Z_upper-Z_lower)), num.max(num.abs(Z_upper-Z_lower))
+    print np.sum(np.abs(R_upper-R_lower)), np.max(np.abs(R_upper-R_lower))
+    print np.sum(np.abs(Z_upper-Z_lower)), np.max(np.abs(Z_upper-Z_lower))
     print '****************************'
-    phasor = (num.cos(phasing)+1j*num.sin(phasing))
-    print '%.5f,%.5f'%(num.cos(phasing),num.sin(phasing))
+    phasor = (np.cos(phasing)+1j*np.sin(phasing))
+    print '%.5f,%.5f'%(np.cos(phasing),np.sin(phasing))
     phasor = -0.5000 + 0.86603*1j
-    B1 = num.array(B1_upper) + num.array(B1_lower)*phasor
-    B2 = num.array(B2_upper) + num.array(B2_lower)*phasor
-    B3 = num.array(B3_upper) + num.array(B3_lower)*phasor
-    Bn = num.array(Bn_upper) + num.array(Bn_lower)*phasor
-    BMn = num.array(BMn_upper) + num.array(BMn_lower)*phasor
+    B1 = np.array(B1_upper) + np.array(B1_lower)*phasor
+    B2 = np.array(B2_upper) + np.array(B2_lower)*phasor
+    B3 = np.array(B3_upper) + np.array(B3_lower)*phasor
+    Bn = np.array(Bn_upper) + np.array(Bn_lower)*phasor
+    BMn = np.array(BMn_upper) + np.array(BMn_lower)*phasor
 
     return R_upper, Z_upper, B1, B2, B3, Bn, BMn
 
@@ -743,10 +785,10 @@ def plot_error(R,Z,error):
     fig = pt.figure()
     ax = fig.add_subplot(111)
     color_ax = ax.pcolor(R[1:-2,:]*R0EXP_tmp,Z[1:-2,:]*R0EXP_tmp,error)
-    II = num.zeros([1,len(rw)+1],dtype=int)
+    II = np.zeros([1,len(rw)+1],dtype=int)
     for j in range(0,len(rw)):
-        II[0,j]=round(num.argmin(num.abs(s_tmp - rw[j])))
-        smin=num.min(num.abs(s_tmp - rw[j]))
+        II[0,j]=round(np.argmin(np.abs(s_tmp - rw[j])))
+        smin=np.min(np.abs(s_tmp - rw[j]))
     for j in range(0,len(rw)):
         ax.plot(R[II[0,j],:].flatten()*R0EXP_tmp,Z[II[0,j],:].flatten()*R0EXP_tmp,'k-')
     color_ax.set_clim([0,0.4])
