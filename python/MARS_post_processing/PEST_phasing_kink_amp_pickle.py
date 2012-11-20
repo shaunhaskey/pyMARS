@@ -17,8 +17,9 @@ import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_fine_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
-N = 6; n = 4
+#file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4_V2/equal_spacing_n4_post_processing_PEST.pickle'
+N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
 I0EXP = 1.0e+3*0.528 #PMZ n4 real
@@ -54,6 +55,8 @@ amps_vac_comp_upper = []; amps_vac_comp_lower = []
 #upper_tot_res = []; lower_tot_res = []
 #upper_vac_res = []; lower_vac_res = []
 res_vac = []; res_tot = []; res_plas = []
+res_vac_list_upper = []; res_vac_list_lower = []
+res_plas_list_upper = []; res_plas_list_lower = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     serial_list.append(i)
@@ -64,10 +67,10 @@ for i in project_dict['sims'].keys():
     relevant_values_lower_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_lower']
     mk_list.append(project_dict['sims'][i]['responses'][str(psi)]['mk'])
 
-    upper_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_upper']
-    lower_tot_res = (project_dict['sims'][i]['responses']['total_resonant_response_lower'])
-    upper_vac_res = (project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
-    lower_vac_res = (project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
+    upper_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_upper'])
+    lower_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_lower'])
+    upper_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
+    lower_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
 
     pmult_list.append(project_dict['sims'][i]['PMULT'])
     qmult_list.append(project_dict['sims'][i]['QMULT'])
@@ -84,10 +87,18 @@ for i in project_dict['sims'].keys():
     amps_vac_comp.append(relevant_values_upper_vac + relevant_values_lower_vac*phasor)
     amps_tot_comp.append(relevant_values_upper_tot + relevant_values_lower_tot*phasor)
     amps_plas_comp.append(relevant_values_upper_tot-relevant_values_upper_vac + (relevant_values_lower_tot-relevant_values_lower_vac)*phasor)
-    amps_plas_comp_upper.append(relevant_values_upper_tot-relevant_values_upper_vac)
-    amps_plas_comp_lower.append(relevant_values_lower_tot-relevant_values_lower_vac)
-    amps_vac_comp_upper.append(relevant_values_upper_vac)
-    amps_vac_comp_lower.append(relevant_values_lower_vac)
+
+    #These do not have phasings applied to them yet
+    amps_plas_comp_upper.append((relevant_values_upper_tot-relevant_values_upper_vac).tolist())
+    amps_plas_comp_lower.append((relevant_values_lower_tot-relevant_values_lower_vac).tolist())
+    amps_vac_comp_upper.append((relevant_values_upper_vac).tolist())
+    amps_vac_comp_lower.append((relevant_values_lower_vac).tolist())
+
+    res_vac_list_upper.append(upper_vac_res)
+    res_vac_list_lower.append(lower_vac_res)
+    res_plas_list_upper.append(upper_tot_res - upper_vac_res)
+    res_plas_list_lower.append(lower_tot_res - lower_vac_res)
+
 
 
 plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
@@ -167,15 +178,15 @@ for interp_meth in ['linear', 'cubic']:
     fig.canvas.draw(); fig.show()
 
 fig,ax = pt.subplots(nrows = 3, sharex = 1, sharey = 1)
-color_fig = ax[0].pcolor(xnew, ynew, vac_data_res)
+color_fig = ax[0].pcolor(xnew, ynew, np.ma.array(vac_data_res, mask=np.isnan(mode_data)))
 color_fig.set_clim([0,7])
 pt.colorbar(color_fig, ax = ax[0])
 ax[0].set_title('vac')
-color_fig = ax[1].pcolor(xnew, ynew, plas_data_res)
+color_fig = ax[1].pcolor(xnew, ynew, np.ma.array(plas_data_res, mask=np.isnan(mode_data)))
 color_fig.set_clim([0,7])
 pt.colorbar(color_fig, ax = ax[1])
 ax[1].set_title('plas')
-color_fig = ax[2].pcolor(xnew, ynew, tot_data_res)
+color_fig = ax[2].pcolor(xnew, ynew, np.ma.array(tot_data_res, mask=np.isnan(mode_data)))
 color_fig.set_clim([0,7])
 pt.colorbar(color_fig, ax = ax[2])
 ax[2].set_title('tot')
@@ -329,6 +340,7 @@ rel_upper_vals_vac = np.array(upper_values_vac)[pmult_array==pmult_values[0]]
 
 Bn_Li_value = 2.2
 q95_single = np.linspace(2.6,6,100)
+
 rel_lower_vals_plasma = griddata(q95_Bn_array, np.array(lower_values_plasma), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 rel_upper_vals_plasma = griddata(q95_Bn_array, np.array(upper_values_plasma), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 rel_lower_vals_vac = griddata(q95_Bn_array, np.array(lower_values_vac), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
@@ -344,10 +356,16 @@ plot_array_vac = np.ones((phasing_array.shape[0], rel_q95_vals.shape[0]),dtype=f
 plot_array_vac = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
 
 
+plot_array_vac_res = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
+plot_array_plas_res = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
+
 for i, curr_phase in enumerate(phasing_array):
     phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
     plot_array_plasma[i,:] = np.abs(rel_upper_vals_plasma + rel_lower_vals_plasma*phasor)
     plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
+
+
+
 #color_plot = ax[0].pcolor(rel_q95_vals, phasing_array, plot_array_plasma, cmap='hot')
 #color_plot2 = ax[1].pcolor(rel_q95_vals, phasing_array, plot_array_vac, cmap='hot')
 color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_plasma, cmap='hot', rasterized=True)
@@ -372,7 +390,37 @@ cb.ax.set_ylabel('Amp G/kA')
 cb = pt.colorbar(color_plot2, ax = ax[1])
 cb.ax.set_ylabel('Amp G/kA')
 fig.canvas.draw(); fig.show()
+
+
+res_vac_array_upper = np.array(res_vac_list_upper)
+res_vac_array_lower = np.array(res_vac_list_lower)
+res_plas_array_upper = np.array(res_plas_list_upper)
+res_plas_array_lower = np.array(res_plas_list_lower)
+
+for i, curr_phase in enumerate(phasing_array):
+    print 'phase :', curr_phase
+    phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
+    tmp_vac_list = []; tmp_plas_list = []
+    for ii in range(0,len(res_vac_array_upper)):
+        tmp_vac_list.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor)))
+        tmp_plas_list.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor)))
+
+    plot_array_vac_res[i,:] = griddata(q95_Bn_array, np.array(tmp_vac_list), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+    plot_array_plas_res[i,:] = griddata(q95_Bn_array, np.array(tmp_plas_list), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+
+fig, ax = pt.subplots(); ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_vac_res, cmap='hot', rasterized=True)
+color_plot.set_clim([0,10])
+ax[0].set_xlim([2.6, 6])
+ax[0].set_ylim([-180, 180])
+
+pt.colorbar(color_plot, ax = ax[0])
+#color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_plas_res, cmap='hot', rasterized=True)
+#color_plot2.set_clim([0,10])
+#pt.colorbar(color_plot2, ax = ax[1])
+fig.canvas.draw(); fig.show()
             
+
 # ax[1].grid(b=True)
 # ax[0].grid(b=True)
 # ax[0].set_title('PlasmaResponse, sqrt(psi)=%.2f'%(psi))

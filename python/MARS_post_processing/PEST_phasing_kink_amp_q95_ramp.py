@@ -50,7 +50,9 @@ amps_vac_comp_upper = []; amps_vac_comp_lower = []
 key_list = project_dict['sims'].keys()
 #extract the relevant data from the pickle file and put it into lists
 for i in key_list:
-    q95_list.append(project_dict['sims'][i]['Q95'])
+    #q95_list.append(project_dict['sims'][i]['Q95'])
+    q95_list.append((project_dict['sims'][i]['Q95']+2.*project_dict['sims'][i]['QMAX'])/3.)
+    #q95_list.append(project_dict['sims'][i]['QMAX'])
     Bn_Li_list.append(project_dict['sims'][i]['BETAN']/project_dict['sims'][i]['LI'])
     relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
     relevant_values_lower_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_lower']

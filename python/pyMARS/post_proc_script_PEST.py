@@ -55,6 +55,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
 
             project_dict['sims'][i]['responses']['resonant_response_mq'] = copy.deepcopy(upper_data_tot.mq)
             project_dict['sims'][i]['responses']['resonant_response_qn'] = copy.deepcopy(upper_data_tot.qn)
+            project_dict['sims'][i]['responses']['resonant_response_sq'] = copy.deepcopy(upper_data_tot.sq)
 
             for psi in psi_list:
                 current_label = str(psi)
