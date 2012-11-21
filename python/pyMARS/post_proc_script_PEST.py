@@ -8,7 +8,7 @@ import RZfuncs as RZfuncs
 project_name = sys.argv[1]
 upper_and_lower = int(sys.argv[2])
 
-def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list = [0.92], q_range = [2,6]):
+def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list = [0.92]):
     link_RMZM = 0
     for i in project_dict['sims'].keys():
         project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
@@ -17,6 +17,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
 
         print 'working on serial : ', i
         n = num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>'])
+        q_range = [n, n+4]
         I0EXP = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
 
         if upper_and_lower == 1:

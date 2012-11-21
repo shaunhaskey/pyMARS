@@ -18,12 +18,14 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_300
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
+file_name = '/u/haskeysr/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
+#file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 
 N = 6; n = 4
 I = np.array([1.,-1.,0.,1,-1.,0.])
 facn = 1.0; psi = 0.92
-q_range = [2,6]; ylim = [0,1.4]
+ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
 phase_machine_ntor = 0
@@ -94,6 +96,7 @@ plot_quantity_vac_phase=[]; plot_quantity_plas_phase=[]; plot_quantity_tot_phase
 
 #Get the plot quantities out of the lists from the previous section
 plot_quantity = 'max'
+max_based_on_total=1
 max_loc_list = []; mode_list = []
 upper_values_plasma = []; lower_values_plasma = []
 upper_values_vac = []; lower_values_vac = []
@@ -109,7 +112,10 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_tot_phase.append(0)
 
     elif plot_quantity == 'max':
-        max_loc = np.argmax(np.abs(amps_plas_comp[i]))
+        if max_based_on_total:
+            max_loc = np.argmax(np.abs(amps_tot_comp[i]))
+        else:
+            max_loc = np.argmax(np.abs(amps_plas_comp[i]))
         max_loc_list.append(max_loc)
 
         mode_list.append(mk_list[i][max_loc])
@@ -302,7 +308,7 @@ fig.canvas.draw(); fig.show()
 plot_quantity = 'total'
 plot_PEST_pics = 1
 if plot_PEST_pics:
-    for i in key_list_arranged:
+    for tmp_loc, i in enumerate(key_list_arranged):
         print i
         I0EXP = RZfuncs.I0EXP_calc_real(n,I)
         facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
@@ -345,20 +351,30 @@ if plot_PEST_pics:
         print plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i]
         suptitle = '%s key: %d, q95: %.2f, max_amp: %.2f, psi: %.2f, m_max: %d'%(plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i])
         fig, ax = pt.subplots()
-        color_plot = upper.plot_BnPEST(ax, n=n, inc_contours = 1))
-        #color_plot.set_clim([0,3])
+        if n==2:
+            contour_levels = np.linspace(0,5.0,7)
+        else:
+            contour_levels = np.linspace(0,1.5, 7)
+        color_plot = upper.plot_BnPEST(ax, n=n, inc_contours = 1, contour_levels = contour_levels)
+        if n==2:
+            color_plot.set_clim([0,5.])
+        else:
+            color_plot.set_clim([0,1.5])
+            
         ax.set_title(suptitle)
         cbar = pt.colorbar(color_plot, ax = ax)
+        ax.plot([-29,29],[psi,psi],'b--')
+        ax.plot(mode_list_arranged[tmp_loc], psi,'bo')
         ax.set_xlabel('m')
         ax.set_ylabel(r'$\sqrt{\psi_N}$', fontsize = 14)
         cbar.ax.set_ylabel(r'$\delta B_r$ (G/kA)')
         ax.set_xlim([-29,29])
         ax.set_ylim([0,1])
-        fig_name='/u/haskeysr/tmp_pics_dir/%03d_q95_scan.png'%(i)
+        fig_name='/u/haskeysr/tmp_pics_dir/n%d_%03d_q95_scan.png'%(n,i)
         fig.savefig(fig_name)
-        fig.canvas.draw(); fig.show()
-        #fig.clf()
-        #pt.close('all')
+        #fig.canvas.draw(); fig.show()
+        fig.clf()
+        pt.close('all')
 
         #upper.plot1(suptitle = suptitle,inc_phase=0, clim_value=[0,2], ss_squared = 0, fig_show=0,fig_name='/u/haskeysr/%03d_q95_scan.png'%(i))
 

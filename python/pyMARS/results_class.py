@@ -774,11 +774,15 @@ class data():
             fig.clf()
             pt.close('all')
 
-    def plot_BnPEST(self, ax, n=2, inc_contours = 1):
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None):
         ss_plas_edge = np.argmin(np.abs(self.ss-1.0))
         tmp_plot_quantity = (np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose()
         color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
-        ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, colors='white')
+        if contour_levels==None:
+            ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, colors='white')
+        else:
+            ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, contour_levels, colors='white')
+            
         #color_ax = ax.pcolor(self.mk,self.ss,np.abs(self.BnPEST),cmap='hot')
         file_name = 'PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
