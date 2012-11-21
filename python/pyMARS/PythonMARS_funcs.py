@@ -3,6 +3,53 @@ import time, os, sys, string, re, csv, pickle
 import scipy.interpolate as interpolate
 from scipy.interpolate import griddata as scipy_griddata
 
+
+def extract_surfmn_data(filename, n):
+    a = file(filename,'r').readlines()
+    tmp = a[0].rstrip('\n').split(" ")
+    unfinished=1
+    while unfinished:
+        try:
+            tmp.remove("")
+            #print 'removed something'
+        except ValueError:
+            #print 'finished?'
+            unfinished = 0
+    print tmp
+    nst = int(tmp[0])
+    nfpts = int(tmp[1])
+    irpt = int(tmp[2])
+    iradvar = int(tmp[3])
+    khand = int(tmp[4])
+    gfile = tmp[5]
+    imax = nst -1
+    jmax = 2*nfpts
+    kmax = nfpts
+
+    ms = np.arange(-nfpts, nfpts+1,1)
+    ns = np.arange(0,nst+1,1)
+
+    rvals = np.fromstring(a[1],dtype=float,sep=" ")
+    qvals = np.fromstring(a[2],dtype=float,sep=" ")
+
+
+    adat = np.zeros((nst, 2*nfpts+1, nfpts+1),dtype=float)
+    line_num = 3
+    for i in range(0,nst):
+        for j in range(0,2*nfpts+1):
+            tmp = np.fromstring(a[line_num],dtype=float,sep=" ")
+            adat[i,j,:]=tmp[:]
+            line_num += 1
+    qlvals = np.fromstring(a[line_num],dtype=float,sep=" ")
+    zdat = adat[:,:,n]
+    xdat = np.tile(ms,(zdat.shape[0],1)).transpose()
+    ydat = np.tile(rvals, (zdat.shape[1],1))
+    zdat = zdat.transpose()
+
+    return qlvals, xdat, ydat, zdat
+
+
+
 #create the string version of FEEDI required for phasing
 def construct_FEEDI(phase):
     real_part = num.cos(phase/360.*2*num.pi)

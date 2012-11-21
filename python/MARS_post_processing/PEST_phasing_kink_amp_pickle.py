@@ -17,9 +17,9 @@ import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_fine_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
-#file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4_V2/equal_spacing_n4_post_processing_PEST.pickle'
-N = 6; n = 2
+N = 6; n = 4
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
 I0EXP = 1.0e+3*0.528 #PMZ n4 real
@@ -325,7 +325,7 @@ leg.get_frame().set_alpha(0.5)
 fig.canvas.draw(); fig.show()
 
 
-phasing_array = np.linspace(-180,180,360)
+phasing_array = np.linspace(0,360,360)
 fig, ax = pt.subplots(nrows =2 , sharex = 1, sharey = 1)
 pmult_values = [1.0]
 pmult_array = np.array(pmult_list)
@@ -358,6 +358,8 @@ plot_array_vac = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=flo
 
 plot_array_vac_res = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
 plot_array_plas_res = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
+plot_array_vac_res2 = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
+plot_array_plas_res2 = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
 
 for i, curr_phase in enumerate(phasing_array):
     phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
@@ -382,7 +384,7 @@ ax[1].set_ylabel('Phasing (deg)')
 ax[0].set_title('Kink Amplitude - Plasma')
 ax[1].set_title('Kink Amplitude - Vacuum')
 ax[0].set_xlim([np.min(q95_single),np.max(q95_single)])
-ax[0].set_ylim([-180,180])
+ax[0].set_ylim([np.min(phasing_array),np.max(phasing_array)])
 color_plot.set_clim([0, 2])
 color_plot2.set_clim([0, 1])
 cb = pt.colorbar(color_plot, ax = ax[0])
@@ -392,29 +394,49 @@ cb.ax.set_ylabel('Amp G/kA')
 fig.canvas.draw(); fig.show()
 
 
-res_vac_array_upper = np.array(res_vac_list_upper)
-res_vac_array_lower = np.array(res_vac_list_lower)
-res_plas_array_upper = np.array(res_plas_list_upper)
-res_plas_array_lower = np.array(res_plas_list_lower)
+#res_vac_array_upper = np.array(res_vac_list_upper)
+#res_vac_array_lower = np.array(res_vac_list_lower)
+#res_plas_array_upper = np.array(res_plas_list_upper)
+#res_plas_array_lower = np.array(res_plas_list_lower)
 
 for i, curr_phase in enumerate(phasing_array):
     print 'phase :', curr_phase
     phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
     tmp_vac_list = []; tmp_plas_list = []
-    for ii in range(0,len(res_vac_array_upper)):
+    tmp_vac_list2 = []; tmp_plas_list2 = []
+    for ii in range(0,len(res_vac_list_upper)):
+        divisor = len(res_vac_list_upper[ii])
+        tmp_vac_list2.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor))/divisor)
+        tmp_plas_list2.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor))/divisor)
         tmp_vac_list.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor)))
         tmp_plas_list.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor)))
 
     plot_array_vac_res[i,:] = griddata(q95_Bn_array, np.array(tmp_vac_list), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
     plot_array_plas_res[i,:] = griddata(q95_Bn_array, np.array(tmp_plas_list), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+    plot_array_vac_res2[i,:] = griddata(q95_Bn_array, np.array(tmp_vac_list2), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+    plot_array_plas_res2[i,:] = griddata(q95_Bn_array, np.array(tmp_plas_list2), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 
-fig, ax = pt.subplots(); ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
 color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_vac_res, cmap='hot', rasterized=True)
+color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_vac_res2, cmap='hot', rasterized=True)
 color_plot.set_clim([0,10])
-ax[0].set_xlim([2.6, 6])
-ax[0].set_ylim([-180, 180])
+color_plot2.set_clim([0,0.75])
 
-pt.colorbar(color_plot, ax = ax[0])
+title_string1 = 'Total Forcing'
+title_string2 = 'Average Forcing'
+    
+ax[0].set_xlim([2.6, 6])
+ax[0].set_ylim([np.min(phasing_array), np.max(phasing_array)])
+ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
+
+ax[0].set_title('n=%d, Pitch Resonant Forcing'%(n))
+ax[0].set_ylabel('Phasing (deg)')
+ax[1].set_ylabel('Phasing (deg)')
+
+cbar = pt.colorbar(color_plot, ax = ax[0])
+cbar.ax.set_ylabel('%s G/kA'%(title_string1))
+cbar = pt.colorbar(color_plot2, ax = ax[1])
+cbar.ax.set_ylabel('%s G/kA'%(title_string2))
 #color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_plas_res, cmap='hot', rasterized=True)
 #color_plot2.set_clim([0,10])
 #pt.colorbar(color_plot2, ax = ax[1])

@@ -48,6 +48,14 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0):
         import matplotlib.pyplot as pt
         fig, ax = pt.subplots(nrows = 2)
         ax[0].plot(phi_tmp*180./np.pi, current_array)
+        for i, phi in enumerate(phi_zero):
+            phi_tmp1 = phi_zero[i]/np.pi*180.
+            phi_range_tmp = phi_range[i]/np.pi*180.
+            ax[0].plot([phi_tmp1-phi_range_tmp/2., phi_tmp1-phi_range_tmp/2.],[-1.1,1.1], 'k--')
+            ax[0].plot([phi_tmp1+phi_range_tmp/2., phi_tmp1+phi_range_tmp/2.],[-1.1,1.1], 'k--')
+            ax[0].text(phi_tmp1,0,'Coil %d'%(i+1,),horizontalalignment='center')
+            #ax[0].fill_between(current_array, phi_tmp-phi_range_tmp, phi_tmp+phi_range_tmp, facecolor='blue', alpha=0.5)
+            #ax[0].fill_between(phi_tmp/np.pi*180., current_array*0, current_array, facecolor='blue', alpha=0.5)
         ax[0].set_ylim([-1.1,1.1])
         ax[0].set_xlim([0,360])
         ax[0].set_xlabel(r'$\phi$ (deg)',fontsize = 14)

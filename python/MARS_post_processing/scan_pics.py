@@ -3,6 +3,14 @@ SH : Nov19 2012 - This will go through a q95 scan style pickle output, and
 generate plots of the PEST results (vac, total, or plasma), so they can be
 viewed to see what is going on.
 '''
+import results_class, copy
+import RZfuncs
+import numpy as np
+import matplotlib.pyplot as pt
+import PythonMARS_funcs as pyMARS
+from scipy.interpolate import griddata
+import pickle
+import matplotlib.cm as cm
 
 file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 N = 6; n = 2; I = np.array([1.,-1.,0.,1,-1.,0.])
@@ -26,7 +34,9 @@ for i in range(0,len(q95_list)):
     key_list_arranged.append(key_list.pop(cur_loc))
 
 plot_quantity = 'total'
-I0EXP = I0EXP_calc(N,n,I)
+#I0EXP = I0EXP_calc(N,n,I)
+I0EXP = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
+
 facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
 
 for i in project_dict['sims'].keys():

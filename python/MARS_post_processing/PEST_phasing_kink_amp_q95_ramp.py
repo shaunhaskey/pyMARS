@@ -6,7 +6,7 @@ components in PEST co-ordinates
 '''
 
 import results_class, copy
-from RZfuncs import I0EXP_calc
+import RZfuncs
 import numpy as np
 import matplotlib.pyplot as pt
 import PythonMARS_funcs as pyMARS
@@ -17,10 +17,11 @@ import matplotlib.cm as cm
 file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
-N = 6; n = 2
+
+N = 6; n = 4
 I = np.array([1.,-1.,0.,1,-1.,0.])
-I0EXP = I0EXP_calc(N,n,I)
 facn = 1.0; psi = 0.92
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
@@ -48,10 +49,13 @@ amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; time_li
 amps_plas_comp_upper = []; amps_plas_comp_lower = []
 amps_vac_comp_upper = []; amps_vac_comp_lower = []
 key_list = project_dict['sims'].keys()
+resonant_close = []
 #extract the relevant data from the pickle file and put it into lists
+res_vac_list_upper = []; res_vac_list_lower = []
+res_plas_list_upper = []; res_plas_list_lower = []
 for i in key_list:
-    #q95_list.append(project_dict['sims'][i]['Q95'])
-    q95_list.append((project_dict['sims'][i]['Q95']+2.*project_dict['sims'][i]['QMAX'])/3.)
+    q95_list.append(project_dict['sims'][i]['Q95'])
+    #q95_list.append((project_dict['sims'][i]['Q95']+2.*project_dict['sims'][i]['QMAX'])/3.)
     #q95_list.append(project_dict['sims'][i]['QMAX'])
     Bn_Li_list.append(project_dict['sims'][i]['BETAN']/project_dict['sims'][i]['LI'])
     relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
@@ -59,11 +63,12 @@ for i in key_list:
     relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
     relevant_values_lower_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_lower']
     mk_list.append(project_dict['sims'][i]['responses'][str(psi)]['mk'])
-    upper_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_upper']
-    lower_tot_res = project_dict['sims'][i]['responses']['total_resonant_response_lower']
-    upper_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_upper']
-    lower_vac_res = project_dict['sims'][i]['responses']['vacuum_resonant_response_lower']
+    upper_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_upper'])
+    lower_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_lower'])
+    upper_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
+    lower_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
     time_list.append(project_dict['sims'][i]['shot_time'])
+    resonant_close.append(np.min(np.abs(project_dict['sims'][i]['responses']['resonant_response_sq']-psi)))
 
     if phase_machine_ntor:
         phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
@@ -79,6 +84,10 @@ for i in key_list:
     amps_vac_comp_upper.append(relevant_values_upper_vac)
     amps_vac_comp_lower.append(relevant_values_lower_vac)
 
+    res_vac_list_upper.append(upper_vac_res)
+    res_vac_list_lower.append(lower_vac_res)
+    res_plas_list_upper.append(upper_tot_res - upper_vac_res)
+    res_plas_list_lower.append(lower_tot_res - lower_vac_res)
 
 plot_quantity_vac=[]; plot_quantity_plas=[]; plot_quantity_tot=[];
 plot_quantity_vac_phase=[]; plot_quantity_plas_phase=[]; plot_quantity_tot_phase=[];
@@ -126,6 +135,7 @@ q95_list_arranged = []; Bn_Li_list_arranged = []; mode_list_arranged = []
 time_list_arranged = []
 q95_list_copy = copy.deepcopy(q95_list)
 key_list_arranged = []
+resonant_close_arranged = []
 for i in range(0,len(q95_list)):
     cur_loc = np.argmin(q95_list)
     q95_list_arranged.append(q95_list.pop(cur_loc))
@@ -139,6 +149,13 @@ for i in range(0,len(q95_list)):
     mode_list_arranged.append(mode_list.pop(cur_loc))
     time_list_arranged.append(time_list.pop(cur_loc))
     key_list_arranged.append(key_list.pop(cur_loc))
+    resonant_close_arranged.append(resonant_close.pop(cur_loc))
+
+fig_single, ax_single = pt.subplots(nrows = 3)
+ax_single[0].plot(q95_list_arranged, resonant_close_arranged, '.-')
+ax_single[1].plot(q95_list_arranged, plot_quantity_plas_arranged, 'o-', label = 'plasma')
+ax_single[2].plot(q95_list_arranged, plot_quantity_plas_phase_arranged, 'o-', label = 'plasma')
+fig_single.canvas.draw(); fig_single.show()
 
 #amplitude and phase versus q95 and time
 fig, ax = pt.subplots(ncols = 2, nrows = 2)
@@ -188,7 +205,7 @@ fig.canvas.draw(); fig.show()
 
 
 #Work on the phasing as a function of q95
-phasing_array = np.linspace(-180,180,360)
+phasing_array = np.linspace(0,360,360)
 fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1)
 q95_array = np.array(q95_list_copy)
 
@@ -221,20 +238,73 @@ ax[0].set_ylabel('Phasing (deg)')
 ax[1].set_ylabel('Phasing (deg)')
 ax[0].set_title('Kink Amplitude - Plasma')
 ax[1].set_title('Kink Amplitude - Vacuum')
-ax[0].set_xlim([2.2,5.8])
-ax[0].set_ylim([-180,180])
+ax[0].set_xlim([2.5,5.8])
+ax[0].set_ylim([np.min(phasing_array), np.max(phasing_array)])
 color_plot.set_clim([0.002, 3])
 pt.colorbar(color_plot, ax = ax[0])
 pt.colorbar(color_plot, ax = ax[1])
 fig.canvas.draw(); fig.show()
 
 
+plot_array_vac_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+plot_array_plas_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+plot_array_vac_res2 = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+plot_array_plas_res2 = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+
+for i, curr_phase in enumerate(phasing_array):
+    print 'phase :', curr_phase
+    phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
+    tmp_vac_list = []; tmp_plas_list = []
+    tmp_vac_list2 = []; tmp_plas_list2 = []
+    for ii in range(0,len(res_vac_list_upper)):
+        divisor = len(res_vac_list_upper[ii])
+        tmp_vac_list2.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor))/divisor)
+        tmp_plas_list2.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor))/divisor)
+        tmp_vac_list.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor)))
+        tmp_plas_list.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor)))
+
+    plot_array_vac_res[i,:] = tmp_vac_list
+    plot_array_plas_res[i,:] = tmp_plas_list
+    plot_array_vac_res2[i,:] = tmp_vac_list2
+    plot_array_plas_res2[i,:] = tmp_plas_list2
+
+
+
+fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+color_plot = ax[0].pcolor(q95_array, phasing_array, plot_array_vac_res, cmap='hot', rasterized=True)
+color_plot2 = ax[1].pcolor(q95_array, phasing_array, plot_array_vac_res2, cmap='hot', rasterized=True)
+color_plot.set_clim([0,10])
+color_plot2.set_clim([0,0.75])
+
+title_string1 = 'Total Forcing'
+title_string2 = 'Average Forcing'
+    
+ax[0].set_xlim([2.6, 6])
+ax[0].set_ylim([np.min(phasing_array), np.max(phasing_array)])
+ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
+
+ax[0].set_title('n=%d, Pitch Resonant Forcing'%(n))
+ax[0].set_ylabel('Phasing (deg)')
+ax[1].set_ylabel('Phasing (deg)')
+
+cbar = pt.colorbar(color_plot, ax = ax[0])
+cbar.ax.set_ylabel('%s G/kA'%(title_string1))
+cbar = pt.colorbar(color_plot2, ax = ax[1])
+cbar.ax.set_ylabel('%s G/kA'%(title_string2))
+#color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_plas_res, cmap='hot', rasterized=True)
+#color_plot2.set_clim([0,10])
+#pt.colorbar(color_plot2, ax = ax[1])
+fig.canvas.draw(); fig.show()
+
+
+
+
 plot_quantity = 'total'
-plot_PEST_pics = 0
+plot_PEST_pics = 1
 if plot_PEST_pics:
     for i in key_list_arranged:
-        N = 6; n = 2; I = np.array([1.,-1.,0.,1,-1.,0.])
-        I0EXP = I0EXP_calc(N,n,I)
+        print i
+        I0EXP = RZfuncs.I0EXP_calc_real(n,I)
         facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
 
         print '===========',i,'==========='
@@ -274,7 +344,23 @@ if plot_PEST_pics:
 
         print plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i]
         suptitle = '%s key: %d, q95: %.2f, max_amp: %.2f, psi: %.2f, m_max: %d'%(plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i])
-        upper.plot1(suptitle = suptitle,inc_phase=0, clim_value=[0,2], ss_squared = 0, fig_show=0,fig_name='/u/haskeysr/%03d_q95_scan.png'%(i))
+        fig, ax = pt.subplots()
+        color_plot = upper.plot_BnPEST(ax, n=n, inc_contours = 1))
+        #color_plot.set_clim([0,3])
+        ax.set_title(suptitle)
+        cbar = pt.colorbar(color_plot, ax = ax)
+        ax.set_xlabel('m')
+        ax.set_ylabel(r'$\sqrt{\psi_N}$', fontsize = 14)
+        cbar.ax.set_ylabel(r'$\delta B_r$ (G/kA)')
+        ax.set_xlim([-29,29])
+        ax.set_ylim([0,1])
+        fig_name='/u/haskeysr/tmp_pics_dir/%03d_q95_scan.png'%(i)
+        fig.savefig(fig_name)
+        fig.canvas.draw(); fig.show()
+        #fig.clf()
+        #pt.close('all')
+
+        #upper.plot1(suptitle = suptitle,inc_phase=0, clim_value=[0,2], ss_squared = 0, fig_show=0,fig_name='/u/haskeysr/%03d_q95_scan.png'%(i))
 
 
 '''

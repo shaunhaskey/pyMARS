@@ -60,49 +60,6 @@ def extract_plotk_results():
     return m, mode_amps
 
 
-def extract_surfmn_data(filename, n):
-    a = file(filename,'r').readlines()
-    tmp = a[0].rstrip('\n').split(" ")
-    unfinished=1
-    while unfinished:
-        try:
-            tmp.remove("")
-            #print 'removed something'
-        except ValueError:
-            #print 'finished?'
-            unfinished = 0
-    print tmp
-    nst = int(tmp[0])
-    nfpts = int(tmp[1])
-    irpt = int(tmp[2])
-    iradvar = int(tmp[3])
-    khand = int(tmp[4])
-    gfile = tmp[5]
-    imax = nst -1
-    jmax = 2*nfpts
-    kmax = nfpts
-
-    ms = np.arange(-nfpts, nfpts+1,1)
-    ns = np.arange(0,nst+1,1)
-
-    rvals = np.fromstring(a[1],dtype=float,sep=" ")
-    qvals = np.fromstring(a[2],dtype=float,sep=" ")
-
-
-    adat = np.zeros((nst, 2*nfpts+1, nfpts+1),dtype=float)
-    line_num = 3
-    for i in range(0,nst):
-        for j in range(0,2*nfpts+1):
-            tmp = np.fromstring(a[line_num],dtype=float,sep=" ")
-            adat[i,j,:]=tmp[:]
-            line_num += 1
-    qlvals = np.fromstring(a[line_num],dtype=float,sep=" ")
-    zdat = adat[:,:,n]
-    xdat = np.tile(ms,(zdat.shape[0],1)).transpose()
-    ydat = np.tile(rvals, (zdat.shape[1],1))
-    zdat = zdat.transpose()
-
-    return qlvals, xdat, ydat, zdat
 
 
 class data():
@@ -395,7 +352,7 @@ class data():
                 zdat = stored_data[0][0]; xdat = stored_data[0][1]; ydat = stored_data[0][2]
             else:
                 print 'getting surfmn natively, n = ', n
-                tmp, xdat, ydat, zdat  = extract_surfmn_data(surfmn_file, n)
+                tmp, xdat, ydat, zdat  = pyMARS.extract_surfmn_data(surfmn_file, n)
             min_loc = np.argmin(np.abs(xdat[:,0]-(-30.)))
             max_loc = np.argmin(np.abs(xdat[:,0]-(30.)))
             print 'ss, mk values :', min(self.ss), max(self.ss), min(self.mk), max(self.mk)
@@ -573,7 +530,7 @@ class data():
                     if include_surfmn_tmp:
                         tmp_styles = ['-k','--r']
                         for tmp_i, tmp_n in enumerate([2,4]):
-                            tmp, xdat_tmp, ydat_tmp, zdat_tmp  = extract_surfmn_data(surfmn_file, tmp_n)
+                            tmp, xdat_tmp, ydat_tmp, zdat_tmp  = pyMARS.extract_surfmn_data(surfmn_file, tmp_n)
                             tmp_surfmn_m = xdat_tmp[:,0]
                             tmp_surfmn_s = ydat_tmp[0,:].flatten()
                             tmp_surfmn_loc = np.argmin(np.abs(tmp_surfmn_m-tmp_m))
