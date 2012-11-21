@@ -363,8 +363,8 @@ if plot_PEST_pics:
             
         ax.set_title(suptitle)
         cbar = pt.colorbar(color_plot, ax = ax)
-        ax.plot([-29,29],[psi,psi],'b--')
         ax.plot(mode_list_arranged[tmp_loc], psi,'bo')
+        ax.plot([-29,29],[psi,psi], 'b--')
         ax.set_xlabel('m')
         ax.set_ylabel(r'$\sqrt{\psi_N}$', fontsize = 14)
         cbar.ax.set_ylabel(r'$\delta B_r$ (G/kA)')
