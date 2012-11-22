@@ -17,7 +17,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
 
         print 'working on serial : ', i
         n = num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>'])
-        q_range = [n, n+4]
+        q_range = [0, n+4]
         I0EXP = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
 
         if upper_and_lower == 1:
