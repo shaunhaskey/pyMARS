@@ -18,7 +18,7 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_300
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
-file_name = '/u/haskeysr/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
+#file_name = '/u/haskeysr/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 
@@ -47,7 +47,7 @@ print phasing
 phasing = phasing/180.*np.pi
 print phasing
 q95_list = []; Bn_Li_list = []
-amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; time_list = []
+amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; time_list = []; qn_list = []
 amps_plas_comp_upper = []; amps_plas_comp_lower = []
 amps_vac_comp_upper = []; amps_vac_comp_lower = []
 key_list = project_dict['sims'].keys()
@@ -65,6 +65,7 @@ for i in key_list:
     relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
     relevant_values_lower_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_lower']
     mk_list.append(project_dict['sims'][i]['responses'][str(psi)]['mk'])
+    qn_list.append(project_dict['sims'][i]['responses'][str(psi)]['qn'])
     upper_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_upper'])
     lower_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_lower'])
     upper_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
@@ -112,6 +113,7 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_tot_phase.append(0)
 
     elif plot_quantity == 'max':
+        allowable_indices = np.array(mk_list)>(np.array(qn)*(n+0.5))
         if max_based_on_total:
             max_loc = np.argmax(np.abs(amps_tot_comp[i]))
         else:

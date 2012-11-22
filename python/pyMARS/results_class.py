@@ -297,7 +297,7 @@ class data():
         relevant_values = self.BnPEST[s_loc,lower_bound:upper_bound_new]
         print relevant_values
         print 'sum', np.abs(np.sum(np.abs(relevant_values)))
-        return self.mk.flatten()[lower_bound:upper_bound_new], self.ss[s_loc],relevant_values
+        return self.mk.flatten()[lower_bound:upper_bound_new], self.ss[s_loc], relevant_values, relevant_q
 
 
     def plot1(self,suptitle='',title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):

@@ -62,10 +62,10 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
                 current_label = str(psi)
                 project_dict['sims'][i]['responses'][current_label]={}
                 print 'getting kink data'
-                mk_upper, ss_upper, relevant_values_upper_tot = upper_data_tot.kink_amp(psi, q_range, n = n)
-                mk_lower, ss_lower, relevant_values_lower_tot = lower_data_tot.kink_amp(psi, q_range, n = n)
-                mk_upper, ss_upper, relevant_values_upper_vac = upper_data_vac.kink_amp(psi, q_range, n = n)
-                mk_lower, ss_lower, relevant_values_lower_vac = lower_data_vac.kink_amp(psi, q_range, n = n)
+                mk_upper, ss_upper, relevant_values_upper_tot, q_val_upper_tot = upper_data_tot.kink_amp(psi, q_range, n = n)
+                mk_lower, ss_lower, relevant_values_lower_tot, q_val_lower_tot = lower_data_tot.kink_amp(psi, q_range, n = n)
+                mk_upper, ss_upper, relevant_values_upper_vac, q_val_upper_vac = upper_data_vac.kink_amp(psi, q_range, n = n)
+                mk_lower, ss_lower, relevant_values_lower_vac, q_val_lower_vac = lower_data_vac.kink_amp(psi, q_range, n = n)
 
                 #record the kink results
                 project_dict['sims'][i]['responses'][current_label]['vacuum_kink_response_upper'] = copy.deepcopy(relevant_values_upper_vac)
@@ -74,6 +74,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
                 project_dict['sims'][i]['responses'][current_label]['total_kink_response_lower'] = copy.deepcopy(relevant_values_lower_tot)
                 project_dict['sims'][i]['responses'][current_label]['mk'] = copy.deepcopy(mk_upper)
                 project_dict['sims'][i]['responses'][current_label]['ss'] = copy.deepcopy(ss_upper)
+                project_dict['sims'][i]['responses'][current_label]['q_val'] = copy.deepcopy(q_val_upper_tot)
 
         else:
             #print 'hello2'
@@ -102,12 +103,16 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
                 project_dict['sims'][i]['responses'][current_label]={}
 
                 print 'getting kink data'
-                mk_upper, ss_upper, relevant_values_single_tot = single_data_tot.kink_amp(psi, q_range, n = n)
-                mk_upper, ss_upper, relevant_values_single_vac = single_data_vac.kink_amp(psi, q_range, n = n)
+                mk_upper, ss_upper, relevant_values_single_tot, q_val = single_data_tot.kink_amp(psi, q_range, n = n)
+                mk_upper, ss_upper, relevant_values_single_vac, q_val = single_data_vac.kink_amp(psi, q_range, n = n)
 
                 #record the kink results
                 project_dict['sims'][i]['responses'][current_label]['vacuum_kink_response_single'] = copy.deepcopy(relevant_values_single_vac)
                 project_dict['sims'][i]['responses'][current_label]['total_kink_response_single'] = copy.deepcopy(relevant_values_single_tot)
+                project_dict['sims'][i]['responses'][current_label]['q_val'] = copy.deepcopy(q_val_upper_tot)
+                project_dict['sims'][i]['responses'][current_label]['mk'] = copy.deepcopy(mk_upper)
+                project_dict['sims'][i]['responses'][current_label]['ss'] = copy.deepcopy(ss_upper)
+                project_dict['sims'][i]['responses'][current_label]['q_val'] = q_val
 
     return project_dict
 
