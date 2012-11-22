@@ -774,9 +774,12 @@ class data():
             fig.clf()
             pt.close('all')
 
-    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None):
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0):
         ss_plas_edge = np.argmin(np.abs(self.ss-1.0))
-        tmp_plot_quantity = (np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose()
+        if phase==1:
+            tmp_plot_quantity = np.angle(self.BnPEST[:ss_plas_edge,:], deg = True)
+        else:
+            tmp_plot_quantity = (np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose()
         color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
         if contour_levels==None:
             ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, colors='white')

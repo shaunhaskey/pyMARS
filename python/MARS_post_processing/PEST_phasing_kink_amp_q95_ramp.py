@@ -17,12 +17,12 @@ import matplotlib.cm as cm
 file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 
-N = 6; n = 4
+N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 facn = 1.0; psi = 0.92
 ylim = [0,1.4]
@@ -47,7 +47,7 @@ print phasing
 phasing = phasing/180.*np.pi
 print phasing
 q95_list = []; Bn_Li_list = []
-amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; time_list = []; qn_list = []
+amps_vac_comp = []; amps_tot_comp = []; amps_plas_comp=[]; mk_list = []; time_list = []; q_val_list = []
 amps_plas_comp_upper = []; amps_plas_comp_lower = []
 amps_vac_comp_upper = []; amps_vac_comp_lower = []
 key_list = project_dict['sims'].keys()
@@ -65,7 +65,7 @@ for i in key_list:
     relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
     relevant_values_lower_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_lower']
     mk_list.append(project_dict['sims'][i]['responses'][str(psi)]['mk'])
-    qn_list.append(project_dict['sims'][i]['responses'][str(psi)]['qn'])
+    q_val_list.append(project_dict['sims'][i]['responses'][str(psi)]['q_val'])
     upper_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_upper'])
     lower_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_lower'])
     upper_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
@@ -113,11 +113,15 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_tot_phase.append(0)
 
     elif plot_quantity == 'max':
-        allowable_indices = np.array(mk_list)>(np.array(qn)*(n+0.5))
+        allowable_indices = np.array(mk_list[i])>(np.array(q_val_list[i])*(n+2))
         if max_based_on_total:
-            max_loc = np.argmax(np.abs(amps_tot_comp[i]))
+            maximum_val = np.max(np.abs(amps_tot_comp[i])[allowable_indices])
+            max_loc = np.argmin(np.abs(np.abs(amps_tot_comp[i]) - maximum_val))
+            print i, maximum_val, max_loc, np.abs(amps_tot_comp[i][max_loc]), q_val_list[i]*(n+0.5), mk_list[i][max_loc]
         else:
-            max_loc = np.argmax(np.abs(amps_plas_comp[i]))
+            maximum_val = np.max(np.abs(amps_plas_comp[i])[allowable_indices])
+            max_loc = np.argmin(np.abs(np.abs(amps_plas_comp[i]) - maximum_val))
+            print i, maximum_val, max_loc, np.abs(amps_plas_comp[i][max_loc]), q_val_list[i]*(n+0.5), mk_list[i][max_loc]
         max_loc_list.append(max_loc)
 
         mode_list.append(mk_list[i][max_loc])
@@ -352,27 +356,34 @@ if plot_PEST_pics:
 
         print plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i]
         suptitle = '%s key: %d, q95: %.2f, max_amp: %.2f, psi: %.2f, m_max: %d'%(plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], psi, mode_list_arranged[i])
-        fig, ax = pt.subplots()
+        include_phase = 1
+        fig, ax = pt.subplots(nrows = include_phase + 1, sharex = 1, sharey = 1)
+        if include_phase == 0: ax = [ax]
         if n==2:
             contour_levels = np.linspace(0,5.0,7)
         else:
             contour_levels = np.linspace(0,1.5, 7)
-        color_plot = upper.plot_BnPEST(ax, n=n, inc_contours = 1, contour_levels = contour_levels)
+        color_plot = upper.plot_BnPEST(ax[0], n=n, inc_contours = 1, contour_levels = contour_levels)
+        if include_phase:
+            color_plot2 = upper.plot_BnPEST(ax[1], n=n, inc_contours = 0, contour_levels = contour_levels, phase=1)
+            color_plot2.set_clim([-180,180])
+            cbar = pt.colorbar(color_plot2, ax = ax[1])
+            cbar.ax.set_ylabel('Phase (deg)')
+            ax[1].plot(mode_list_arranged[tmp_loc], psi,'bo')
         if n==2:
             color_plot.set_clim([0,5.])
         else:
             color_plot.set_clim([0,1.5])
-            
-        ax.set_title(suptitle)
-        cbar = pt.colorbar(color_plot, ax = ax)
-        ax.plot(mode_list_arranged[tmp_loc], psi,'bo')
-        ax.plot([-29,29],[psi,psi], 'b--')
-        ax.set_xlabel('m')
-        ax.set_ylabel(r'$\sqrt{\psi_N}$', fontsize = 14)
+        ax[0].set_title(suptitle)
+        cbar = pt.colorbar(color_plot, ax = ax[0])
+        ax[0].plot(mode_list_arranged[tmp_loc], psi,'bo')
+        ax[0].plot([-29,29],[psi,psi], 'b--')
+        ax[0].set_xlabel('m')
+        ax[0].set_ylabel(r'$\sqrt{\psi_N}$', fontsize = 14)
         cbar.ax.set_ylabel(r'$\delta B_r$ (G/kA)')
-        ax.set_xlim([-29,29])
-        ax.set_ylim([0,1])
-        fig_name='/u/haskeysr/tmp_pics_dir/n%d_%03d_q95_scan.png'%(n,i)
+        ax[0].set_xlim([-29,29])
+        ax[0].set_ylim([0,1])
+        fig_name='/u/haskeysr/tmp_pics_dir2/n%d_%03d_q95_scan.png'%(n,i)
         fig.savefig(fig_name)
         #fig.canvas.draw(); fig.show()
         fig.clf()
