@@ -20,7 +20,7 @@ file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_p
 file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
-#file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
+file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
@@ -311,7 +311,7 @@ fig.canvas.draw(); fig.show()
 
 
 
-plot_quantity = 'total'
+plot_quantity = 'plasma'
 plot_PEST_pics = 1
 if plot_PEST_pics:
     for tmp_loc, i in enumerate(key_list_arranged):
@@ -324,11 +324,11 @@ if plot_PEST_pics:
             upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
             lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
         elif plot_quantity=='vacuum':
-            upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
-            lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
-        elif plot_qauantity=='plasma':
-            upper_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
-            lower_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
+            upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vacuum_dir']
+            lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vacuum_dir']
+        elif plot_quantity=='plasma':
+            upper_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_upper_vacuum_dir']
+            lower_file_loc_vac = project_dict['sims'][i]['dir_dict']['mars_lower_vacuum_dir']
             upper_file_loc_plasma = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
             lower_file_loc_plasma = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
 
@@ -339,10 +339,10 @@ if plot_PEST_pics:
         tmp_R, tmp_Z, upper.B1, upper.B2, upper.B3, upper.Bn, upper.BMn, upper.BnPEST = results_class.combine_data(upper, lower, 0)
 
         if plot_quantity=='plasma':
-            upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vac_dir']
-            lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vac_dir']
-            upper_vac = results_class.data(upper_file_loc, I0EXP=I0EXP)
-            lower_vac = results_class.data(lower_file_loc, I0EXP=I0EXP)
+            #upper_file_loc = project_dict['sims'][i]['dir_dict']['mars_upper_vacuum_dir']
+            #lower_file_loc = project_dict['sims'][i]['dir_dict']['mars_lower_vacuum_dir']
+            upper_vac = results_class.data(upper_file_loc_vac, I0EXP=I0EXP)
+            lower_vac = results_class.data(lower_file_loc_vac, I0EXP=I0EXP)
             upper_vac.get_PEST(facn = facn)
             lower_vac.get_PEST(facn = facn)
             tmp_R, tmp_Z, upper_vac.B1, upper_vac.B2, upper_vac.B3, upper_vac.Bn, upper_vac.BMn, upper_vac.BnPEST = results_class.combine_data(upper_vac, lower_vac, 0)
@@ -364,18 +364,19 @@ if plot_PEST_pics:
         else:
             contour_levels = np.linspace(0,1.5, 7)
         color_plot = upper.plot_BnPEST(ax[0], n=n, inc_contours = 1, contour_levels = contour_levels)
-        if include_phase:
-            color_plot2 = upper.plot_BnPEST(ax[1], n=n, inc_contours = 0, contour_levels = contour_levels, phase=1)
-            color_plot2.set_clim([-180,180])
-            cbar = pt.colorbar(color_plot2, ax = ax[1])
-            cbar.ax.set_ylabel('Phase (deg)')
-            ax[1].plot(mode_list_arranged[tmp_loc], psi,'bo')
         if n==2:
             color_plot.set_clim([0,5.])
         else:
             color_plot.set_clim([0,1.5])
         ax[0].set_title(suptitle)
         cbar = pt.colorbar(color_plot, ax = ax[0])
+        if include_phase:
+            min_phase = -130
+            color_plot2 = upper.plot_BnPEST(ax[1], n=n, inc_contours = 0, contour_levels = contour_levels, phase=1, min_phase = min_phase)
+            color_plot2.set_clim([min_phase,min_phase+360])
+            cbar = pt.colorbar(color_plot2, ax = ax[1])
+            cbar.ax.set_ylabel('Phase (deg)')
+            ax[1].plot(mode_list_arranged[tmp_loc], psi,'bo')
         ax[0].plot(mode_list_arranged[tmp_loc], psi,'bo')
         ax[0].plot([-29,29],[psi,psi], 'b--')
         ax[0].set_xlabel('m')
