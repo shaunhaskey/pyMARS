@@ -774,18 +774,33 @@ class data():
             fig.clf()
             pt.close('all')
 
-    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0):
+<<<<<<< HEAD
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, min_phase = -130):
+=======
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid = 0):
+>>>>>>> e619c5249368d2bdb45a2165d59098673393a852
         ss_plas_edge = np.argmin(np.abs(self.ss-1.0))
         if phase==1:
             tmp_plot_quantity = np.angle(self.BnPEST[:ss_plas_edge,:], deg = True)
+            tmp_plot_quantity[tmp_plot_quantity<min_phase] += 360
         else:
             tmp_plot_quantity = (np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose()
-        color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
-        if contour_levels==None:
-            ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, colors='white')
+        if increase_grid:
+            tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity = increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], tmp_plot_quantity, number=100)
         else:
-            ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, contour_levels, colors='white')
-            
+            tmp_plot_mk = self.mk.flatten()
+            tmp_plot_ss = self.ss[:ss_plas_edge].flatten()
+
+
+        #color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
+        color_ax = ax.pcolor(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap='hot', rasterized=True)
+        if inc_contours:
+            if contour_levels==None:
+                ax.contour(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, colors='white')
+            else:
+                ax.contour(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, contour_levels, colors='white')
+                #ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, contour_levels, colors='white')
+
         #color_ax = ax.pcolor(self.mk,self.ss,np.abs(self.BnPEST),cmap='hot')
         file_name = 'PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
