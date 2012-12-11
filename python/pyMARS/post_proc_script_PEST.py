@@ -95,8 +95,8 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
             #record the kink results
             project_dict['sims'][i]['responses']['vacuum_resonant_response_single'] = copy.deepcopy(single_vac_res)
             project_dict['sims'][i]['responses']['total_resonant_response_single'] = copy.deepcopy(single_tot_res)
-            project_dict['sims'][i]['responses']['resonant_response_mq'] = copy.deepcopy(upper_data_tot.mq)
-            project_dict['sims'][i]['responses']['resonant_response_qn'] = copy.deepcopy(upper_data_tot.qn)
+            project_dict['sims'][i]['responses']['resonant_response_mq'] = copy.deepcopy(single_data_tot.mq)
+            project_dict['sims'][i]['responses']['resonant_response_qn'] = copy.deepcopy(single_data_tot.qn)
 
             for psi in psi_list:
                 current_label = str(psi)
@@ -109,7 +109,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
                 #record the kink results
                 project_dict['sims'][i]['responses'][current_label]['vacuum_kink_response_single'] = copy.deepcopy(relevant_values_single_vac)
                 project_dict['sims'][i]['responses'][current_label]['total_kink_response_single'] = copy.deepcopy(relevant_values_single_tot)
-                project_dict['sims'][i]['responses'][current_label]['q_val'] = copy.deepcopy(q_val_upper_tot)
+                project_dict['sims'][i]['responses'][current_label]['q_val'] = copy.deepcopy(q_val)
                 project_dict['sims'][i]['responses'][current_label]['mk'] = copy.deepcopy(mk_upper)
                 project_dict['sims'][i]['responses'][current_label]['ss'] = copy.deepcopy(ss_upper)
                 project_dict['sims'][i]['responses'][current_label]['q_val'] = q_val
