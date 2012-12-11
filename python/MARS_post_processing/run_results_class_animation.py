@@ -55,7 +55,7 @@ I0EXP = I0EXP_calc(N,n,I)
 print I0EXP, 1.0e+3 * 3./num.pi
 
 fig_save_dir = '/home/srh112/Desktop/animations/'
-base_dir = '/home/srh112/code/pyMARS/shot146382_single_ul/qmult1.000/exp1.000/marsrun/'
+base_dir = '/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/'
 #base_dir = '/home/srh112/code/pyMARS/shot146382_single_tog/qmult1.000/exp1.000/marsrun/'
 ul = 1; theta = 300./180*num.pi; plot_field = 'Bn'
 run_data = extract_data(base_dir, I0EXP, ul=ul)

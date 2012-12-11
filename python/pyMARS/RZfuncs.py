@@ -535,15 +535,23 @@ def calc_BNORM(FEEDI, R0EXP, I0EXP=1.0e+3 * 3./np.pi,phas=0.):
     BNORM  = BNORM*fac*I0EXP/FEEDI*1.e4
     return BNORM
 
-def increase_grid(x, y, z, number=100):
+def increase_grid(x, y, z, increase_y = 0, increase_x = 0, new_y_lims = None, number=100):
     #generic use function to re-grid data
     x_grid,y_grid = np.meshgrid(x,y)
     input_grid = np.ones([len(x_grid.flatten()),2],dtype=float)
     input_grid[:,0]=x_grid.flatten()
     input_grid[:,1]=y_grid.flatten()
-
-    x_out = np.linspace(min(x),max(x),num=number)
-    y_out = y
+    if increase_x:
+        x_out = np.linspace(min(x),max(x),num=number)
+    else:
+        x_out = x
+    if increase_y:
+        if new_y_lims == None:
+            y_out = np.linspace(min(y),max(y),num=number)
+        else:
+            y_out = np.linspace(new_y_lims[0],new_y_lims[1],num=number)
+    else:
+        y_out = y
     x_grid_output, y_grid_output = np.meshgrid(x_out,y_out)
     output_grid = np.ones([len(x_grid_output.flatten()),2],dtype=float)
     output_grid[:,0]=x_grid_output.flatten()

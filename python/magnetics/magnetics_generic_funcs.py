@@ -170,6 +170,10 @@ def interpolate_signal(pickup_name, shot, time, existing_signals, remove_mean = 
     return output
 
 def get_hdf5values(f, sensor_name, coil_name, nd, debug=0):
+    '''
+    Get the couplings between sensor_name and coil_name from the h5 object 
+    '''
+
     g = f.get(sensor_name.lower()).get(coil_name.lower())
     ng = len(g.items())
     if ng % nd == 0:
@@ -196,6 +200,7 @@ def get_hdf5values(f, sensor_name, coil_name, nd, debug=0):
         print 'sz:', ['%.2e %.2ei'%(num.real(i_tmp),num.imag(i_tmp)) for i_tmp in sz]
         print 'sk:', ['%.2e'%(i_tmp) for i_tmp in sk]
     return sk, sp, sz, Afit, Bfit, np, nz
+
 
 def sfft(ref_signal, signal, time, length, fs=1000., phase_ax=None, amp_ax=None, label=None,i_coil_freq = 10., window='boxcar'):
     complex_list=[]; time_values = []; ref_list = []

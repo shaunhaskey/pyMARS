@@ -20,7 +20,7 @@ file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_p
 file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
-file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
+#file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
@@ -312,7 +312,7 @@ fig.canvas.draw(); fig.show()
 
 
 plot_quantity = 'plasma'
-plot_PEST_pics = 1
+plot_PEST_pics = 0
 if plot_PEST_pics:
     for tmp_loc, i in enumerate(key_list_arranged):
         print i

@@ -1,10 +1,12 @@
 import numpy as np
+import scipy.ndimage as ndimage
 import scipy.interpolate as interp
 import matplotlib.mlab as mlab
 from scipy.interpolate import *
 import PythonMARS_funcs as pyMARS
 import os, copy,time
 from RZfuncs import *
+import RZfuncs
 import matplotlib
 
 def combine_data(upper_data, lower_data, phasing):
@@ -300,7 +302,7 @@ class data():
         return self.mk.flatten()[lower_bound:upper_bound_new], self.ss[s_loc], relevant_values, relevant_q
 
 
-    def plot1(self,suptitle='',title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid = 0):
+    def plot1(self,suptitle='',title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid_BnPEST = 0):
         os.chdir(self.directory) 
         #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
         #file_name = 'PROFEQ_PEST'
@@ -326,8 +328,8 @@ class data():
         qn_grid, s_grid = np.meshgrid(q*n, self.s.flatten())
         #print q.shape, s.shape, mk_grid.shape, ss_grid.shape, self.BnPEST.shape
         temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(q*n, s.flatten()),method='linear')
-        if increase_grid:
-            mk,ss,BnPEST=increase_grid(self.mk.flatten(),self.ss.flatten(),abs(self.BnPEST),number=200)
+        if increase_grid_BnPEST:
+            mk,ss,BnPEST=RZfuncs.increase_grid(self.mk.flatten(),self.ss.flatten(),abs(self.BnPEST),number=200)
         else:
             BnPEST= self.BnPEST
             mk = self.mk
@@ -339,8 +341,7 @@ class data():
         tmp_cmap = tmp_cmap.from_list(tmp_cmap.name, tmp_cmap.name)
         ss_plas_edge = np.argmin(np.abs(ss-1.0))
 
-
-        tmp_mk_range, tmp_ss, tmp_relevant_values = self.kink_amp(0.92, [2,4], n = n)
+        tmp_mk_range, tmp_ss, tmp_relevant_values, relevant_q_values = self.kink_amp(0.92, [2,4], n = n)
 
         if surfmn_file != None:
             import h5py
@@ -774,22 +775,27 @@ class data():
             fig.clf()
             pt.close('all')
 
-    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid = 0, min_phase = -130):
-        ss_plas_edge = np.argmin(np.abs(self.ss-1.0))
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100):
+        ss_plas_edge = np.argmin(np.abs(self.ss-max_ss))
         if phase==1:
             tmp_plot_quantity = np.angle(self.BnPEST[:ss_plas_edge,:], deg = True)
             tmp_plot_quantity[tmp_plot_quantity<min_phase] += 360
         else:
             tmp_plot_quantity = (np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose()
-        if increase_grid:
-            tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity = increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], tmp_plot_quantity, number=100)
+        if increase_grid_BnPEST:
+            tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], tmp_plot_quantity, increase_y = 1, increase_x = 0, new_y_lims = [0,0.99],number=interp_points)
+            tmp_plot_quantity =  ndimage.gaussian_filter(tmp_plot_quantity,[0,0.5])
         else:
             tmp_plot_mk = self.mk.flatten()
             tmp_plot_ss = self.ss[:ss_plas_edge].flatten()
 
 
         #color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
-        color_ax = ax.pcolor(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap='hot', rasterized=True)
+        if increase_grid_BnPEST:
+            color_ax = ax.imshow(tmp_plot_quantity, cmap='hot', aspect='auto', interpolation='bicubic', rasterized=True, extent = [np.min(tmp_plot_mk), np.max(tmp_plot_mk), np.min(tmp_plot_ss), np.max(tmp_plot_ss)], origin='lower')
+        else:
+            color_ax = ax.pcolor(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap='hot', rasterized=True)
+        self.tmp_plot_quantity = tmp_plot_quantity
         if inc_contours:
             if contour_levels==None:
                 ax.contour(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, colors='white')

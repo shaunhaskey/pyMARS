@@ -1,4 +1,5 @@
 import numpy as num
+import numpy as np
 import time, os, sys, string, re, csv, pickle
 import scipy.interpolate as interpolate
 from scipy.interpolate import griddata as scipy_griddata
@@ -47,8 +48,6 @@ def extract_surfmn_data(filename, n):
     zdat = zdat.transpose()
 
     return qlvals, xdat, ydat, zdat
-
-
 
 #create the string version of FEEDI required for phasing
 def construct_FEEDI(phase):

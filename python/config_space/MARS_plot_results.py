@@ -13,7 +13,8 @@ name = 'shot146388_stab_limit_post_processing.pickle'#'shot146388_post_processin
 name = 'shot146388_stab_limit2_post_processing.pickle'
 name = 'shot138344_comparison_post_processing.pickle'
 name = 'shot146382_scan_post_processing.pickle'
-
+name = '/home/srh112/NAMP_datafiles/24_mar/shot146382_scan_post_processing.pickle'
+name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
 #name = '/home/srh112/code/DIII-D_Work/24_mar/shot146382_scan_post_processing.pickle'
 
 name2 = None #set to this to do a single calculation
@@ -22,11 +23,10 @@ name2 = None #set to this to do a single calculation
 #name2 = '9_project1_new_eq_COIL_lower_post_setup.pickle'
 contains_both = True #Set this for the newer simulations when both upper and lower are included in the file
 
+response_type = 'total' # 'plasma_only' # 'vac' 'total'
+data_plot_BetaN = True # True/None
 
-response_type = 'plasma_only' #'plasma_only' # 'vac' 'total'
-data_plot_BetaN = None # True/None
-
-q_list = [3,4.5,6.5] #None/list to plot arrows
+q_list = None#[3,4.5,6.5] #None/list to plot arrows
 color_list3 = ['blue','black','yellow','red']
 
 #range of upper lower phasings to include (will loop through all these phasings)
@@ -36,11 +36,11 @@ probe  = [ 'dBp_upper - 67A', 'dBp_mid - 66M', 'dBp_lower - 67B', 'dBr_ext - ESL
 probe2  = [ 'dBp_u', 'dBp_m', 'dBp_l', 'dBr_ext', 'dBr_m','dBr_u','dBr_l','Inb_p','Inb_r']
 #Choose the probe to plot (see above for for reference)
 probe_list = [0,1,2,3,4,5,6,7,8]
-probe_list = [4]
+probe_list = [1]
 
 #Plot line slices along the arrow lines
-q95_slice_check = 1
-Bn_slice_check = 1
+q95_slice_check = 0
+Bn_slice_check = 0
 
 q95_values =[2.,8.] #q95 limits
 Bn_Div_Li_values = [0.5,5]#[0.75,3.] #Bn/Li limits
@@ -57,7 +57,7 @@ expt_data_filename = None
 
 #Colour limits for the plots - each one is for a different pickup coil
 clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[0,2],[0,1.5],[0,2],[0,1],[0,1]]
-clim_list = [[0,1.5],[0,1.34],[0,1.5],[0,0.7],[0,1],[0,1.5],[0,2],[0,1],[0,1]]
+clim_list = [[0,1.5],[0,10],[0,1.5],[0,0.7],[0,1],[0,1.5],[0,2],[0,1],[0,1]]
 #clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[0,0.4],[0,1.5],[0,2],[0,1],[0,1]]
 #clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[5,7],[0,1.5],[0,2],[0,1],[0,1]]
 image_extent = [q95_values[0], q95_values[1], Bn_Div_Li_values[0], Bn_Div_Li_values[1]]

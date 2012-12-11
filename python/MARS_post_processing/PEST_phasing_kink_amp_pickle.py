@@ -6,7 +6,8 @@ components in PEST co-ordinates
 '''
 
 import results_class
-from RZfuncs import I0EXP_calc
+#from RZfuncs import I0EXP_calc
+import RZfuncs
 import numpy as np
 import matplotlib.pyplot as pt
 import PythonMARS_funcs as pyMARS
@@ -17,15 +18,16 @@ import matplotlib.cm as cm
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot146394_3000_q95/shot146394_3000_q95_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_fine_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4_V2/equal_spacing_n4_post_processing_PEST.pickle'
-N = 6; n = 4
+N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
-I0EXP = I0EXP_calc(N,n,I)
-I0EXP = 1.0e+3*0.528 #PMZ n4 real
+#I0EXP = I0EXP_calc(N,n,I)
+#I0EXP = 1.0e+3*0.528 #PMZ n4 real
+I0EXP = RZfuncs.I0EXP_calc_real(n,I)
 
 
-facn = 1.0; psi = 0.92
+facn = 1.0; psi = 0.97
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
@@ -35,7 +37,8 @@ make_animations = 0
 include_discrete_comparison = 0
 seperate_res_plot = 0
 include_vert_lines = 0
-
+beta_n_axis = 'beta_n'#'beta_n/li'
+#beta_n_axis = 'beta_n/li'
 plot_type = 'best_harmonic'
 #plot_type = 'normalised'
 #plot_type = 'normalised_average'
@@ -60,7 +63,11 @@ res_plas_list_upper = []; res_plas_list_lower = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     serial_list.append(i)
-    Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
+    if beta_n_axis=='beta_n':
+        Bn_Li_list.append(project_dict['sims'][i]['BETAN'])
+    elif beta_n_axis=='beta_n/li':
+        Bn_Li_list.append(project_dict['sims'][i]['BETAN']/project_dict['sims'][i]['LI'])
+
     relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
     relevant_values_lower_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_lower']
     relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
@@ -143,13 +150,13 @@ q95_Bn_new = np.zeros((len(xnew),2),dtype=float)
 q95_Bn_new[:,0] = xnew[:]
 q95_Bn_new[:,1] = ynew[:]
 
-plas_data = griddata(q95_Bn_array, plot_quantity_plas, (xnew_grid, ynew_grid),method = 'cubic')
-vac_data = griddata(q95_Bn_array, plot_quantity_vac, (xnew_grid, ynew_grid), method = 'cubic')
-tot_data = griddata(q95_Bn_array, plot_quantity_tot, (xnew_grid, ynew_grid), method = 'cubic')
+plas_data = griddata(q95_Bn_array, np.array(plot_quantity_plas), (xnew_grid, ynew_grid),method = 'linear')
+vac_data = griddata(q95_Bn_array, np.array(plot_quantity_vac), (xnew_grid, ynew_grid), method = 'linear')
+tot_data = griddata(q95_Bn_array, np.array(plot_quantity_tot), (xnew_grid, ynew_grid), method = 'linear')
 
-plas_data_res = griddata(q95_Bn_array, res_plas, (xnew_grid, ynew_grid),method = 'cubic')
-vac_data_res = griddata(q95_Bn_array, res_vac, (xnew_grid, ynew_grid), method = 'cubic')
-tot_data_res = griddata(q95_Bn_array, res_tot, (xnew_grid, ynew_grid), method = 'cubic')
+plas_data_res = griddata(q95_Bn_array, np.array(res_plas), (xnew_grid, ynew_grid),method = 'linear')
+vac_data_res = griddata(q95_Bn_array, np.array(res_vac), (xnew_grid, ynew_grid), method = 'linear')
+tot_data_res = griddata(q95_Bn_array, np.array(res_tot), (xnew_grid, ynew_grid), method = 'linear')
 
 mode_data = griddata(q95_Bn_array, mode_list, (xnew_grid, ynew_grid), method = 'cubic')
 plas_data_phase = griddata(q95_Bn_array, plot_quantity_plas_phase, (xnew_grid, ynew_grid), method = 'linear')
@@ -242,7 +249,10 @@ color_fig.set_clim([5,15])
 pt.colorbar(color_fig, ax=ax)
 ax.plot(q95_list, Bn_Li_list,'k.')
 ax.set_title('Max mode number, sqrt(psi)=%.2f'%(psi))
-ax.set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+if beta_n_axis=='beta_n':
+    ax.set_ylabel(r'$\beta_N$', fontsize = 14)
+elif beta_n_axis=='beta_n/li':
+    ax.set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
 ax.set_xlabel(r'$q_{95}$', fontsize = 14)
 fig.suptitle(file_name,fontsize=8)
 fig.canvas.draw(); fig.show()
@@ -251,15 +261,36 @@ fig.canvas.draw(); fig.show()
 color_map = 'jet'
 fig,ax = pt.subplots(nrows = 3,sharex = 1, sharey = 1)
 color_fig_plas = ax[0].pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map)#, cmap = cmap)
+
+fig_JAW, ax_JAW = pt.subplots()
+color_fig_plas_JAW = ax_JAW.pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map, rasterized=True)
+cbar = pt.colorbar(color_fig_plas_JAW, ax = ax_JAW)
+cbar.ax.set_ylabel('G/kA')
+ax_JAW.set_xlabel(r'$q_{95}$', fontsize = 14)
+ax_JAW.set_ylabel(r'$\beta_N$', fontsize = 14)
+ax_JAW.plot(q95_list, Bn_Li_list,'k.')
+ax_JAW.set_title(r'Plasma, $\psi_N=%.2f$'%(psi**2))
+color_fig_plas_JAW.set_clim([0,3.0])
+fig_JAW.canvas.draw(); fig_JAW.show()
+
+
+color_fig_plas = ax[0].pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map)#, cmap = cmap)
+
 #color_fig = ax[0].pcolor(xnew, ynew, plas_data)
-pt.colorbar(color_fig_plas, ax = ax[0])
+cbar = pt.colorbar(color_fig_plas, ax = ax[0])
+cbar.ax.set_ylabel('G/kA')
 if plot_quantity=='average':
     color_fig_plas.set_clim([0,7])
 elif plot_quantity=='max':
     #pass
-    color_fig_plas.set_clim([0,2])
-ax[0].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
-ax[0].set_title('Plasma, sqrt(psi)=%.2f'%(psi))
+    color_fig_plas.set_clim([0,3.0])
+if beta_n_axis=='beta_n':
+    ax[0].set_ylabel(r'$\beta_N$', fontsize = 14)
+elif beta_n_axis=='beta_n/li':
+    ax[0].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+
+#ax[0].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+ax[0].set_title(r'Plasma, $\psi_N=%.2f$'%(psi**2))
 ax[0].plot(q95_list, Bn_Li_list,'k.')
 #fig.canvas.draw(); fig.show()
 
@@ -271,16 +302,26 @@ ax[0].plot(q95_list, Bn_Li_list,'k.')
 color_fig_vac = ax[1].pcolor(xnew, ynew, np.ma.array(vac_data, mask=np.isnan(vac_data)),cmap=color_map)#, cmap = cmap)
 color_fig_relative = ax[2].pcolor(xnew, ynew, np.ma.array(plas_data/vac_data, mask=np.isnan(vac_data)),cmap=color_map)#, cmap = cmap)
 color_fig_relative.set_clim([0,10])
-pt.colorbar(color_fig_relative, ax = ax[2])
+cbar = pt.colorbar(color_fig_relative, ax = ax[2])
+#cbar.ax.set_ylabel('G/kA')
 if plot_quantity=='average':
     color_fig_vac.set_clim([0,0.2])
 elif plot_quantity=='max':
-    color_fig_vac.set_clim([0,0.5])
+    color_fig_vac.set_clim([0,0.9])
 
-pt.colorbar(color_fig_vac, ax = ax[1])
-ax[1].set_title('Vacuum, sqrt(psi)=%.2f'%(psi))
-ax[1].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
-ax[2].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+cbar = pt.colorbar(color_fig_vac, ax = ax[1])
+cbar.ax.set_ylabel('G/kA')
+ax[1].set_title(r'Vacuum, $\psi_N=%.2f$'%(psi**2))
+
+
+if beta_n_axis=='beta_n':
+    ax[1].set_ylabel(r'$\beta_N$', fontsize = 14)
+    ax[2].set_ylabel(r'$\beta_N$', fontsize = 14)
+elif beta_n_axis=='beta_n/li':
+    ax[1].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+    ax[2].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+#ax[1].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+#ax[2].set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
 ax[-1].set_xlabel(r'$q_{95}$', fontsize = 14)
 ax[1].plot(q95_list, Bn_Li_list,'k.')
 ax[2].plot(q95_list, Bn_Li_list,'k.')
@@ -444,6 +485,16 @@ fig.canvas.draw(); fig.show()
             
 
 # ax[1].grid(b=True)
+fig, ax = pt.subplots()
+ax.plot(q95_list, Bn_Li_list,'k.')
+if beta_n_axis=='beta_n':
+    ax.set_ylabel(r'$\beta_N$', fontsize = 14)
+    ax.set_ylabel(r'$\beta_N$', fontsize = 14)
+elif beta_n_axis=='beta_n/li':
+    ax.set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+    ax.set_ylabel(r'$\beta_N / L_i$', fontsize = 14)
+ax.set_xlabel(r'$q_{95}$', fontsize=14)
+fig.canvas.draw(); fig.show()
 # ax[0].grid(b=True)
 # ax[0].set_title('PlasmaResponse, sqrt(psi)=%.2f'%(psi))
 # ax[0].set_ylabel('Amplitude', fontsize = 14)

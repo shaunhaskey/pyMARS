@@ -19,7 +19,7 @@ def return_initial_eq(project_dict):
     return initial_eq_serial
 
 def return_probe_values(project_dict, calc, calc2, iii):
-    q95_list = [];Bn_Div_Li_list = [];coil1 = [];passes = 0;fails = 0
+    q95_list = []; Bn_Div_Li_list = [];coil1 = [];passes = 0;fails = 0
     Bn_list = []; Li_list = [];serial_list=[]
     for jjj in project_dict['sims'].keys():
         try:
@@ -40,7 +40,6 @@ def return_probe_values(project_dict, calc, calc2, iii):
             del project_dict['sims'][jjj]
             print 'fail'
     print 'pass : %d, fails : %d'%(passes, fails)
-
     q95_array = num.array(q95_list)
     Bn_Div_Li_array = num.array(Bn_Div_Li_list)
     Bn_array = num.array(Bn_list)

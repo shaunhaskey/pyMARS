@@ -27,7 +27,7 @@ I_coil_freq = 10.
 
 shot = 146392; start_time = 2990; end_time = 4700
 #shot = 146397; start_time = 3030; end_time = 4800
-#shot = 146398; start_time = 3200; end_time = 3620
+shot = 146398; start_time = 3200; end_time = 3620
 
 #shot = 146398; start_time = 3050; end_time = 3950
 
@@ -68,7 +68,8 @@ elif shot == 146398:
     print 'using new non kinetic shot 146398 MARS run'
     base_dir = '/home/srh112/code/pyMARS/other_scripts/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
     base_dir = '/u/haskeysr/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
-    base_dir = '/home/srh112/NAMP_datafiles/mars/shot146398_3515/qmult1.000/exp1.000/marsrun/'
+    base_dir = '/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
+    #base_dir = '/home/srh112/NAMP_datafiles/mars/shot146398_3515/qmult1.000/exp1.000/marsrun/'
 else:
     base_dir = '/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
 #for sh_laptop
@@ -220,6 +221,8 @@ ax_freq.append(fig_freq.add_subplot(311))
 ax_freq.append(fig_freq.add_subplot(312, sharex=ax_freq[0]))
 ax_freq.append(fig_freq.add_subplot(325))
 ax_freq.append(fig_freq.add_subplot(326, sharex=ax_freq[2], sharey = ax_freq[2]))
+
+fig_freq_JAW, ax_freq_JAW = pt.subplots()
 
 #frequency domain plots 2 - constant radius lines
 fig_freq2 = pt.figure()
@@ -605,9 +608,11 @@ if boundary_x != None:
 ax_time[2].set_ylim([2.1,2.35])
 #plot I-coil freq pickup amp as a function of radius and SNR of that signal
 ax_freq[0].plot(radius_list, amp_list, 'x-',label='10Hz reflect')
+ax_freq_JAW.plot(radius_list, amp_list, 'x-',label='10Hz reflect')
 
 
 ax_freq[0].set_title('shot:%d time:%d->%d, dens %.1e -> %.1e'%(shot, start_time, end_time,min(plot_densities),max(plot_densities)))
+ax_freq_JAW.set_title('shot%d time:%dms -> %dms'%(shot, start_time, end_time))
 
 boundary_list = [np.max(boundary_y)*100,np.min(boundary_y)*100,np.mean(boundary_y)*100]
 v_line_list = boundary_list
@@ -733,6 +738,10 @@ ax_time[0].set_xlim([start_time, end_time])
 ax_freq[1].set_xlabel('R (cm)')
 ax_freq[1].set_ylabel('%.1fHz SNR'%(I_coil_freq))
 ax_freq[0].set_ylabel('disp mag @ %.1fHz (cm/kA)'%(I_coil_freq))
+ax_freq_JAW.set_ylabel('Displacement (cm/kA)')
+ax_freq_JAW.set_xlabel('R (cm)')
+#ax_freq_JAW.set_ylim([0,0.4])
+
 ax_freq[0].set_title('shot:%d time:%d->%d, dens %.1e -> %.1e'%(shot,start_time, end_time,min(plot_densities),max(plot_densities)))
 ax_freq[0].set_ylim([0,0.4])
 
@@ -745,6 +754,8 @@ ax_freq[3].set_xlim([3,30]); ax_freq[3].set_ylim([0,0.6])
 ax_freq2[3].set_ylim([0,1.e20]); ax_freq2[2].set_xlim([3,30])
 
 v_line_axes = [ax_freq[0],ax_freq[1],ax_freq2[0],ax_freq2[1],ax_delta]
+#ax_freq_JAW.vlines(boundary_list,ax_freq_JAW.get_ylim()[0],ax_freq_JAW.get_ylim()[1])
+
 for tmp_ax in v_line_axes:
     tmp_ax.vlines(boundary_list,tmp_ax.get_ylim()[0],tmp_ax.get_ylim()[1])
 
@@ -831,7 +842,8 @@ if include_MARS == 1:
         Z_values=R_values * 0
         Vn_values = scipy_griddata((plas_r.flatten(),plas_z.flatten()), plot_quantity.flatten(), (R_values.flatten(),Z_values.flatten()))
         ax_freq[0].plot(R_values*100, np.abs(Vn_values)*100,'k-', label='MARS-Vn')
-        ax_freq[0].plot(R_values*100, np.imag(Vn_values)*100,'k-', label='MARS-Vn')
+        ax_freq_JAW.plot(R_values*100, np.abs(Vn_values)*100,'k-', label='MARS-F')
+        #ax_freq[0].plot(R_values*100, np.imag(Vn_values)*100,'k-', label='MARS-Vn')
 
     plot_field = 'Vr'; field_type = 'plas'
     for theta_deg in [0]:
@@ -849,13 +861,19 @@ if include_MARS == 1:
         Z_values=R_values * 0
 
         Vr_values = scipy_griddata((plas_r.flatten(),plas_z.flatten()), plot_quantity.flatten(), (R_values.flatten(),Z_values.flatten()))
-        ax_freq[0].plot(R_values*100, np.abs(Vr_values)*100,'r.', label='MARS-Vr')
+        #ax_freq[0].plot(R_values*100, np.abs(Vr_values)*100,'r.', label='MARS-Vr')
 
 
     ax_freq[0].set_ylim([0,0.4])
+    ax_freq_JAW.set_ylim([0,0.6])
+    ax_freq_JAW.grid()
     ax_freq[0].legend(loc='lower left')
+    ax_freq_JAW.legend(loc='best')
     fig_freq.canvas.draw()
     fig_freq.show()
+
+    fig_freq_JAW.canvas.draw()
+    fig_freq_JAW.show()
 
 
 

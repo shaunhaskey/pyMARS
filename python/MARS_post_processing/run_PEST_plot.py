@@ -39,8 +39,8 @@ print I0EXP, 1.0e+3 * 3./np.pi
 
 #d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.p/', I0EXP=I0EXP)
 
-#d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_lower.p',I0EXP=I0EXP)
-d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_lower.p',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
 
 #d = data('/home/srh112/NAMP_datafiles/mars/shot146382_single_n4/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
 #d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/', I0EXP=I0EXP)
