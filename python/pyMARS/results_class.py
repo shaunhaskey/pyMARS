@@ -244,9 +244,11 @@ class data():
             #self.new_area.append(np.sum(np.sqrt(dR**2+dZ**2))*np.pi*2.)
         if new_area[0]==0:new_area[0]=new_area[1] #so that nothing blows up if dividing by it
         self.A = np.array(new_area)
+        tmp = self.A[:self.BnPEST.shape[0]]
+        tmp.resize((self.BnPEST.shape[0],1))
+        self.BnPEST_SURF = self.BnPEST*4.*(np.pi)**2/(tmp)
 
-
-    def resonant_strength(self, min_s = 0, power = 1, n=2):
+    def resonant_strength(self, min_s = 0, power = 1, n=2, SURFMN_coords = 0):
         os.chdir(self.directory) 
         #os.system('ln -sf PROFEQ.OUT PROFEQ_PEST')
         #file_name = 'PROFEQ_PEST'
@@ -254,8 +256,12 @@ class data():
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         qn_grid, s_grid = np.meshgrid(q*n, self.s.flatten())
-        temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(q*n, s.flatten()),method='linear')
-        temp_discrete  = griddata((mk_grid.flatten(),ss_grid.flatten()),self.BnPEST.flatten(),(qn.flatten()*n, sq.flatten()),method='linear')
+        if SURFMN_coords:
+            temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST_SURF.flatten()),(q*n, s.flatten()),method='linear')
+            temp_discrete  = griddata((mk_grid.flatten(),ss_grid.flatten()),self.BnPEST_SURF.flatten(),(qn.flatten()*n, sq.flatten()),method='linear')
+        else:
+            temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(q*n, s.flatten()),method='linear')
+            temp_discrete  = griddata((mk_grid.flatten(),ss_grid.flatten()),self.BnPEST.flatten(),(qn.flatten()*n, sq.flatten()),method='linear')
         #print s.shape,len(s), temp_qn.shape, len(temp_qn)
         total_integral = 0
         min_location = np.argmin(np.abs(s-min_s))
@@ -273,7 +279,7 @@ class data():
         return total_integral, temp_discrete
 
 
-    def kink_amp(self, psi, q_range, n = 2):
+    def kink_amp(self, psi, q_range, n = 2, SURFMN_coords = 0):
         #self.q_profile
         #self.q_profile_s
         #self.mk, self.ss, self.BnPEST
@@ -296,7 +302,11 @@ class data():
         upper_bound_new = np.min([upper_bound, len(self.mk.flatten())-1])
         print lower_bound, upper_bound, upper_bound_new
         print 'relevant_q: %.2f, bounds: %d %d, values: %d, %d'%(relevant_q, lower_bound, upper_bound_new, self.mk.flatten()[lower_bound], self.mk.flatten()[upper_bound_new])
-        relevant_values = self.BnPEST[s_loc,lower_bound:upper_bound_new]
+        if SURFMN_coords:
+            relevant_values = self.BnPEST_SURF[s_loc,lower_bound:upper_bound_new]
+        else:
+            relevant_values = self.BnPEST[s_loc,lower_bound:upper_bound_new]
+
         print relevant_values
         print 'sum', np.abs(np.sum(np.abs(relevant_values)))
         return self.mk.flatten()[lower_bound:upper_bound_new], self.ss[s_loc], relevant_values, relevant_q
@@ -440,15 +450,15 @@ class data():
 
                 self.SURFMN_DPSIDS = griddata(self.ss[:181],self.DPSIDS_1, self.SURFMN_ydat[0,:],method='linear')
             #self.SURFMN_A = griddata(self.ss[:181],self.A.flatten()[:181], self.SURFMN_ydat[0,:],method='linear')
-            get_plotk_results = 1
+            get_plotk_results = 0
             if get_plotk_results:
                 self.plotk_m, self.plotk_mode_amps = extract_plotk_results()
-            plotk_fig, plotk_ax = pt.subplots()
-            self.plotk_mode_amps = self.plotk_mode_amps*self.BNORM*2.*np.pi
-            color_plot = plotk_ax.pcolor(self.plotk_m, (s[1:self.plotk_mode_amps.shape[1]+1]), np.abs(self.plotk_mode_amps).transpose(),cmap='hot')
-            pt.colorbar(color_plot,ax = plotk_ax)
-            plotk_ax.set_title('PLOT_K, max : %.2f'%(np.max(np.abs(self.plotk_mode_amps)),))
-            plotk_fig.canvas.draw(); plotk_fig.show()
+                plotk_fig, plotk_ax = pt.subplots()
+                self.plotk_mode_amps = self.plotk_mode_amps*self.BNORM*2.*np.pi
+                color_plot = plotk_ax.pcolor(self.plotk_m, (s[1:self.plotk_mode_amps.shape[1]+1]), np.abs(self.plotk_mode_amps).transpose(),cmap='hot')
+                pt.colorbar(color_plot,ax = plotk_ax)
+                plotk_ax.set_title('PLOT_K, max : %.2f'%(np.max(np.abs(self.plotk_mode_amps)),))
+                plotk_fig.canvas.draw(); plotk_fig.show()
             fig_tmp100, ax_tmp100 = pt.subplots(nrows = 2, sharex = 1)
             single_mode_plots = range(1,3**2+1)
             sqrt_modes = int(np.sqrt(len(single_mode_plots)))
@@ -481,6 +491,7 @@ class data():
                     top_z_M = top_z_S * np.array(self.new_area)[0:self.plotk_mode_amps.shape[1]]/((2*np.pi)**2)#*self.SURFMN_DPSIDS
 
                 plot_quantity_bottom = 'PLOTK'
+                plot_quantity_bottom = 'SURFMN'
                 if plot_quantity_bottom == 'SURFMN':
                     bottom_z_S = zdat
                     bottom_m = xdat[:,0]
@@ -558,7 +569,7 @@ class data():
                     #print bottom_s[j], bottom_z[tmp_bottom_loc, j], str(tmp_m)
                     ax_tmp100[1].text(bottom_s[j], bottom_z[tmp_bottom_loc, j], str(tmp_m), fontsize = 8.5)
                     pass
-                compare_MARS = 0
+                compare_MARS = 1
                 correct_SURFMN = 0
                 tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
                 if correct_SURFMN:
@@ -775,7 +786,7 @@ class data():
             fig.clf()
             pt.close('all')
 
-    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100):
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100, gauss_filter = [0,0.5]):
         ss_plas_edge = np.argmin(np.abs(self.ss-max_ss))
         if phase==1:
             tmp_plot_quantity = np.angle(self.BnPEST[:ss_plas_edge,:], deg = True)
@@ -784,7 +795,7 @@ class data():
             tmp_plot_quantity = (np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose()
         if increase_grid_BnPEST:
             tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], tmp_plot_quantity, increase_y = 1, increase_x = 0, new_y_lims = [0,0.99],number=interp_points)
-            tmp_plot_quantity =  ndimage.gaussian_filter(tmp_plot_quantity,[0,0.5])
+            tmp_plot_quantity =  ndimage.gaussian_filter(tmp_plot_quantity,gauss_filter)
         else:
             tmp_plot_mk = self.mk.flatten()
             tmp_plot_ss = self.ss[:ss_plas_edge].flatten()

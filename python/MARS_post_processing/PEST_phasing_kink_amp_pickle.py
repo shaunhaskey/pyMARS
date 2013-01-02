@@ -20,13 +20,14 @@ file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_
 file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4_V2/equal_spacing_n4_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4_V2/equal_spacing_n4_post_processing_PEST.pickle'
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 #I0EXP = I0EXP_calc(N,n,I)
 #I0EXP = 1.0e+3*0.528 #PMZ n4 real
 I0EXP = RZfuncs.I0EXP_calc_real(n,I)
 
-
+Bn_Li_value = 1.5 
 facn = 1.0; psi = 0.97
 q_range = [2,6]; ylim = [0,1.4]
 #phasing_range = [-180.,180.]
@@ -38,11 +39,31 @@ include_discrete_comparison = 0
 seperate_res_plot = 0
 include_vert_lines = 0
 beta_n_axis = 'beta_n'#'beta_n/li'
-#beta_n_axis = 'beta_n/li'
+beta_n_axis = 'beta_n/li'
 plot_type = 'best_harmonic'
 #plot_type = 'normalised'
 #plot_type = 'normalised_average'
 #plot_type = 'standard_average'
+
+
+
+def no_wall_limit(q95_list, beta_n_list):
+    '''
+    Returns the maximum item in beta_n_list for each unique item in q95_list
+    Useful for returning the no wall limit
+    SH 26/12/2012
+    '''
+    q95 = np.array(q95_list)
+    bn = np.array(beta_n_list)
+    q95_values = set(q95_list)
+    xaxis = []; yaxis = []
+    for i in q95_values:
+        xaxis.append(i)
+        yaxis.append(np.max(bn[q95==i]))
+    tmp1 = sorted(zip(xaxis,yaxis))
+    xaxis = [tmp for (tmp,tmp2) in tmp1]
+    yaxis = [tmp2 for (tmp,tmp2) in tmp1]
+    return xaxis, yaxis
 
 project_dict = pickle.load(file(file_name,'r'))
 phasing = 0.
@@ -60,6 +81,7 @@ amps_vac_comp_upper = []; amps_vac_comp_lower = []
 res_vac = []; res_tot = []; res_plas = []
 res_vac_list_upper = []; res_vac_list_lower = []
 res_plas_list_upper = []; res_plas_list_lower = []
+divisor_list = []
 for i in project_dict['sims'].keys():
     q95_list.append(project_dict['sims'][i]['Q95'])
     serial_list.append(i)
@@ -78,7 +100,7 @@ for i in project_dict['sims'].keys():
     lower_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_lower'])
     upper_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
     lower_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
-
+    divisor_list.append(len(np.array(project_dict['sims'][i]['responses']['total_resonant_response_upper'])))
     pmult_list.append(project_dict['sims'][i]['PMULT'])
     qmult_list.append(project_dict['sims'][i]['QMULT'])
 
@@ -107,6 +129,7 @@ for i in project_dict['sims'].keys():
     res_plas_list_lower.append(lower_tot_res - lower_vac_res)
 
 
+x_axis_NW, y_axis_NW = no_wall_limit(q95_list, Bn_Li_list)
 
 plot_quantity_vac=[];plot_quantity_plas=[];plot_quantity_tot=[];
 plot_quantity_vac_phase=[];plot_quantity_plas_phase=[];plot_quantity_tot_phase=[];
@@ -115,12 +138,17 @@ plot_quantity = 'max'
 max_loc_list = []; mode_list = []
 upper_values_plasma = []; lower_values_plasma = []
 upper_values_vac = []; lower_values_vac = []
+upper_values_vac_fixed = []; lower_values_vac_fixed = []
+nq_plus_one = 1
 for i in range(0,len(amps_vac_comp)):
     if plot_quantity == 'average':
         plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
         plot_quantity_plas.append(np.sum(np.abs(amps_plas_comp[i])**2)/len(amps_vac_comp[i]))
         plot_quantity_tot.append(np.sum(np.abs(amps_tot_comp[i])**2)/len(amps_vac_comp[i]))
     elif plot_quantity == 'max':
+        #argmin(mk_list[i][max_loc])
+
+        #mode_list.append(mk_list[i][max_loc])
         
         max_loc = np.argmax(np.abs(amps_plas_comp[i]))
         max_loc_list.append(max_loc)
@@ -136,6 +164,10 @@ for i in range(0,len(amps_vac_comp)):
         lower_values_plasma.append(amps_plas_comp_lower[i][max_loc])
         upper_values_vac.append(amps_vac_comp_upper[i][max_loc])
         lower_values_vac.append(amps_vac_comp_lower[i][max_loc])
+
+
+        upper_values_vac_fixed.append(amps_vac_comp_upper[i][4])
+        lower_values_vac_fixed.append(amps_vac_comp_lower[i][4])
         
 
 
@@ -157,6 +189,7 @@ tot_data = griddata(q95_Bn_array, np.array(plot_quantity_tot), (xnew_grid, ynew_
 plas_data_res = griddata(q95_Bn_array, np.array(res_plas), (xnew_grid, ynew_grid),method = 'linear')
 vac_data_res = griddata(q95_Bn_array, np.array(res_vac), (xnew_grid, ynew_grid), method = 'linear')
 tot_data_res = griddata(q95_Bn_array, np.array(res_tot), (xnew_grid, ynew_grid), method = 'linear')
+vac_data_res_ave = griddata(q95_Bn_array, np.array(res_vac)/np.array(divisor_list), (xnew_grid, ynew_grid), method = 'linear')
 
 mode_data = griddata(q95_Bn_array, mode_list, (xnew_grid, ynew_grid), method = 'cubic')
 plas_data_phase = griddata(q95_Bn_array, plot_quantity_plas_phase, (xnew_grid, ynew_grid), method = 'linear')
@@ -257,10 +290,7 @@ ax.set_xlabel(r'$q_{95}$', fontsize = 14)
 fig.suptitle(file_name,fontsize=8)
 fig.canvas.draw(); fig.show()
 
-
 color_map = 'jet'
-fig,ax = pt.subplots(nrows = 3,sharex = 1, sharey = 1)
-color_fig_plas = ax[0].pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map)#, cmap = cmap)
 
 fig_JAW, ax_JAW = pt.subplots()
 color_fig_plas_JAW = ax_JAW.pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map, rasterized=True)
@@ -273,8 +303,69 @@ ax_JAW.set_title(r'Plasma, $\psi_N=%.2f$'%(psi**2))
 color_fig_plas_JAW.set_clim([0,3.0])
 fig_JAW.canvas.draw(); fig_JAW.show()
 
+fig_JAW, ax_JAW = pt.subplots()
+color_fig_plas_JAW = ax_JAW.pcolor(xnew, ynew, np.ma.array(vac_data_res_ave, mask=np.isnan(plas_data)),cmap=color_map, rasterized=True)
+cbar = pt.colorbar(color_fig_plas_JAW, ax = ax_JAW)
+cbar.ax.set_ylabel(r'$\bar{\delta B}_{res}$ G/kA',fontsize=20)
+ax_JAW.set_xlabel(r'$q_{95}$', fontsize = 20)
+ax_JAW.set_ylabel(r'$\beta_N$', fontsize = 20)
+ax_JAW.plot(q95_list, Bn_Li_list,'k.')
+ax_JAW.set_title(r'Plasma, $\psi_N=%.2f$'%(psi**2), fontsize = 18)
+ax_JAW.set_xlim([2.5, 6.8])
+ax_JAW.set_ylim([0.75,4.5])
+#color_fig_plas_JAW.set_clim([0,9.0])
+fig_JAW.canvas.draw(); fig_JAW.show()
 
+
+fig_JAW, ax_JAW = pt.subplots(nrows=2, sharex =1, sharey=1)
+color_fig_plas_JAW = ax_JAW[0].pcolor(xnew, ynew, np.ma.array(vac_data_res_ave, mask=np.isnan(plas_data)),cmap=color_map, rasterized=True)
+cbar = pt.colorbar(color_fig_plas_JAW, ax = ax_JAW[0])
+cbar.ax.set_ylabel(r'$\overline{\delta B}_{res}$ G/kA',fontsize=20)
+color_fig_plas_JAW = ax_JAW[1].pcolor(xnew, ynew, np.ma.array(vac_data_res, mask=np.isnan(plas_data)),cmap=color_map, rasterized=True)
+color_fig_plas_JAW.set_clim([0,8])
+cbar = pt.colorbar(color_fig_plas_JAW, ax = ax_JAW[1])
+cbar.ax.set_ylabel(r'$\delta B_{res}$ G/kA',fontsize=20)
+
+ax_JAW[1].set_xlabel(r'$q_{95}$', fontsize = 20)
+ax_JAW[0].set_ylabel(r'$\beta_N$', fontsize = 20)
+ax_JAW[1].set_ylabel(r'$\beta_N$', fontsize = 20)
+ax_JAW[0].plot(q95_list, Bn_Li_list,'k.')
+ax_JAW[1].plot(q95_list, Bn_Li_list,'k.')
+ax_JAW[0].plot(x_axis_NW, y_axis_NW,'b-')
+ax_JAW[1].plot(x_axis_NW, y_axis_NW,'b-')
+
+ax_JAW[0].plot(x_axis_NW, np.array(y_axis_NW)*0.75,'b-')
+ax_JAW[1].plot(x_axis_NW, np.array(y_axis_NW)*0.75,'b-')
+
+#ax_JAW.set_title(r'Plasma, $\psi_N=%.2f$'%(psi**2), fontsize = 18)
+ax_JAW[0].set_xlim([2.5, 6.8])
+ax_JAW[0].set_ylim([0.75,4.5])
+#color_fig_plas_JAW.set_clim([0,9.0])
+fig_JAW.canvas.draw(); fig_JAW.show()
+
+
+fig_JAW, ax_JAW = pt.subplots()
+color_fig_plas_JAW = ax_JAW.pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map, rasterized=True)
+#ax_JAW.contour(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)))
+cbar = pt.colorbar(color_fig_plas_JAW, ax = ax_JAW)
+cbar.ax.set_ylabel(r'$\delta B_{kink}$ G/kA',fontsize=20)
+ax_JAW.set_xlabel(r'$q_{95}$', fontsize = 20)
+ax_JAW.set_ylabel(r'$\beta_N$', fontsize = 20)
+ax_JAW.plot(q95_list, Bn_Li_list,'k.')
+ax_JAW.set_title(r'Plasma, $\psi_N=%.2f$'%(psi**2), fontsize = 18)
+ax_JAW.set_xlim([2.5, 6.8])
+ax_JAW.set_ylim([0.75,4.5])
+color_fig_plas_JAW.set_clim([0,3.0])
+fig_JAW.canvas.draw(); fig_JAW.show()
+
+
+
+fig,ax = pt.subplots(nrows = 3,sharex = 1, sharey = 1)
 color_fig_plas = ax[0].pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map)#, cmap = cmap)
+
+
+
+#color_fig_plas = ax[0].pcolor(xnew, ynew, np.ma.array(plas_data, mask=np.isnan(plas_data)),cmap=color_map)#, cmap = cmap)
 
 #color_fig = ax[0].pcolor(xnew, ynew, plas_data)
 cbar = pt.colorbar(color_fig_plas, ax = ax[0])
@@ -379,13 +470,18 @@ rel_upper_vals_plasma = np.array(upper_values_plasma)[pmult_array==pmult_values[
 rel_lower_vals_vac = np.array(lower_values_vac)[pmult_array==pmult_values[0]]
 rel_upper_vals_vac = np.array(upper_values_vac)[pmult_array==pmult_values[0]]
 
-Bn_Li_value = 2.2
+rel_lower_vals_vac_fixed = np.array(lower_values_vac_fixed)[pmult_array==pmult_values[0]]
+rel_upper_vals_vac_fixed = np.array(upper_values_vac_fixed)[pmult_array==pmult_values[0]]
+
 q95_single = np.linspace(2.6,6,100)
 
 rel_lower_vals_plasma = griddata(q95_Bn_array, np.array(lower_values_plasma), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 rel_upper_vals_plasma = griddata(q95_Bn_array, np.array(upper_values_plasma), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 rel_lower_vals_vac = griddata(q95_Bn_array, np.array(lower_values_vac), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 rel_upper_vals_vac = griddata(q95_Bn_array, np.array(upper_values_vac), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+
+rel_lower_vals_vac_fixed = griddata(q95_Bn_array, np.array(lower_values_vac_fixed), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
+rel_upper_vals_vac_fixed = griddata(q95_Bn_array, np.array(upper_values_vac_fixed), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 
 
 
@@ -395,6 +491,7 @@ plot_array_plasma = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=
 
 plot_array_vac = np.ones((phasing_array.shape[0], rel_q95_vals.shape[0]),dtype=float)
 plot_array_vac = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
+plot_array_vac_fixed = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
 
 
 plot_array_vac_res = np.ones((phasing_array.shape[0], q95_single.shape[0]),dtype=float)
@@ -406,6 +503,7 @@ for i, curr_phase in enumerate(phasing_array):
     phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
     plot_array_plasma[i,:] = np.abs(rel_upper_vals_plasma + rel_lower_vals_plasma*phasor)
     plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
+    plot_array_vac_fixed[i,:] = np.abs(rel_upper_vals_vac_fixed + rel_lower_vals_vac_fixed*phasor)
 
 
 
@@ -420,8 +518,8 @@ ax[0].plot(q95_single, phasing_array[np.argmin(plot_array_plasma,axis=0)],'b.')
 ax[1].plot(q95_single, phasing_array[np.argmin(plot_array_vac,axis=0)],'b.')
 
 ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
-ax[0].set_ylabel('Phasing (deg)')
-ax[1].set_ylabel('Phasing (deg)')
+ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 14)
+ax[1].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 14)
 ax[0].set_title('Kink Amplitude - Plasma')
 ax[1].set_title('Kink Amplitude - Vacuum')
 ax[0].set_xlim([np.min(q95_single),np.max(q95_single)])
@@ -429,10 +527,78 @@ ax[0].set_ylim([np.min(phasing_array),np.max(phasing_array)])
 color_plot.set_clim([0, 2])
 color_plot2.set_clim([0, 1])
 cb = pt.colorbar(color_plot, ax = ax[0])
-cb.ax.set_ylabel('Amp G/kA')
+cb.ax.set_ylabel(r'$\delta B_{kink}$ G/kA',fontsize=20)
 cb = pt.colorbar(color_plot2, ax = ax[1])
-cb.ax.set_ylabel('Amp G/kA')
+cb.ax.set_ylabel(r'$\delta B_{kink}$ G/kA',fontsize=20)
 fig.canvas.draw(); fig.show()
+
+
+fig, ax = pt.subplots(); ax=[ax]
+color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_plasma, cmap='hot', rasterized=True)
+ax[0].set_xlabel(r'$q_{95}$', fontsize=14)
+ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 14)
+ax[0].set_title('Kink Amplitude - Plasma')
+ax[0].set_xlim([np.min(q95_single),np.max(q95_single)])
+ax[0].set_ylim([np.min(phasing_array),np.max(phasing_array)])
+color_plot.set_clim([0, 2])
+ax[0].plot(np.arange(1,10), np.arange(1,10)*(-35.)+130+180,'b-')
+tmp_xaxis = np.arange(1,10,0.1)
+tmp_yaxis = np.arange(1,10,0.1)*(-35.)+130
+ax[0].plot(tmp_xaxis[tmp_yaxis>0], tmp_yaxis[tmp_yaxis>0],'b-')
+ax[0].plot(tmp_xaxis[tmp_yaxis<0], tmp_yaxis[tmp_yaxis<0]+360,'b-')
+ax[0].set_xlim([2.6, 6])
+cb = pt.colorbar(color_plot, ax = ax[0])
+cb.ax.set_ylabel(r'$\delta B_{kink}$ G/kA',fontsize=20)
+fig.canvas.draw(); fig.show()
+
+
+fig, ax = pt.subplots(); ax=[ax]
+color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_vac_fixed, cmap='hot', rasterized=True)
+ax[0].set_xlabel(r'$q_{95}$', fontsize=14)
+ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 14)
+ax[0].set_title('Kink Amplitude - Vacuum')
+ax[0].set_xlim([np.min(q95_single),np.max(q95_single)])
+ax[0].set_ylim([np.min(phasing_array),np.max(phasing_array)])
+#color_plot.set_clim([0, 2])
+ax[0].plot(np.arange(1,10), np.arange(1,10)*(-35.)+130+180,'b-')
+tmp_xaxis = np.arange(1,10,0.1)
+tmp_yaxis = np.arange(1,10,0.1)*(-35.)+130
+ax[0].plot(tmp_xaxis[tmp_yaxis>0], tmp_yaxis[tmp_yaxis>0],'b-')
+ax[0].plot(tmp_xaxis[tmp_yaxis<0], tmp_yaxis[tmp_yaxis<0]+360,'b-')
+ax[0].set_xlim([2.6, 6])
+cb = pt.colorbar(color_plot, ax = ax[0])
+cb.ax.set_ylabel(r'$\delta B_{vac}^{m=nq+4,n=2}$ G/kA',fontsize=20)
+fig.canvas.draw(); fig.show()
+
+
+
+fig, ax = pt.subplots(nrows=2,sharex = 1, sharey=1)
+color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_plasma, cmap='hot', rasterized=True)
+cb = pt.colorbar(color_plot, ax = ax[0])
+ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 14)
+color_plot.set_clim([0, 2])
+ax[0].plot(np.arange(1,10), np.arange(1,10)*(-35.)+130+180,'b-')
+tmp_xaxis = np.arange(1,10,0.1)
+tmp_yaxis = np.arange(1,10,0.1)*(-35.)+130
+ax[0].plot(tmp_xaxis[tmp_yaxis>0], tmp_yaxis[tmp_yaxis>0],'b-')
+ax[0].plot(tmp_xaxis[tmp_yaxis<0], tmp_yaxis[tmp_yaxis<0]+360,'b-')
+cb.ax.set_ylabel(r'$\delta B_{kink}$ G/kA',fontsize=20)
+color_plot = ax[1].pcolor(q95_single, phasing_array, plot_array_vac_fixed, cmap='hot', rasterized=True)
+cb = pt.colorbar(color_plot, ax = ax[1])
+ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
+ax[1].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 14)
+#ax[1].set_title('Kink Amplitude - Vacuum')
+ax[1].set_ylim([np.min(phasing_array),np.max(phasing_array)])
+#color_plot.set_clim([0, 2])
+ax[1].plot(np.arange(1,10), np.arange(1,10)*(-35.)+130+180,'b-')
+tmp_xaxis = np.arange(1,10,0.1)
+tmp_yaxis = np.arange(1,10,0.1)*(-35.)+130
+ax[1].plot(tmp_xaxis[tmp_yaxis>0], tmp_yaxis[tmp_yaxis>0],'b-')
+ax[1].plot(tmp_xaxis[tmp_yaxis<0], tmp_yaxis[tmp_yaxis<0]+360,'b-')
+ax[1].set_xlim([2.6, 6])
+cb.ax.set_ylabel(r'$\delta B_{vac}^{m=nq+4,n=2}$ G/kA',fontsize=20)
+fig.canvas.draw(); fig.show()
+
 
 
 #res_vac_array_upper = np.array(res_vac_list_upper)
@@ -457,31 +623,67 @@ for i, curr_phase in enumerate(phasing_array):
     plot_array_vac_res2[i,:] = griddata(q95_Bn_array, np.array(tmp_vac_list2), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
     plot_array_plas_res2[i,:] = griddata(q95_Bn_array, np.array(tmp_plas_list2), (q95_single, q95_single*0.+Bn_Li_value),method = 'cubic')
 
+
+max_phases = phasing_array[np.argmax(plot_array_vac_res,axis=0)]
+max_phases[max_phases>max_phases[0]]-=360
+poly_max_res = np.polyfit(q95_single,max_phases,1)
+best_fit_max_res = np.polyval(poly_max_res, q95_single)
+best_fit_max_res[best_fit_max_res<0]+=360
+best_fit_max_res[best_fit_max_res>360]-=360
+
+min_phases = phasing_array[np.argmin(plot_array_vac_res,axis=0)]
+min_phases[min_phases>min_phases[0]]-=360
+poly_min_res = np.polyfit(q95_single,min_phases,1)
+best_fit_min_res = np.polyval(poly_min_res, q95_single)
+best_fit_min_res[best_fit_min_res<0]+=360
+best_fit_min_res[best_fit_min_res>360]-=360
+
+print '############ best fit min res ################'
+print poly_min_res
+print '############ best fit max res  ################'
+print poly_max_res
 fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
 color_plot = ax[0].pcolor(q95_single, phasing_array, plot_array_vac_res, cmap='hot', rasterized=True)
+ax[0].contour(q95_single,phasing_array, plot_array_vac_res, colors='white')
 color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_vac_res2, cmap='hot', rasterized=True)
+ax[1].contour(q95_single,phasing_array, plot_array_vac_res2, colors='white')
 color_plot.set_clim([0,10])
 color_plot2.set_clim([0,0.75])
-
-title_string1 = 'Total Forcing'
-title_string2 = 'Average Forcing'
-    
+#ax[0].plot(np.arange(1,10), np.arange(1,10)*(-35.)+250,'b-')
+#ax[0].plot(np.arange(1,10), np.arange(1,10)*(-35.)+250+180,'b-')
+#ax[1].plot(np.arange(1,10), np.arange(1,10)*(-35.)+250,'b-')
+#ax[1].plot(np.arange(1,10), np.arange(1,10)*(-35.)+250+180,'b-')
+ax[0].plot(q95_single, best_fit_max_res, 'b.')
+ax[0].plot(q95_single, best_fit_min_res, 'b.')
+ax[1].plot(q95_single, best_fit_max_res, 'b.')
+ax[1].plot(q95_single, best_fit_min_res, 'b.')
 ax[0].set_xlim([2.6, 6])
 ax[0].set_ylim([np.min(phasing_array), np.max(phasing_array)])
-ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
-
+ax[1].set_xlabel(r'$q_{95}$', fontsize=20)
 ax[0].set_title('n=%d, Pitch Resonant Forcing'%(n))
-ax[0].set_ylabel('Phasing (deg)')
-ax[1].set_ylabel('Phasing (deg)')
-
+ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+ax[1].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
 cbar = pt.colorbar(color_plot, ax = ax[0])
-cbar.ax.set_ylabel('%s G/kA'%(title_string1))
+cbar.ax.set_ylabel(r'$\delta B_{res}$ G/kA',fontsize = 20)
 cbar = pt.colorbar(color_plot2, ax = ax[1])
-cbar.ax.set_ylabel('%s G/kA'%(title_string2))
-#color_plot2 = ax[1].pcolor(q95_single, phasing_array, plot_array_plas_res, cmap='hot', rasterized=True)
-#color_plot2.set_clim([0,10])
-#pt.colorbar(color_plot2, ax = ax[1])
+cbar.ax.set_ylabel(r'$\overline{\delta B}_{res}$ G/kA', fontsize = 20)
 fig.canvas.draw(); fig.show()
+
+
+# fig, ax = pt.subplots()
+# color_plot = ax.pcolor(q95_single, phasing_array, plot_array_vac_res, cmap='hot', rasterized=True)
+# ax.contour(q95_single,phasing_array, plot_array_vac_res, colors='white')
+# color_plot.set_clim([0,10])
+# ax.set_ylim([np.min(phasing_array), np.max(phasing_array)])
+# ax.set_title('n=%d, Pitch Resonant Forcing'%(n))
+# ax.set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+# ax.plot(np.arange(1,10), np.arange(1,10)*(-35.)+250,'b-')
+# ax.plot(np.arange(1,10), np.arange(1,10)*(-35.)+250+180,'b-')
+# cbar = pt.colorbar(color_plot, ax = ax)
+# ax.set_xlim([2.6, 6])
+# cbar.ax.set_ylabel(r'$\delta B_{res}$ G/kA',fontsize = 20)
+# ax.set_xlabel(r'$q_{95}$', fontsize=20)
+# fig.canvas.draw(); fig.show()
             
 
 # ax[1].grid(b=True)

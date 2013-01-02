@@ -40,13 +40,20 @@ print I0EXP, 1.0e+3 * 3./np.pi
 #d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.p/', I0EXP=I0EXP)
 
 d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_lower.p',I0EXP=I0EXP)
-#d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
 
 #d = data('/home/srh112/NAMP_datafiles/mars/shot146382_single_n4/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
 #d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/', I0EXP=I0EXP)
 
 #d = data('/home/srh112/NAMP_datafiles/mars/shot146398_0_MARS_SURFMN/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
 
+
+
+########These are for checking the psi_N offset between SURMN and MARS-F
+d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_003/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_006/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_010/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_020/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
 
 #c = data('/home/srh112/code/pyMARS/other_scripts/shot146382_single2/qmult1.000/exp1.000/marsrun/RUNrfa.p',I0EXP=I0EXP)
 #d = data('/home/srh112/code/pyMARS/other_scripts/shot146382_single2/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)

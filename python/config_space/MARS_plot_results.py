@@ -15,16 +15,23 @@ name = 'shot138344_comparison_post_processing.pickle'
 name = 'shot146382_scan_post_processing.pickle'
 name = '/home/srh112/NAMP_datafiles/24_mar/shot146382_scan_post_processing.pickle'
 name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
+name = '/home/srh112/NAMP_datafiles/project1_new_eq/9_project1_new_eq_FEEDI_0_coil_outputs.pickle.bak' #this one gives good results
+#name = '/home/srh112/NAMP_datafiles/project1_new_eq/9_project1_new_eq_COIL_upper_post_setup_new_low_beta2.pickle'
 #name = '/home/srh112/code/DIII-D_Work/24_mar/shot146382_scan_post_processing.pickle'
 
 name2 = None #set to this to do a single calculation
+#name2 = '/home/srh112/NAMP_datafiles/project1_new_eq/9_project1_new_eq_COIL_lower_post_setup_new_low_beta2.pickle'
 #name = 'combined_upper.pickle'
 #name2 = 'combined_lower.pickle'
 #name2 = '9_project1_new_eq_COIL_lower_post_setup.pickle'
 contains_both = True #Set this for the newer simulations when both upper and lower are included in the file
+contains_both = False #Set this for the newer simulations when both upper and lower are included in the file
 
 response_type = 'total' # 'plasma_only' # 'vac' 'total'
+#response_type = 'plasma_only' # 'vac' 'total'
+#response_type = 'vac'
 data_plot_BetaN = True # True/None
+data_plot_BetaN = False # True/None
 
 q_list = None#[3,4.5,6.5] #None/list to plot arrows
 color_list3 = ['blue','black','yellow','red']
@@ -56,10 +63,10 @@ expt_data_filename = 'betan-q95-20111116.txt' #name of experimental data point f
 expt_data_filename = None
 
 #Colour limits for the plots - each one is for a different pickup coil
-clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[0,2],[0,1.5],[0,2],[0,1],[0,1]]
+#clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[0,2],[0,1.5],[0,2],[0,1],[0,1]]
 clim_list = [[0,1.5],[0,10],[0,1.5],[0,0.7],[0,1],[0,1.5],[0,2],[0,1],[0,1]]
 #clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[0,0.4],[0,1.5],[0,2],[0,1],[0,1]]
-#clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[5,7],[0,1.5],[0,2],[0,1],[0,1]]
+clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[5,7],[0,1.5],[0,2],[0,1],[0,1]]
 image_extent = [q95_values[0], q95_values[1], Bn_Div_Li_values[0], Bn_Div_Li_values[1]]
 contour_list = [0,0.1, 0.2,0.5,0.8,1.1, 1.5, 2.2]
 
@@ -266,7 +273,8 @@ for iii in probe_list:
             #calc = 'plasma_upper_response4'
             #calc2 = 'vacuum_upper_response4'
             project_dict, q95_array, Bn_Div_Li_array,Bn_array, Li_array, coil1, coil1_abs_array, coil1_angle_array,serial_list = return_probe_values(project_dict, calc, calc2, iii)
-            project_dict, q95_array2, Bn_Div_Li_array2, Bn_array2, Li_array2, coil12, coil1_abs_array2, coil1_angle_array2,serial_list2 = return_probe_values(project_dict, calc3, calc4, iii)
+            #project_dict, q95_array2, Bn_Div_Li_array2, Bn_array2, Li_array2, coil12, coil1_abs_array2, coil1_angle_array2,serial_list2 = return_probe_values(project_dict, calc3, calc4, iii)
+            project_dict, q95_array2, Bn_Div_Li_array2, Bn_array2, Li_array2, coil12, coil1_abs_array2, coil1_angle_array2,serial_list2 = return_probe_values(project_dict, calc, calc2, iii)
             theta = theta_range[theta_i]/180.*num.pi #in radians
             print '****************************',theta,'****************************'
             print 'Check to see q95 array and Bn_Div_Li arrays are the same'
@@ -274,8 +282,9 @@ for iii in probe_list:
             print num.sum(num.abs(Bn_Div_Li_array2-Bn_Div_Li_array))
             coil1 = num.array(coil1) + num.array(coil12)*(num.cos(theta)+1j*num.sin(theta))
             coil1_abs_array = num.abs(num.array(coil1))
-            coil1_angle_array = num.angle(num.array(coil1))*180./num.pi #degrees
+            coil1_angle_array = num.angle(num.array(coil1),deg=True)#*180./num.pi #degrees
         else:
+            print 'two seperate files'
             project_dict, q95_array, Bn_Div_Li_array,Bn_array, Li_array, coil1, coil1_abs_array, coil1_angle_array,serial_list = return_probe_values(project_dict, calc, calc2, iii)
 
             if name2==None:

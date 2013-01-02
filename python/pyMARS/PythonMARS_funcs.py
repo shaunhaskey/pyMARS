@@ -780,7 +780,6 @@ def modify_pickle(old_base_dir, new_base_dir, old_pickle_name, new_pickle_name):
     dir_dict = pickle.load(open(old_base_dir + old_pickle_name))
 
     def edit_string(string, old_base_dir, new_base_dir):
-        string
         new_string = new_base_dir + string[len(old_base_dir):]
         return new_string
 
