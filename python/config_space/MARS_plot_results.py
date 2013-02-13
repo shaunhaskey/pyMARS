@@ -16,7 +16,11 @@ name = 'shot146382_scan_post_processing.pickle'
 name = '/home/srh112/NAMP_datafiles/24_mar/shot146382_scan_post_processing.pickle'
 name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
 name = '/home/srh112/NAMP_datafiles/project1_new_eq/9_project1_new_eq_FEEDI_0_coil_outputs.pickle.bak' #this one gives good results
+name = '/home/srh112/NAMP_datafiles/mars/equal_spacingV2_single/equal_spacingV2_single_post_processing_PEST.pickle'
+name = '/home/srh112/NAMP_datafiles/mars/equal_spacingV2/equal_spacingV2_post_processing_PEST.pickle'
+name = '/home/srh112/NAMP_datafiles/mars/project1_redone/project1_redone_post_processing_PEST.pickle'
 #name = '/home/srh112/NAMP_datafiles/project1_new_eq/9_project1_new_eq_COIL_upper_post_setup_new_low_beta2.pickle'
+
 #name = '/home/srh112/code/DIII-D_Work/24_mar/shot146382_scan_post_processing.pickle'
 
 name2 = None #set to this to do a single calculation
@@ -25,20 +29,21 @@ name2 = None #set to this to do a single calculation
 #name2 = 'combined_lower.pickle'
 #name2 = '9_project1_new_eq_COIL_lower_post_setup.pickle'
 contains_both = True #Set this for the newer simulations when both upper and lower are included in the file
-contains_both = False #Set this for the newer simulations when both upper and lower are included in the file
+#contains_both = False #Set this for the newer simulations when both upper and lower are included in the file
 
 response_type = 'total' # 'plasma_only' # 'vac' 'total'
 #response_type = 'plasma_only' # 'vac' 'total'
 #response_type = 'vac'
 data_plot_BetaN = True # True/None
-data_plot_BetaN = False # True/None
+#data_plot_BetaN = False # True/None
 
 q_list = None#[3,4.5,6.5] #None/list to plot arrows
+q_list = [3,4.5,6.5] #None/list to plot arrows
 color_list3 = ['blue','black','yellow','red']
 
 #range of upper lower phasings to include (will loop through all these phasings)
 theta_range = num.arange(0,-360,-60)
-theta_range = [0]
+#theta_range = [0]
 probe  = [ 'dBp_upper - 67A', 'dBp_mid - 66M', 'dBp_lower - 67B', 'dBr_ext - ESL', 'dBr_mid - ISL','dBr_upper - UISL','dBr_lower  - LISL','Inb_p','Inb_r']
 probe2  = [ 'dBp_u', 'dBp_m', 'dBp_l', 'dBr_ext', 'dBr_m','dBr_u','dBr_l','Inb_p','Inb_r']
 #Choose the probe to plot (see above for for reference)
@@ -46,7 +51,7 @@ probe_list = [0,1,2,3,4,5,6,7,8]
 probe_list = [1]
 
 #Plot line slices along the arrow lines
-q95_slice_check = 0
+q95_slice_check = 1
 Bn_slice_check = 0
 
 q95_values =[2.,8.] #q95 limits
@@ -66,7 +71,7 @@ expt_data_filename = None
 #clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[0,2],[0,1.5],[0,2],[0,1],[0,1]]
 clim_list = [[0,1.5],[0,10],[0,1.5],[0,0.7],[0,1],[0,1.5],[0,2],[0,1],[0,1]]
 #clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[0,0.4],[0,1.5],[0,2],[0,1],[0,1]]
-clim_list = [[0,1.5],[0,2],[0,1.5],[0,0.7],[5,7],[0,1.5],[0,2],[0,1],[0,1]]
+clim_list = [[0,1.5],[0,3],[0,1.5],[0,0.7],[5,7],[0,1.5],[0,2],[0,1],[0,1]]
 image_extent = [q95_values[0], q95_values[1], Bn_Div_Li_values[0], Bn_Div_Li_values[1]]
 contour_list = [0,0.1, 0.2,0.5,0.8,1.1, 1.5, 2.2]
 
@@ -253,18 +258,21 @@ for iii in probe_list:
     for theta_i in range(0,len(theta_range)):
         if contains_both:
             if response_type =='plasma_only':
+                print 'plasma only case'
                 calc = 'plasma_upper_response4'
                 calc2 = 'vacuum_upper_response4'
                 calc3 = 'plasma_lower_response4'
                 calc4 = 'vacuum_lower_response4'
                 extra_title = ' Plasma Response'
             elif response_type == 'total':
+                print 'total case'
                 calc = 'plasma_upper_response4'
                 calc2 = None # gives total response
                 calc3 = 'plasma_lower_response4'
                 calc4 = None # gives total response
                 extra_title = ' Total Response'
             elif response_type == 'vac':
+                print 'vac case'
                 calc = 'vacuum_upper_response4'
                 calc2 = None # gives total response
                 calc3 = 'vacuum_lower_response4'
@@ -272,9 +280,10 @@ for iii in probe_list:
                 extra_title = ' Vacuum Response'
             #calc = 'plasma_upper_response4'
             #calc2 = 'vacuum_upper_response4'
+
             project_dict, q95_array, Bn_Div_Li_array,Bn_array, Li_array, coil1, coil1_abs_array, coil1_angle_array,serial_list = return_probe_values(project_dict, calc, calc2, iii)
-            #project_dict, q95_array2, Bn_Div_Li_array2, Bn_array2, Li_array2, coil12, coil1_abs_array2, coil1_angle_array2,serial_list2 = return_probe_values(project_dict, calc3, calc4, iii)
-            project_dict, q95_array2, Bn_Div_Li_array2, Bn_array2, Li_array2, coil12, coil1_abs_array2, coil1_angle_array2,serial_list2 = return_probe_values(project_dict, calc, calc2, iii)
+            project_dict, q95_array2, Bn_Div_Li_array2, Bn_array2, Li_array2, coil12, coil1_abs_array2, coil1_angle_array2,serial_list2 = return_probe_values(project_dict, calc3, calc4, iii)
+            #project_dict, q95_array2, Bn_Div_Li_array2, Bn_array2, Li_array2, coil12, coil1_abs_array2, coil1_angle_array2,serial_list2 = return_probe_values(project_dict, calc, calc2, iii)
             theta = theta_range[theta_i]/180.*num.pi #in radians
             print '****************************',theta,'****************************'
             print 'Check to see q95 array and Bn_Div_Li arrays are the same'
@@ -312,10 +321,13 @@ for iii in probe_list:
         list_images.append(color_plot(ax, fig, B1grid_data, image_extent, clim_list[iii], contour_list = contour_list, cbar_label = '|B| G/kA', include_cbar = True))
 
 
+        ax2 = fig.add_subplot(212)
+        list_images.append(color_plot(ax2, fig, interp_data_angle, image_extent, [deg_min, deg_min+360], cbar_label = 'deg', include_cbar = True))
+
         if plot_simulation_points == True:
             if data_plot_BetaN ==True:
                 ax.plot(q95_array, Bn_array,'k,')
-                #ax2.plot(q95_array, Bn_array,'k,')
+                ax2.plot(q95_array, Bn_array,'k,')
             else:
                 ax.plot(q95_array, Bn_Div_Li_array,'k,')
                 #ax2.plot(q95_array, Bn_Div_Li_array,'k,')
@@ -328,8 +340,6 @@ for iii in probe_list:
         #ax.plot(project_dict['sims'][initial_eq_serial]['Q95'],project_dict['sims'][initial_eq_serial]['BETAN']/project_dict['sims'][initial_eq_serial]['LI'], 'k*', markersize = 10, markerfacecolor='white')
         axis_labelling(ax,plot_ylabel,'',start_title + str(theta_range[theta_i]) + 'deg I-coil phasing ' + probe2[iii] + extra_title, q95_values,Bn_Div_Li_values, xlabel_fontsize = 20,ylabel_fontsize = 20, title_fontsize = 14)
 
-        ax2 = fig.add_subplot(212)
-        list_images.append(color_plot(ax2, fig, interp_data_angle, image_extent, [deg_min, deg_min+360], cbar_label = 'deg', include_cbar = True))
 
 
         if expt_data_filename !=None:

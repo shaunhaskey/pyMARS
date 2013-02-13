@@ -23,7 +23,7 @@ def I0EXP_calc(N,n,I):
     print 'I0EXP :', I0EXP
     return I0EXP
 
-def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0):
+def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None):
     '''
     SH : 19Nov2012
     For given coil currents described by list I, and coil geometry described in
@@ -43,10 +43,14 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0):
     current_array = np.array(current_output)
     current_fft = np.fft.fft(current_array)
     current_fft_freq = np.fft.fftfreq(len(current_fft),d=(phi_tmp[1]-phi_tmp[0])/(np.pi*2))
+    print len(current_fft_freq)
     n_loc = np.argmin(np.abs(current_fft_freq - n))
     if produce_plot:
-        import matplotlib.pyplot as pt
-        fig, ax = pt.subplots(nrows = 2)
+        if plot_axes == None:
+            import matplotlib.pyplot as pt
+            fig, ax = pt.subplots(nrows = 2)
+        else:
+            ax = plot_axes
         ax[0].plot(phi_tmp*180./np.pi, current_array)
         for i, phi in enumerate(phi_zero):
             phi_tmp1 = phi_zero[i]/np.pi*180.
@@ -64,12 +68,14 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0):
         ax[1].set_xlabel('Toroidal Mode Number (n)')
         ax[1].set_ylabel('Current (a.u)')
         start_loc = np.argmin(np.abs(current_fft_freq-0))
-        end_loc = np.argmin(np.abs(current_fft_freq-10))
-        ax[1].stem(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), '-')
-        ax[1].set_xlim([0,10])
+        end_loc = np.argmin(np.abs(current_fft_freq-14))
+        ax[1].stem(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), 'b-')
+        ax[1].set_xlim([0,11])
         ax[1].set_ylim([0,1.1])
-        fig.canvas.draw(); fig.show()
+        if plot_axes == None:
+            fig.canvas.draw(); fig.show()
     return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3
+    #return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3, current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft))
 
 
 

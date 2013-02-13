@@ -71,7 +71,6 @@ class data():
         self.link_RMZM = copy.deepcopy(link_RMZM)
         self.I0EXP = copy.deepcopy(I0EXP)
         self.spline_B23 = spline_B23
-
         self.extract_single()
 
     def extract_single(self):
@@ -95,8 +94,11 @@ class data():
         self.BNORM = calc_BNORM(self.FEEDI, self.R0EXP, I0EXP = self.I0EXP)
         print self.directory, self.BNORM, self.FEEDI, self.R0EXP, self.I0EXP
         file_name = 'BPLASMA'
-        self.BM1, self.BM2, self.BM3, self.Mm = ReadBPLASMA(file_name, self.BNORM, self.Ns, self.s, spline_B23=self.spline_B23)
+        #Extract geometry related stuff
         self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian = GetUnitVec(self.R, self.Z, self.s, self.chi)
+
+        #Extract all the magnetic field stuff
+        self.BM1, self.BM2, self.BM3, self.Mm = ReadBPLASMA(file_name, self.BNORM, self.Ns, self.s, spline_B23=self.spline_B23)
         self.B1,self.B2,self.B3,self.Bn,self.BMn = GetB123(self.BM1, self.BM2, self.BM3, self.R, self.Mm, self.chi, self.dRdchi, self.dZdchi)
         self.Br,self.Bz,self.Bphi = MacGetBphysC(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3)
         self.Brho,self.Bchi,self.Bphi2 = MacGetBphysT(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3,self.B0EXP)
@@ -252,53 +254,68 @@ class data():
         os.chdir(self.directory) 
         #os.system('ln -sf PROFEQ.OUT PROFEQ_PEST')
         #file_name = 'PROFEQ_PEST'
-        file_name = 'PROFEQ.OUT'
-        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
+
+        #file_name = 'PROFEQ.OUT'
+        #qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
+        #self.qn = qn
+        #self.mq = mq
+        #self.sq = sq
+        #self.q_profile = q
+        #self.q_profile_s = s
+        self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
-        qn_grid, s_grid = np.meshgrid(q*n, self.s.flatten())
+        qn_grid, s_grid = np.meshgrid(self.q_profile*n, self.s.flatten())
         if SURFMN_coords:
-            temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST_SURF.flatten()),(q*n, s.flatten()),method='linear')
-            temp_discrete  = griddata((mk_grid.flatten(),ss_grid.flatten()),self.BnPEST_SURF.flatten(),(qn.flatten()*n, sq.flatten()),method='linear')
+            temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST_SURF.flatten()),(self.q_profile*n, self.q_profile_s.flatten()),method='linear')
+            temp_discrete  = griddata((mk_grid.flatten(),ss_grid.flatten()),self.BnPEST_SURF.flatten(),(self.qn.flatten()*n, self.sq.flatten()),method='linear')
         else:
-            temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(q*n, s.flatten()),method='linear')
-            temp_discrete  = griddata((mk_grid.flatten(),ss_grid.flatten()),self.BnPEST.flatten(),(qn.flatten()*n, sq.flatten()),method='linear')
+            temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(self.q_profile*n, self.q_profile_s.flatten()),method='linear')
+            temp_discrete  = griddata((mk_grid.flatten(),ss_grid.flatten()),self.BnPEST.flatten(),(self.qn.flatten()*n, self.sq.flatten()),method='linear')
         #print s.shape,len(s), temp_qn.shape, len(temp_qn)
         total_integral = 0
-        min_location = np.argmin(np.abs(s-min_s))
-        print min_s, min_location, s[min_location]
-        for i in range(min_location,len(s)-1):
-            total_integral += temp_qn[i]*((s[i+1]-s[i])**power)
+        min_location = np.argmin(np.abs(self.q_profile_s-min_s))
+        print min_s, min_location, self.q_profile_s[min_location]
+        for i in range(min_location,len(self.q_profile_s)-1):
+            total_integral += temp_qn[i]*((self.q_profile_s[i+1]-self.q_profile_s[i])**power)
 
         #ax2.plot(temp_qn, s,'.-')
         #ax2.plot(mq*0, sq,'o')
+        return total_integral, temp_discrete
+
+    def extract_q_profile_information(self, n=2, file_name='PROFEQ.OUT'):
+        os.chdir(self.directory) 
+        #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
+        #file_name = 'PROFEQ_PEST'
+        #file_name = 'PROFEQ.OUT'
+        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         self.qn = qn
-        self.mq = mq
         self.sq = sq
         self.q_profile = q
         self.q_profile_s = s
-        return total_integral, temp_discrete
-
+        self.mq = mq
+        
 
     def kink_amp(self, psi, q_range, n = 2, SURFMN_coords = 0):
         #self.q_profile
         #self.q_profile_s
         #self.mk, self.ss, self.BnPEST
-        os.chdir(self.directory) 
         #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
         #file_name = 'PROFEQ_PEST'
-        file_name = 'PROFEQ.OUT'
-        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
-        self.qn = qn
-        self.sq = sq
-        self.q_profile = q
-        self.q_profile_s = s
-        self.mq = mq
+        #os.chdir(self.directory) 
+        self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
+        #file_name = 'PROFEQ.OUT'
+        #qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
+        #self.qn = qn
+        #self.sq = sq
+        #self.q_profile = q
+        #self.q_profile_s = s
+        #self.mq = mq
         s_loc = np.argmin(np.abs(self.ss-psi))
-        relevant_q = q[s_loc]
+        relevant_q = self.q_profile[s_loc]
         print np.max(self.mk), q_range[0]*relevant_q, q_range[1]*relevant_q
         lower_bound = np.argmin(np.abs(self.mk.flatten() - q_range[0]*relevant_q))
         upper_bound = np.argmin(np.abs(self.mk.flatten() - q_range[1]*relevant_q))
-        print 'kink_amp: s_loc: %d, self.ss_val: %.2f, self.q_profile_s: %.2f'%(s_loc, self.ss[s_loc], q[s_loc])
+        print 'kink_amp: s_loc: %d, self.ss_val: %.2f, self.q_profile_s: %.2f'%(s_loc, self.ss[s_loc], self.q_profile[s_loc])
         upper_bound_new = np.min([upper_bound, len(self.mk.flatten())-1])
         print lower_bound, upper_bound, upper_bound_new
         print 'relevant_q: %.2f, bounds: %d %d, values: %d, %d'%(relevant_q, lower_bound, upper_bound_new, self.mk.flatten()[lower_bound], self.mk.flatten()[upper_bound_new])
@@ -312,32 +329,159 @@ class data():
         return self.mk.flatten()[lower_bound:upper_bound_new], self.ss[s_loc], relevant_values, relevant_q
 
 
-    def plot1(self,suptitle='',title='',fig_name = '',fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid_BnPEST = 0):
+    def SURFMN_MARS_F_comparison_plot(self, mk, ss, tmp_plot_quantity, ss_plas_edge, n, xdat, ydat, zdat):
+        '''MARS-F SURFMN comparison
+
+        '''
+
+        import matplotlib.pyplot as pt
+        fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1, sharey=1)
+        image2 = ax_tmp[1].pcolor(mk.flatten(),ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
+        ax_tmp[1].contour(mk.flatten(),ss[:ss_plas_edge].flatten(), tmp_plot_quantity, colors='white')
+        ax_tmp[1].set_title('MARS-F, n=%d'%(n,))
+        ax_tmp[1].set_ylabel(r'$\sqrt{\psi_N}$',fontsize=14)
+        ax_tmp[1].set_xlabel('m')
+        ax_tmp[1].plot(self.mq,self.sq,'wo')
+        ax_tmp[1].plot(self.q_profile*n,self.q_profile_s,'w--') 
+
+        image2.set_clim([0, np.max(tmp_plot_quantity)])
+        image2.set_clim([0, 1.5])
+        image1 = ax_tmp[0].pcolor(xdat,ydat,zdat, cmap = 'hot', rasterized=True)
+        ax_tmp[0].contour(xdat,ydat,zdat, colors='white')
+        #ax_tmp[0].set_title('SURFMN, n=%d, maximum: %.2f G/kA'%(n, np.max(np.abs(zdat))))
+        ax_tmp[0].set_title('SURFMN, n=%d'%(n,))
+        ax_tmp[0].plot(self.mq,self.sq,'wo')
+        ax_tmp[0].plot(self.q_profile*n,self.q_profile_s,'w--') 
+        ax_tmp[0].set_xlim([-29,29])
+        ax_tmp[0].set_ylabel(r'$\sqrt{\psi_N}$',fontsize=14)
+        image1.set_clim([0,np.max(np.abs(zdat))])
+        image1.set_clim([0, 1.5])
+        cb = pt.colorbar(mappable=image1, ax = ax_tmp[0])
+        cb.ax.set_ylabel('G/kA')
+        cb = pt.colorbar(mappable=image2, ax = ax_tmp[1])
+        cb.ax.set_ylabel('G/kA')
+        fig_tmp.canvas.draw(); fig_tmp.show()
+        #fig_tmp10, ax_tmp10 = pt.subplots()
+
+    def SURFMN_MARS_F_horizontal_cut(self,xdat, ydat, zdat, BnPEST, ss, ss_plas_edge, mk,psi_list=[0.92]):
+        import matplotlib.pyplot as pt
+        fig_tmp10, ax_tmp10 = pt.subplots()
+        for tmp_psi in [0.92]:
+            tmp_SURFMN_loc = np.argmin(np.abs(ydat[0,:]-tmp_psi))
+            tmp_MARSF_loc = np.argmin(np.abs(ss[:ss_plas_edge] - tmp_psi))
+            print tmp_SURFMN_loc, tmp_MARSF_loc, ydat[0,tmp_SURFMN_loc],ss[tmp_MARSF_loc]
+            ax_tmp10.plot(xdat[:,tmp_SURFMN_loc], zdat[:,tmp_SURFMN_loc],'bx-', label = 'SURFMN s=%.2f'%(tmp_psi))
+            print mk.shape, np.abs(BnPEST[tmp_MARSF_loc, : ]).shape
+            ax_tmp10.plot(mk.flatten(), np.abs(BnPEST[tmp_MARSF_loc, : ]), 'kx-', label = 'MARS-F s=%.2f'%(tmp_psi))
+        ax_tmp10.legend(loc='best')
+        ax_tmp10.set_ylabel('mode amplitude')
+        ax_tmp10.set_xlabel('m')
+        fig_tmp10.canvas.draw(); fig_tmp10.show()
+
+    def compare_with_matlab(self,BnPEST, cmap='hot',RZ_dir = '/home/srh112/Desktop/Test_Case/matlab_outputs/'):
+        import matplotlib.pyplot as pt
+        print 'reading in data from ', RZ_dir
+        BnPEST_matlab = np.loadtxt(RZ_dir+'PEST_BnPEST_real.txt',delimiter=',')+np.loadtxt(RZ_dir+'PEST_BnPEST_imag.txt',delimiter=',')*1j
+        ss_matlab = np.loadtxt(RZ_dir+'PEST_ss.txt',delimiter=',')
+        mk_matlab = np.loadtxt(RZ_dir+'PEST_mk.txt',delimiter=',')
+
+        mat_fig, mat_ax = pt.subplots()
+        mat_image = mat_ax.pcolor(mk_matlab, (ss_matlab)**2, np.abs(BnPEST_matlab),cmap = cmap)
+        mat_image.set_clim([0,1.2])
+        mat_ax.set_xlim([-30,30])
+        mat_ax.set_ylim([0,1])
+        mat_fig.canvas.draw();mat_fig.show()
+
+        print 'finished reading in data from ', RZ_dir
+
+        fig_tmp, ax_tmp = pt.subplots(nrows = 2)
+        diff = np.abs(BnPEST-BnPEST_matlab)
+        self.diff = diff
+        #self.BnPEST = BnPEST
+        print 'max diff :'
+        print np.max(diff), np.mean(np.max(diff)), np.max(diff).shape
+        print 'as a percent:'
+        self.diff_percent = diff/np.abs(BnPEST)*100.
+        print np.max(self.diff_percent), np.mean(self.diff_percent)
+
+        diff_image = ax_tmp[0].pcolor(mk_matlab, ss_matlab, diff, cmap = cmap)
+        diff_image2 = ax_tmp[1].pcolor(mk_matlab, ss_matlab, (diff/np.abs(BnPEST))*100, cmap = cmap)
+        diff_image.set_clim([0,0.1])
+        diff_image2.set_clim([0,5])
+        fig_tmp.canvas.draw(); fig_tmp.show()
+        print diff_image.get_clim(), diff_image2.get_clim()
+
+    def SURFMN_MARS_F_radial_comparison(self, top_s, top_z, top_m, single_mode_plots, plot_quantity_top, n, single_mode_plots2, SURFMN_coords, surfmn_file):
+        import matplotlib.pyplot as pt
+        if SURFMN_coords == 1:
+            tmp_coords = 'SURFMN coords'
+        elif SURFMN_coords == 0:
+            tmp_coords = 'MARS-F coords'
+
+        sqrt_modes = int(np.sqrt(len(single_mode_plots)))
+
+        single_m_fig, single_m_ax = pt.subplots(nrows = sqrt_modes, ncols = sqrt_modes, sharey=1, sharex = 1)
+        single_m_fig2, single_m_ax2 = pt.subplots()
+        for tmp_ax_label in single_m_ax[:,0]:
+            tmp_ax_label.set_ylabel('Mode Amp G/kA')
+        for tmp_ax_label in single_m_ax[-1,:]:
+            tmp_ax_label.set_xlabel(r'$\sqrt{\psi_N}$',fontsize = 14)
+        single_m_ax2.set_xlabel(r'$\sqrt{\psi_N}$',fontsize = 14)
+        single_m_ax2.set_ylabel('Amplitude G/kA',fontsize = 14)
+        single_m_ax2.set_title('Radial mode shapes - SURFMN (dashed), MARS-F (solid)',fontsize = 14)
+        single_m_ax = single_m_ax.flatten()
+
+        for tmp_m in single_mode_plots:
+            tmp_single_loc = single_mode_plots.index(tmp_m)
+            x_shift = 0.00
+            tmp_top_loc = np.argmin(np.abs(top_m-tmp_m))
+            #tmp_bottom_loc = np.argmin(np.abs(bottom_m-tmp_m))
+
+            single_m_ax[tmp_single_loc].plot(top_s+x_shift, top_z[tmp_top_loc,:], '-b',label = '%s, n=%d'%(plot_quantity_top,n))
+            if (tmp_m in single_mode_plots2):
+                single_m_ax2.plot(top_s+x_shift, top_z[tmp_top_loc,:], '-b',label = '%s, n=%d'%(plot_quantity_top,n))
+
+            #single_m_ax[tmp_single_loc].plot(bottom_s+x_shift, bottom_z[tmp_bottom_loc,:], label = '%s'%(plot_quantity_bottom,))
+            include_surfmn_tmp = 1
+            if include_surfmn_tmp:
+                tmp_styles = ['--k','--r']
+                for tmp_i, tmp_n in enumerate([2,4]):
+                    tmp, xdat_tmp, ydat_tmp, zdat_tmp  = pyMARS.extract_surfmn_data(surfmn_file, tmp_n)
+                    tmp_surfmn_m = xdat_tmp[:,0]
+                    tmp_surfmn_s = ydat_tmp[0,:].flatten()
+                    tmp_surfmn_loc = np.argmin(np.abs(tmp_surfmn_m-tmp_m))
+                    if SURFMN_coords:
+                        tmp_surfmn_z = zdat_tmp
+                    else:
+                        tmp_surfmn_z = zdat_tmp*self.SURFMN_A/((2*np.pi)**2)
+                    single_m_ax[tmp_single_loc].plot(tmp_surfmn_s, tmp_surfmn_z[tmp_surfmn_loc,:], tmp_styles[tmp_i], label = '%s'%('SURFMN, n=%d'%(tmp_n),))
+                    if (tmp_n == 2) & (tmp_m in single_mode_plots2):
+                        single_m_ax2.plot(tmp_surfmn_s, tmp_surfmn_z[tmp_surfmn_loc,:], tmp_styles[tmp_i], label = '%s'%('SURFMN, n=%d'%(tmp_n),))
+            single_m_ax[tmp_single_loc].grid(b=True)
+            single_m_ax2.grid(b=True)
+            #single_m_ax[tmp_single_loc].set_xlabel('s')
+            #single_m_ax[tmp_single_loc].set_xlabel('amp')
+            single_m_ax[tmp_single_loc].set_title('m=%d'%(tmp_m,))
+            if tmp_single_loc == (len(single_mode_plots)-1):
+                print 'making legend'
+                tmp_leg = single_m_ax[tmp_single_loc].legend(loc='best', fancybox = True)
+                pt.setp(tmp_leg.get_texts(), fontsize=10)
+            single_m_ax[tmp_single_loc].set_ylim([0,1.6])
+            single_m_ax2.set_ylim([0,1.6])
+        single_m_fig.suptitle('%s, %s'%(self.directory, tmp_coords))
+        single_m_fig.canvas.draw(); single_m_fig.show()
+        single_m_fig2.canvas.draw(); single_m_fig2.show()
+
+
+    def plot1(self, suptitle='', title='', fig_name = '', fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid_BnPEST = 0, single_mode_plots = range(1,3**2+1), single_mode_plots2 = [1,5,9]):
         os.chdir(self.directory) 
-        #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
-        #file_name = 'PROFEQ_PEST'
-        file_name = 'PROFEQ.OUT'
-        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
-        self.q_profile = q
-        self.q_profile_s = s
+        self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
 
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
+        qn_grid, s_grid = np.meshgrid(self.q_profile*n, self.s.flatten())
 
-        #calculate the area of the flux surfaces as a correction for MARSF->SURFMN
-        self.new_area = []
-        for i in range(0, self.R.shape[0]):
-            dR = (self.R[i,1:]-self.R[i,:-1])#*self.R0EXP
-            dZ = (self.Z[i,1:]-self.Z[i,:-1])#*self.R0EXP
-            self.R_ave = (self.R[i,1:]+self.R[i,:-1])/2.#*self.R0EXP
-            self.new_area.append(np.sum(np.sqrt(dR**2+dZ**2)*self.R_ave*2*np.pi))
-            #self.new_area.append(np.sum(np.sqrt(dR**2+dZ**2))*np.pi*2.)
-        if self.new_area[0]==0:self.new_area[0]=self.new_area[1] #so that nothing blows up if dividing by it
-        self.new_area = np.array(self.new_area)
-        self.A = self.new_area
-
-        qn_grid, s_grid = np.meshgrid(q*n, self.s.flatten())
         #print q.shape, s.shape, mk_grid.shape, ss_grid.shape, self.BnPEST.shape
-        temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(q*n, s.flatten()),method='linear')
+        temp_qn  = griddata((mk_grid.flatten(),ss_grid.flatten()),np.abs(self.BnPEST.flatten()),(self.q_profile*n, self.q_profile_s.flatten()),method='linear')
         if increase_grid_BnPEST:
             mk,ss,BnPEST=RZfuncs.increase_grid(self.mk.flatten(),self.ss.flatten(),abs(self.BnPEST),number=200)
         else:
@@ -351,11 +495,11 @@ class data():
         tmp_cmap = tmp_cmap.from_list(tmp_cmap.name, tmp_cmap.name)
         ss_plas_edge = np.argmin(np.abs(ss-1.0))
 
-        tmp_mk_range, tmp_ss, tmp_relevant_values, relevant_q_values = self.kink_amp(0.92, [2,4], n = n)
+        #tmp_mk_range, tmp_ss, tmp_relevant_values, relevant_q_values = self.kink_amp(0.92, [2,4], n = n)
 
         if surfmn_file != None:
             import h5py
-            fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1, sharey=1)
+            #fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1, sharey=1)
             if surfmn_file[-2:] == 'h5':
                 print 'getting data from h5'
                 tmp_file = h5py.File(surfmn_file)
@@ -373,56 +517,14 @@ class data():
             self.SURFMN_ydat = ydat; self.SURFMN_xdat = xdat; self.SURFMN_zdat = zdat
             self.SURFMN_A = griddata(self.ss[:181],self.A.flatten()[:181], self.SURFMN_ydat[0,:],method='linear')
 
-            #image2 = ax_tmp[1].imshow(abs(self.BnPEST[:,min_mk:max_mk+1]),cmap = tmp_cmap, interpolation='bicubic',aspect='auto',extent = [-30,30,0,1],origin='lower',clim=clim_value)
-            #image2 = ax_tmp[1].pcolor(mk,(ss)**2,np.abs(BnPEST),cmap=tmp_cmap,clim=clim_value)
             tmp_plot_quantity = (np.abs(BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose()
-            #image2 = ax_tmp[1].pcolor(mk,(ss[:ss_plas_edge]), tmp_plot_quantity, cmap='hot', rasterized=True)
             print 'tmp plot shape', tmp_plot_quantity.shape, mk.flatten().shape, ss[:ss_plas_edge].flatten().shape
-            image2 = ax_tmp[1].pcolor(mk.flatten(),ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
-            ax_tmp[1].contour(mk.flatten(),ss[:ss_plas_edge].flatten(), tmp_plot_quantity, colors='white')
-            #ax_tmp[1].set_title('MARS-F, n=%d, maximum: %.2f G/kA'%(n, np.max(tmp_plot_quantity)))
-            ax_tmp[1].set_title('MARS-F, n=%d'%(n,))
-            ax_tmp[1].set_ylabel(r'$\sqrt{\psi_N}$',fontsize=14)
-            ax_tmp[1].set_xlabel('m')
-            ax_tmp[1].plot(mq,sq,'wo')
-            ax_tmp[1].plot(q*n,s,'w--') 
 
-            image2.set_clim([0, np.max(tmp_plot_quantity)])
-            image2.set_clim([0, 1.5])
-            #image1 = ax_tmp[0].imshow(zdat[min_loc:max_loc+1,:].transpose(),cmap = tmp_cmap, interpolation='bicubic',aspect='auto',extent = [-30,30,0,1],origin='lower',clim=clim_value)
-            #plot_quantity = zdat[tmp_SURFMN_loc,:]*self.SURFMN_A/((2*np.pi)**2)#*self.SURFMN_DPSIDS
-
-            image1 = ax_tmp[0].pcolor(xdat,ydat,zdat, cmap = 'hot', rasterized=True)
-            ax_tmp[0].contour(xdat,ydat,zdat, colors='white')
-            #ax_tmp[0].set_title('SURFMN, n=%d, maximum: %.2f G/kA'%(n, np.max(np.abs(zdat))))
-            ax_tmp[0].set_title('SURFMN, n=%d'%(n,))
-            ax_tmp[0].plot(mq,sq,'wo')
-            ax_tmp[0].plot(q*n,s,'w--') 
-            #ax.plot(tmp_mk_range, tmp_mk_range*0+tmp_ss,'ko')
-            #tmp_relevant_values = self.kink_amp(0.92, [2,4])
-
-            ax_tmp[0].set_xlim([-29,29])
-            ax_tmp[0].set_ylabel(r'$\sqrt{\psi_N}$',fontsize=14)
-            image1.set_clim([0,np.max(np.abs(zdat))])
-            image1.set_clim([0, 1.5])
-            cb = pt.colorbar(mappable=image1, ax = ax_tmp[0])
-            cb.ax.set_ylabel('G/kA')
-            cb = pt.colorbar(mappable=image2, ax = ax_tmp[1])
-            cb.ax.set_ylabel('G/kA')
+            #comparison between MARS-F and SURFMN
+            self.SURFMN_MARS_F_comparison_plot(mk, ss, tmp_plot_quantity, ss_plas_edge, n, xdat, ydat, zdat)
             
-            fig_tmp10, ax_tmp10 = pt.subplots()
-
-            for tmp_psi in [0.92]:
-                tmp_SURFMN_loc = np.argmin(np.abs(ydat[0,:]-tmp_psi))
-                tmp_MARSF_loc = np.argmin(np.abs(ss[:ss_plas_edge] - tmp_psi))
-                print tmp_SURFMN_loc, tmp_MARSF_loc, ydat[0,tmp_SURFMN_loc],ss[tmp_MARSF_loc]
-                ax_tmp10.plot(xdat[:,tmp_SURFMN_loc], zdat[:,tmp_SURFMN_loc],'bx-', label = 'SURFMN s=%.2f'%(tmp_psi))
-                print mk.shape, np.abs(BnPEST[tmp_MARSF_loc, : ]).shape
-                ax_tmp10.plot(mk.flatten(), np.abs(BnPEST[tmp_MARSF_loc, : ]), 'kx-', label = 'MARS-F s=%.2f'%(tmp_psi))
-            ax_tmp10.legend(loc='best')
-            ax_tmp10.set_ylabel('mode amplitude')
-            ax_tmp10.set_xlabel('m')
-            fig_tmp10.canvas.draw(); fig_tmp10.show()
+            #horizontal cut of comparison between MARS-F and SURFMN
+            self.SURFMN_MARS_F_horizontal_cut(xdat, ydat, zdat, BnPEST, ss, ss_plas_edge, mk, psi_list=[0.92])
 
             fig_tmp10, ax_tmp10 = pt.subplots(nrows = 2, sharex = 1)
             start_mode = -20; end_mode = 25
@@ -450,6 +552,7 @@ class data():
 
                 self.SURFMN_DPSIDS = griddata(self.ss[:181],self.DPSIDS_1, self.SURFMN_ydat[0,:],method='linear')
             #self.SURFMN_A = griddata(self.ss[:181],self.A.flatten()[:181], self.SURFMN_ydat[0,:],method='linear')
+
             get_plotk_results = 0
             if get_plotk_results:
                 self.plotk_m, self.plotk_mode_amps = extract_plotk_results()
@@ -460,67 +563,60 @@ class data():
                 plotk_ax.set_title('PLOT_K, max : %.2f'%(np.max(np.abs(self.plotk_mode_amps)),))
                 plotk_fig.canvas.draw(); plotk_fig.show()
             fig_tmp100, ax_tmp100 = pt.subplots(nrows = 2, sharex = 1)
-            single_mode_plots = range(1,3**2+1)
-            sqrt_modes = int(np.sqrt(len(single_mode_plots)))
-            single_m_fig, single_m_ax = pt.subplots(nrows = sqrt_modes, ncols = sqrt_modes, sharey=1, sharex = 1)
-            for tmp_ax_label in single_m_ax[:,0]:
-                tmp_ax_label.set_ylabel('Mode Amp G/kA')
-            for tmp_ax_label in single_m_ax[-1,:]:
-                tmp_ax_label.set_xlabel(r'$\sqrt{\psi_N}$',fontsize = 14)
-            single_m_ax = single_m_ax.flatten()
+
+
+            plot_quantity_top = 'MARS-F'
+            if plot_quantity_top == 'SURFMN':
+                top_z_S = zdat
+                top_m = xdat[:,0]
+                top_s = ydat[0,:].flatten()
+                top_z_M = zdat*self.SURFMN_A/((2*np.pi)**2)
+            elif plot_quantity_top == 'MARS-F':
+                top_m = mk.flatten()
+                top_s = self.ss[:ss_plas_edge].flatten()
+                top_z_M = np.abs(BnPEST[:ss_plas_edge,:]).transpose()
+                top_z_S = top_z_M * 1./(np.array(self.A)[:ss_plas_edge]/((2.*np.pi)**2))
+            elif plot_quantity_top == 'PLOTK':
+                top_z_S = np.abs(self.plotk_mode_amps[:,:])
+
+                #skip the first value in the file otherwise the shape looks weird
+                #Note this is what Matt does in marsplot3d here : dumy = dumy[*,1:imax]
+                top_s = np.loadtxt('PROFEQ.OUT')[1:self.plotk_mode_amps.shape[1]+1,0].flatten()
+                #top_s = self.s[:self.plotk_mode_amps.shape[1]].flatten() 
+                top_m = self.plotk_m[:]
+                top_z_M = top_z_S * np.array(self.A)[0:self.plotk_mode_amps.shape[1]]/((2*np.pi)**2)#*self.SURFMN_DPSIDS
+
+            plot_quantity_bottom = 'SURFMN'
+            if plot_quantity_bottom == 'SURFMN':
+                bottom_z_S = zdat
+                bottom_m = xdat[:,0]
+                bottom_s = ydat[0,:].flatten()
+                bottom_z_M = zdat*self.SURFMN_A/((2*np.pi)**2)
+            elif plot_quantity_bottom == 'MARS-F':
+                bottom_m = mk.flatten()
+                bottom_s = self.ss[:ss_plas_edge].flatten()
+                bottom_z_M = np.abs(BnPEST[:ss_plas_edge,:]).transpose()
+                bottom_z_S = bottom_z_M * 1./(np.array(self.A)[:ss_plas_edge]/((2.*np.pi)**2))
+            elif plot_quantity_bottom == 'PLOTK':
+                bottom_z_S = np.abs(self.plotk_mode_amps[:,:])
+                #skip the first value in the file otherwise the shape looks weird
+                #Note this is what Matt does in marsplot3d here : dumy = dumy[*,1:imax]
+                bottom_s = np.loadtxt('PROFEQ.OUT')[1:self.plotk_mode_amps.shape[1]+1,0].flatten()
+                #bottom_s = self.s[:self.plotk_mode_amps.shape[1]].flatten()
+                bottom_m = self.plotk_m[:].flatten()
+                bottom_z_M = bottom_z_S * np.array(self.A)[0:self.plotk_mode_amps.shape[1]]/((2*np.pi)**2)#*self.SURFMN_DPSIDS
+
+            SURFMN_coords = 1
+            if SURFMN_coords:
+                top_z = top_z_S
+                bottom_z = bottom_z_S
+            else:
+                top_z = top_z_M
+                bottom_z = bottom_z_M
+
+            self.SURFMN_MARS_F_radial_comparison(top_s, top_z, top_m, single_mode_plots, plot_quantity_top, n, single_mode_plots2, SURFMN_coords, surfmn_file)
+
             for tmp_m in range(start_mode,end_mode):
-                plot_quantity_top = 'MARS-F'
-                if plot_quantity_top == 'SURFMN':
-                    top_z_S = zdat
-                    top_m = xdat[:,0]
-                    top_s = ydat[0,:].flatten()
-                    top_z_M = zdat*self.SURFMN_A/((2*np.pi)**2)
-                elif plot_quantity_top == 'MARS-F':
-                    top_m = mk.flatten()
-                    top_s = self.ss[:ss_plas_edge].flatten()
-                    top_z_M = np.abs(BnPEST[:ss_plas_edge,:]).transpose()
-                    top_z_S = top_z_M * 1./(np.array(self.new_area)[:ss_plas_edge]/((2.*np.pi)**2))
-                elif plot_quantity_top == 'PLOTK':
-                    top_z_S = np.abs(self.plotk_mode_amps[:,:])
-
-                    #skip the first value in the file otherwise the shape looks weird
-                    #Note this is what Matt does in marsplot3d here : dumy = dumy[*,1:imax]
-                    top_s = np.loadtxt('PROFEQ.OUT')[1:self.plotk_mode_amps.shape[1]+1,0].flatten()
-                    #top_s = self.s[:self.plotk_mode_amps.shape[1]].flatten() 
-                    top_m = self.plotk_m[:]
-                    top_z_M = top_z_S * np.array(self.new_area)[0:self.plotk_mode_amps.shape[1]]/((2*np.pi)**2)#*self.SURFMN_DPSIDS
-
-                plot_quantity_bottom = 'PLOTK'
-                plot_quantity_bottom = 'SURFMN'
-                if plot_quantity_bottom == 'SURFMN':
-                    bottom_z_S = zdat
-                    bottom_m = xdat[:,0]
-                    bottom_s = ydat[0,:].flatten()
-                    bottom_z_M = zdat*self.SURFMN_A/((2*np.pi)**2)
-                elif plot_quantity_bottom == 'MARS-F':
-                    bottom_m = mk.flatten()
-                    bottom_s = self.ss[:ss_plas_edge].flatten()
-                    bottom_z_M = np.abs(BnPEST[:ss_plas_edge,:]).transpose()
-                    bottom_z_S = bottom_z_M * 1./(np.array(self.new_area)[:ss_plas_edge]/((2.*np.pi)**2))
-                elif plot_quantity_bottom == 'PLOTK':
-                    bottom_z_S = np.abs(self.plotk_mode_amps[:,:])
-
-                    #skip the first value in the file otherwise the shape looks weird
-                    #Note this is what Matt does in marsplot3d here : dumy = dumy[*,1:imax]
-                    bottom_s = np.loadtxt('PROFEQ.OUT')[1:self.plotk_mode_amps.shape[1]+1,0].flatten()
-                    #bottom_s = self.s[:self.plotk_mode_amps.shape[1]].flatten()
-                    bottom_m = self.plotk_m[:].flatten()
-                    bottom_z_M = bottom_z_S * np.array(self.new_area)[0:self.plotk_mode_amps.shape[1]]/((2*np.pi)**2)#*self.SURFMN_DPSIDS
-
-                    
-                SURFMN_coords = 1
-                if SURFMN_coords:
-                    top_z = top_z_S
-                    bottom_z = bottom_z_S
-                else:
-                    top_z = top_z_M
-                    bottom_z = bottom_z_M
-
                 correction_factor = 1.
                 tmp_top_loc = np.argmin(np.abs(top_m-tmp_m))
                 tmp_bottom_loc = np.argmin(np.abs(bottom_m-tmp_m))
@@ -533,33 +629,6 @@ class data():
                 ax_tmp100[1].set_title('%s (colour), %s / %.2f (black)'%(plot_quantity_bottom, plot_quantity_top, correction_factor))
                 ax_tmp100[0].set_title('%s'%(plot_quantity_top))
                 
-                if tmp_m in single_mode_plots:
-                    tmp_single_loc = single_mode_plots.index(tmp_m)
-                    x_shift = 0.00
-                    single_m_ax[tmp_single_loc].plot(top_s+x_shift, top_z[tmp_top_loc,:], '-b',label = '%s, n=%d'%(plot_quantity_top,n))
-                    #single_m_ax[tmp_single_loc].plot(bottom_s+x_shift, bottom_z[tmp_bottom_loc,:], label = '%s'%(plot_quantity_bottom,))
-                    include_surfmn_tmp = 1
-                    if include_surfmn_tmp:
-                        tmp_styles = ['-k','--r']
-                        for tmp_i, tmp_n in enumerate([2,4]):
-                            tmp, xdat_tmp, ydat_tmp, zdat_tmp  = pyMARS.extract_surfmn_data(surfmn_file, tmp_n)
-                            tmp_surfmn_m = xdat_tmp[:,0]
-                            tmp_surfmn_s = ydat_tmp[0,:].flatten()
-                            tmp_surfmn_loc = np.argmin(np.abs(tmp_surfmn_m-tmp_m))
-                            if SURFMN_coords:
-                                tmp_surfmn_z = zdat_tmp
-                            else:
-                                tmp_surfmn_z = zdat_tmp*self.SURFMN_A/((2*np.pi)**2)
-                            single_m_ax[tmp_single_loc].plot(tmp_surfmn_s, tmp_surfmn_z[tmp_surfmn_loc,:], tmp_styles[tmp_i], label = '%s'%('SURFMN, n=%d'%(tmp_n),))
-                    single_m_ax[tmp_single_loc].grid(b=True)
-                    #single_m_ax[tmp_single_loc].set_xlabel('s')
-                    #single_m_ax[tmp_single_loc].set_xlabel('amp')
-                    single_m_ax[tmp_single_loc].set_title('m=%d'%(tmp_m,))
-                    if tmp_single_loc == (len(single_mode_plots)-1):
-                        print 'making legend'
-                        tmp_leg = single_m_ax[tmp_single_loc].legend(loc='best', fancybox = True)
-                        pt.setp(tmp_leg.get_texts(), fontsize=10)
-                    single_m_ax[tmp_single_loc].set_ylim([0,1.6])
                 for j in range(0,len(top_s), 5):
                     #ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j], str(tmp_m), fontsize = 8.5)
                     ax_tmp100[0].text(top_s[j], top_z[tmp_top_loc, j], str(tmp_m), fontsize = 8.5)
@@ -597,85 +666,18 @@ class data():
                         ax_tmp10[1].text(x_axis[j], plot_quantity[j], str(tmp_m), fontsize = 8.5)
                     ax_tmp10[1].set_title('plotk')
 
-                    
-                #print tmp_SURFMN_loc, tmp_MARSF_loc, xdat[tmp_SURFMN_loc, 0],mk.flatten()[tmp_MARSF_loc]
-                #ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:], label = 'SURFMN s=%.2f'%(tmp_m))
-                #ax_tmp10[0].plot(ydat[tmp_SURFMN_loc,:], zdat[tmp_SURFMN_loc,:]*self.SURFMN_DPSIDS, label = 'SURFMN s=%.2f'%(tmp_m))
-                #print mk.shape, np.abs(BnPEST[tmp_MARSF_loc, : ]).shape
-
-                #ax_tmp10[1].plot(ydat[tmp_SURFMN_loc,:], SURFMN_plot_quantity*0.8, 'k-', label = 'SURFMN s=%.2f'%(tmp_m))
-                #for j in range(0,len(ss[:ss_plas_edge]), 5):
-                #    ax_tmp10[1].text(ss[j].flatten(), np.abs(BnPEST[j,tmp_MARSF_loc]), str(tmp_m), fontsize = 8.5)
-
-            #for tmp_m in range(start_mode,end_mode):
-            #    tmp_SURFMN_loc = np.argmin(np.abs(xdat[:,0]-tmp_m))
-            #    tmp_MARSF_loc = np.argmin(np.abs(mk.flatten() - tmp_m))
-            #    SURFMN_plot_quantity = zdat[tmp_SURFMN_loc,:]*self.SURFMN_A/(4*np.pi*np.pi)#/self.SURFMN_DPSIDS
-            #    for j in range(0,len(ydat[tmp_SURFMN_loc,:]), 5):
-            #        #ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], zdat[tmp_SURFMN_loc,j], str(tmp_m), fontsize = 8.5)
-            #        ax_tmp10[0].text(ydat[tmp_SURFMN_loc,j], SURFMN_plot_quantity[j], str(tmp_m), fontsize = 8.5)
-            #    for j in range(0,len(ss[:ss_plas_edge]), 5):
-            #        ax_tmp10[1].text(ss[j].flatten(), np.abs(BnPEST[j,tmp_MARSF_loc]), str(tmp_m), fontsize = 8.5)
-
-            #ax_tmp10.legend(loc='best')
-            if SURFMN_coords == 1:
-                tmp_coords = 'SURFMN coords'
-            elif SURFMN_coords == 0:
-                tmp_coords = 'MARS-F coords'
-            single_m_fig.suptitle('%s, %s'%(self.directory, tmp_coords))
-            single_m_fig.canvas.draw(); single_m_fig.show()
-
             ax_tmp10[1].set_ylabel('mode amplitude')
             ax_tmp10[0].set_ylabel('mode amplitude')
             ax_tmp10[0].set_title('SURFMN * A / (2pi)^2')
             ax_tmp10[1].set_xlabel('s')
             fig_tmp10.canvas.draw(); fig_tmp10.show()
             fig_tmp100.canvas.draw(); fig_tmp100.show()
-            
 
-
-            #print zdat.shape, BnPEST[:ss_plasma_edge,:].shape, np.min(xdat), np.max(xdat), np.min(mk), np.max(mk)
-            #tmp_min_loc = np.argmin(np.abs(xdat - np.min(mk)))
-            #tmp_min_loc = np.argmin(np.abs(xdat - np.max(mk)))
-            #fig_tmp10, ax_tmp10 = pt.subplots()
-            # for ax_tmp1 in ax_tmp:
-            #     ax_tmp1.plot(mq,sq,'wo')
-            #     ax_tmp1.plot(mq,sq**2,'yo')
-            #     ax_tmp1.plot(q*n,s,'w--') 
-            #     ax_tmp1.plot(q*n,s**2,'y--') 
-            #     ax_tmp1.set_xlim([-30,30])
-            #     ax_tmp1.set_ylim([0,1])
-            fig_tmp.canvas.draw(); fig_tmp.show()
             #MATLAB PART
-            RZ_dir = '/home/srh112/Desktop/Test_Case/matlab_outputs/'
-            print 'reading in data from ', RZ_dir
-            BnPEST_matlab = np.loadtxt(RZ_dir+'PEST_BnPEST_real.txt',delimiter=',')+np.loadtxt(RZ_dir+'PEST_BnPEST_imag.txt',delimiter=',')*1j
-            ss_matlab = np.loadtxt(RZ_dir+'PEST_ss.txt',delimiter=',')
-            mk_matlab = np.loadtxt(RZ_dir+'PEST_mk.txt',delimiter=',')
-            mat_fig, mat_ax = pt.subplots()
-            mat_image = mat_ax.pcolor(mk_matlab, (ss_matlab)**2, np.abs(BnPEST_matlab),cmap = tmp_cmap)
-            mat_image.set_clim([0,1.2])
-            mat_ax.set_xlim([-30,30])
-            mat_ax.set_ylim([0,1])
-            mat_fig.canvas.draw();mat_fig.show()
-            print 'finished reading in data from ', RZ_dir
-            fig_tmp, ax_tmp = pt.subplots(nrows = 2)
-            diff = np.abs(BnPEST-BnPEST_matlab)
-            self.diff = diff
-            self.BnPEST = BnPEST
-            print 'differences'
-            print 'max diff :'
-            print np.max(diff), np.mean(np.max(diff)), np.max(diff).shape
-            print 'as a percent:'
-            self.diff_percent = diff/np.abs(BnPEST)*100.
-            print np.max(self.diff_percent), np.mean(self.diff_percent)
+            compare_with_matlab=0
+            if compare_with_matlab:
+                self.compare_with_matlab(BnPEST, cmap='hot', RZ_dir = '/home/srh112/Desktop/Test_Case/matlab_outputs/')
 
-            diff_image = ax_tmp[0].pcolor(mk_matlab, ss_matlab, diff, cmap=tmp_cmap)
-            diff_image2 = ax_tmp[1].pcolor(mk_matlab, ss_matlab, (diff/np.abs(BnPEST))*100, cmap=tmp_cmap)
-            diff_image.set_clim([0,0.1])
-            diff_image2.set_clim([0,5])
-            fig_tmp.canvas.draw(); fig_tmp.show()
-            print diff_image.get_clim(), diff_image2.get_clim()
         fig = pt.figure()
         #ax =fig.add_subplot(121)
         if inc_phase==0:
@@ -690,15 +692,15 @@ class data():
 
         if ss_squared:
             color_ax = ax.pcolor(mk,(ss)**2,np.abs(BnPEST),cmap=tmp_cmap)
-            ax.plot(mq,sq**2,'wo')
-            ax.plot(q*n,s**2,'w--') 
+            ax.plot(self.mq,self.sq**2,'wo')
+            ax.plot(self.q_profile*n,self.q_profile_s**2,'w--') 
         else:
             print 'not ss_squared'
             color_ax = ax.pcolor(mk,ss,np.abs(BnPEST),cmap='hot')#tmp_cmap)
-            ax.plot(mq,sq,'wo')
+            ax.plot(self.mq,self.sq,'wo')
             #ax.plot(tmp_mk_range, tmp_mk_range*0+tmp_ss,'ko')
             #tmp_relevant_values = self.kink_amp(0.92, [2,4])
-            ax.plot(q*n,s,'w--') 
+            ax.plot(self.q_profile*n,self.q_profile_s,'w--') 
 
         if inc_phase!=0:
             if phase_correction!=None:
@@ -730,8 +732,8 @@ class data():
             pt.colorbar(color_ax3,ax=ax3)
             ax3.set_ylim([0,1])#[min(ss.flatten()),max(ss.flatten())])
             ax3.set_xlim([-29,29])
-            ax3.plot(mq,sq,'bo')
-            ax3.plot(q*n,s,'b--') 
+            ax3.plot(self.mq,self.sq,'bo')
+            ax3.plot(self.q_profile*n,self.q_profile_s,'b--') 
 
         if clim_value == None:
             pass
@@ -747,32 +749,18 @@ class data():
         pt.colorbar(mappable = color_ax, ax=ax)
 
 
-        #mk_ss = np.ones([len(R_EQAC.flatten()),2],dtype='float')
-#        R_Z_PEST[:,0] = R_PEST.flatten()
-#        R_Z_PEST[:,1] = Z_PEST.flatten()
-        #print temp_qn.shape, qn_grid.shape, s_grid.shape
-        #print s.shape
-        #fig2 = pt.figure()
-        #ax = fig2.add_subplot(111)
-        #ax.plot(q*n,temp_qn,'.-')
-        #ax.plot(mq, mq*0,'o')
-        #fig2.canvas.draw()
-        #fig2.show()
-
-        #fig = pt.figure()
-       # ax2 = fig.add_subplot(122)
-        ax2.plot(temp_qn, s,'.-')
-        ax2.plot(mq*0, sq,'o')
-        for i in range(0,len(mq)):
-            ax2.plot([0, np.max(temp_qn)],[sq[i], sq[i]],'--')
+        ax2.plot(temp_qn, self.q_profile_s,'.-')
+        ax2.plot(self.mq*0, self.sq,'o')
+        for i in range(0,len(self.mq)):
+            ax2.plot([0, np.max(temp_qn)],[self.sq[i], self.sq[i]],'--')
         ax2.set_xlim([0,1])
         ax2.set_ylim([0,1])
 
         if inc_phase!=0:
-            temp_qn_angle  = griddata((mk_grid.flatten(),ss_grid.flatten()),angles.flatten(), (q*n, s.flatten()),method='linear')
+            temp_qn_angle  = griddata((mk_grid.flatten(),ss_grid.flatten()),angles.flatten(), (self.q_profile*n, self.q_profile_s.flatten()),method='linear')
             ax4.plot(temp_qn_angle*180./np.pi, s,'.-')
-            for i in range(0,len(mq)):
-                ax4.plot([lower_limit*180./np.pi, upper_limit*180./np.pi],[sq[i], sq[i]],'--')
+            for i in range(0,len(self.mq)):
+                ax4.plot([lower_limit*180./np.pi, upper_limit*180./np.pi],[self.sq[i], self.sq[i]],'--')
                 ax4.set_xlim([lower_limit*180./np.pi,upper_limit*180./np.pi])
                 ax4.set_ylim([0,1])
 
@@ -820,6 +808,7 @@ class data():
         ax.plot(mq,sq,'wo')
         ax.plot(q*n,s,'w--') 
         return color_ax
+
 
     
 

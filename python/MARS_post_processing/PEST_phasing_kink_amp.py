@@ -25,7 +25,9 @@ I0EXP = I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0)
 print I0EXP
 
 facn = 1.0; psi = 0.846#np.sqrt(0.95)
-q_range = [2,4]; ylim = [0,3.]
+#psi = np.sqrt(0.95)
+#psi =0.965
+q_range = [2,6]; ylim = [0,3.]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
 phasing_range = [-90.,90.]
@@ -68,7 +70,7 @@ a, upper_tot_res = upper_data_tot.resonant_strength(SURFMN_coords=SURFMN_coords)
 a, lower_tot_res = lower_data_tot.resonant_strength(SURFMN_coords=SURFMN_coords)
 
 number_points = len(relevant_values_lower_vac)
-phasings = np.arange(phasing_range[0], phasing_range[1]+1,0.01)
+phasings = np.arange(phasing_range[0], phasing_range[1]+1,0.1)
 #amps_tot = []; amps_vac = []; amps_plasma = []
 amps_vac_comp = [];amps_tot_comp = [];amps_plasma_comp = []
 if seperate_res_plot:
@@ -92,7 +94,8 @@ for phasing in phasings:
     #amps_tot.append(np.sum(np.abs(relevant_values_upper_tot + relevant_values_lower_tot*phasor))/number_points)
     #amps_plasma.append(np.sum(np.abs((relevant_values_upper_tot-relevant_values_upper_vac) + (relevant_values_lower_tot-relevant_values_lower_vac)*phasor))/number_points)
 
-tmp_loc = np.argmax(np.sum(np.abs(amps_tot_comp),axis=1)/number_points)
+#tmp_loc = np.argmax(np.sum(np.abs(amps_tot_comp),axis=1)/number_points)
+tmp_loc = np.argmax(np.max(np.abs(amps_tot_comp),axis=1)/number_points)
 tmp_max_phasing = phasings[tmp_loc]
 best_harmonic = np.argmax(np.abs(np.array(amps_tot_comp)[tmp_loc,:]))
 
