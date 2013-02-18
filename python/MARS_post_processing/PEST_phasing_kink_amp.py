@@ -26,7 +26,7 @@ print I0EXP
 
 facn = 1.0; psi = 0.846#np.sqrt(0.95)
 #psi = np.sqrt(0.95)
-#psi =0.965
+psi =0.965
 q_range = [2,6]; ylim = [0,3.]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
@@ -128,9 +128,11 @@ plot_list = [4]
 for i, j  in enumerate(upper_data_tot.qn):
     if i in plot_list:
         if seperate_res_plot:
-            ax[1].plot(phasings,vac_qn[:,i], color = 'gray', linestyle = '-', label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
+            #ax[1].plot(phasings,vac_qn[:,i], color = 'gray', linestyle = '-', label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
+            ax[1].plot(phasings,vac_qn[:,i], color = 'green', linestyle = '-', label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
         else:
-            ax[0].plot(phasings,vac_qn[:,i], color = 'gray', linestyle = '-',  label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
+            #ax[0].plot(phasings,vac_qn[:,i], color = 'gray', linestyle = '-',  label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
+            ax[0].plot(phasings,vac_qn[:,i], color = 'green', linestyle = '-',  label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
         
 if seperate_res_plot:
     ax[1].grid(); leg = ax[1].legend(loc='best', fancybox=True)
