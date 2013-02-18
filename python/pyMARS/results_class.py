@@ -292,7 +292,7 @@ class data():
         #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
         #file_name = 'PROFEQ_PEST'
         #file_name = 'PROFEQ.OUT'
-        qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
+        qn, sq, q, s, mq = return_q_profile(self.mk, file_name=file_name, n=n)
         self.qn = qn
         self.sq = sq
         self.q_profile = q

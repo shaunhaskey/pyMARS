@@ -40,6 +40,72 @@ def find_relevant_efit_files(efit_directory, profile_directory):
 
 ######################################################
 ############## CORSICA FUNCTIONS ###############
+def copy_files_combine_stab_setups(base_directory, new_directories, final_directory):
+    '''Copy the files from each individual CORSICA run and combine
+    them into a single final directory and create a single stab_setup_results.dat
+    that contains information on each of the scalings
+    SH: Feb 18 2013
+    '''
+    overal_list = []
+    for i in new_directories:
+        #copy EXPEQ files across
+        os.system('cp '+base_directory+'/'+i+'/EXPEQ* ' + final_directory)
+        #read in each individual stab_setup_results file
+        tmp_file = file(base_directory+'/'+i+'/stab_setup_results.dat','r')
+        tmp_data = tmp_file.readlines()[3:]
+        tmp_file.close()
+        for j in tmp_data:
+            overal_list.append(j)
+
+    #output the final stab_setup_results file
+    tmp_file = file(final_directory+'/stab_setup_results.dat','w')
+    tmp_file.write_lines(overal_list)
+    tmp_file.close()
+    
+
+def corsica_qsub(qsub_directory, qsub_file):
+    '''qsub a corsica job
+    SH: Feb 18 2013
+    '''
+    os.chdir(qsub_directory)
+    os.system('qsub '+ qsub_file)
+
+def read_qmult_pmult_values(prerun_dir, base_directory, new_directories):
+    '''read in the list of pmult and qmult values then distribute them
+    evenly between the new_directories which are going to be the working
+    directories of each seperate job on venus
+    prerun_dir : the location of the CORSICA directory when all the scalings were calculated
+    base_dir : base corsica working directory
+    new_directories : listing of final directory name for all the worker directories
+    SH: Feb 18 2013
+    '''
+
+    pmult_file = file(prerun_dir + '/pmult_values','r')
+    qmult_file = file(prerun_dir + '/qmult_values','r')
+    pmult_values = pmult_file.readlines()
+    qmult_values = qmult_file.readlines()
+    pmult_file.close()
+    qmult_file.close()
+    loc = 0
+    while len(pmult_values)>0:
+        cur_pmult_file = file(base_directory + '/' + new_directories[loc] + '/pmult_values', 'a')
+        cur_qmult_file = file(base_directory + '/' + new_directories[loc] + '/qmult_values', 'a')
+        cur_pmult_file.write(pmult_values.pop(0))
+        cur_qmult_file.write(qmult_values.pop(0))
+        cur_pmult_file.close()
+        cur_qmult_file.close()
+        loc+=1
+        if loc==len(new_directories):
+            loc=0
+    
+def check_corsica_finished(corsica_directory, filename):
+    '''check to see if the CORSICA run has finished 
+    SH: Feb 18 2013
+    '''
+    while not os.path.exists(corsica_directory + '/' + filename):
+        time.sleep(5)
+    
+
 def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
     running_dir = base_dir + input_data[0]
     if not os.path.exists(base_dir):
@@ -67,9 +133,14 @@ def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
     template_file = open('sspqi_sh_this_dir.bas','w')
     template_file.write(template_text)
     template_file.close()
-
-
-
+    corsica_job_file = open('corsica.job','w')
+    corsica_job_string = "#!/bin/bash\n#$ -N corsica_SH\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\n"
+    corsica_job_string += "rm corsica_finished\n"
+    corsica_job_string += "/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt >caltrans_out.log\n"
+    corsica_job_string += "touch corsica_finished\n"
+    template_file.write(corsica_job_string)
+    corsica_job_file.close()
+        
 def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1):
     script = 'sleep %d\n'%(sleep_time)
     for input_data in input_list:#len(list)):
@@ -85,19 +156,6 @@ def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1):
     file_name = open(base_dir + script_name,'w')
     file_name.write(script)
     file_name.close()
-
-    #job_string = '#!/bin/bash\n'
-    #job_string = job_string + '#$ -N Caltrans\n'
-    #job_string = job_string + '#$ -q all.q\n'
-    #job_string = job_string + '#$ -o %s\n'%(script_name + 'sge_output.dat')
-    #job_string = job_string + '#$ -e %s\n'%(script_name + 'sge_error.dat')
-    #job_string = job_string + '#$ -cwd\n'
-    #job_string = job_string + 'echo $PATH\n'
-    #job_string = job_string + './'+ script_name+'\n'
-    #file_name = open(base_dir + script_name +'.job','w')
-    #file_name.write(job_string)
-    #file_name.close()
-
 
 def corsica_batch_qrsh_func(command):
     os.system(command)
@@ -170,41 +228,6 @@ def corsica_multiple_efits(efit_time, project_dict, corsica_base_dir):
     os.system('cp ' + corsica_base_dir + '/'+str(efit_time) + '/stab_setup_results.dat ' + project_dict['details']['efit_dir']+'/'+efit_time+'/')
 
 
-def corsica_qmult_pmult():
-    p_list = []
-    q_list = []
-    pinc = -0.005*3
-    qinc = 0.03*3
-    qmin = 0
-    for pmin in num.arange(0.5,1.86,0.03):
-        if pmin <0.6:
-            range_max = 10
-        elif pmin <0.7:
-            range_max = 25
-        elif pmin > 1.56:
-            range_max = 15
-        elif pmin > 1.76:
-            range_max = 10
-        else:
-            range_max = 30
-        for i in range(0,range_max):
-            p_list.append(pmin + i * pinc)
-            q_list.append(qmin + i * qinc)
-    q_string = '['
-    p_string = '['
-    for i in range(0,len(q_list)):
-        q_string += '%.3f,'%(q_list[i])
-        p_string += '%.3f,'%(p_list[i])
-    q_string = q_string.rstrip(',');p_string = p_string.rstrip(',')
-    q_string += ']'
-    p_string += ']'
-
-    print p_string
-    print q_string
-    print len(q_list), len(p_list)
-    return p_string, q_string, len(p_list)
-
-
 ###################################################################
 #step 2
 
@@ -250,7 +273,6 @@ def remove_certain_values(project_dict, q95_range, Bn_Div_Li_range, filter_WTOTN
     print 'Remaining eq : %d'%(len(project_dict['sims'].keys()))
     return project_dict
 
-
 def generate_directories_func(project_dict, base_dir, multiple_efits = 0):
     print multiple_efits
     for i in project_dict['sims'].keys():
@@ -293,11 +315,6 @@ def generate_directories_func_serial(project_dict, base_dir):
         project_dict['sims'][i] = pyMARS.generate_directories(project_dict['sims'][i],base_dir)
 
     return project_dict
-
-
-
-
-
 
 ###################################################################
 #step 3
