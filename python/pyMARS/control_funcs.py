@@ -133,12 +133,13 @@ def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
     template_file = open('sspqi_sh_this_dir.bas','w')
     template_file.write(template_text)
     template_file.close()
+    os.system('rm corsica_finished')
     corsica_job_file = open('corsica.job','w')
     corsica_job_string = "#!/bin/bash\n#$ -N corsica_SH\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\n"
     corsica_job_string += "rm corsica_finished\n"
     corsica_job_string += "/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt >caltrans_out.log\n"
     corsica_job_string += "touch corsica_finished\n"
-    template_file.write(corsica_job_string)
+    corsica_job_file.write(corsica_job_string)
     corsica_job_file.close()
         
 def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1):
