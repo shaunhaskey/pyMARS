@@ -19,12 +19,13 @@ file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan/q95_scan_post_processing_
 file_name = '/home/srh112/NAMP_datafiles/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3_n4/detailed_q95_scan3_n4_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 #file_name = '/u/haskeysr/mars/detailed_q95_scan3/detailed_q95_scan3_post_processing_PEST.pickle'
 
-N = 6; n = 2
+N = 6; n = 4
 I = np.array([1.,-1.,0.,1,-1.,0.])
-facn = 1.0; psi = 0.92
+facn = 1.0; psi = 0.97
 ylim = [0,1.4]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
@@ -55,21 +56,42 @@ resonant_close = []
 #extract the relevant data from the pickle file and put it into lists
 res_vac_list_upper = []; res_vac_list_lower = []
 res_plas_list_upper = []; res_plas_list_lower = []
+
+
+def extract_q95_Bn(tmp_dict, bn_li = 1):
+    q95_list = []; Bn_Li_list = []
+    for i in tmp_dict['sims'].keys()
+        q95_list.append(tmp_dict['sims'][i]['Q95'])
+        if bn_li == 1:
+            Bn_Li_list.append(tmp_dict['sims'][i]['BETAN']/tmp_dict['sims'][i]['LI'])
+        else:
+            Bn_Li_list.append(tmp_dict['sims'][i]['BETAN']
+    return q95_list, Bn_Li_list
+
+q95_list, Bn_Li_list = extract_q95_Bn(project_dict, bn_li = 1)
+print 'hello!'
+
 for i in key_list:
     q95_list.append(project_dict['sims'][i]['Q95'])
     #q95_list.append((project_dict['sims'][i]['Q95']+2.*project_dict['sims'][i]['QMAX'])/3.)
     #q95_list.append(project_dict['sims'][i]['QMAX'])
     Bn_Li_list.append(project_dict['sims'][i]['BETAN']/project_dict['sims'][i]['LI'])
+
+    #tmp values
     relevant_values_upper_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
     relevant_values_lower_tot = project_dict['sims'][i]['responses'][str(psi)]['total_kink_response_lower']
     relevant_values_upper_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_upper']
     relevant_values_lower_vac = project_dict['sims'][i]['responses'][str(psi)]['vacuum_kink_response_lower']
+
     mk_list.append(project_dict['sims'][i]['responses'][str(psi)]['mk'])
     q_val_list.append(project_dict['sims'][i]['responses'][str(psi)]['q_val'])
+
+    #tmp values
     upper_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_upper'])
     lower_tot_res = np.array(project_dict['sims'][i]['responses']['total_resonant_response_lower'])
     upper_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
     lower_vac_res = np.array(project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
+
     time_list.append(project_dict['sims'][i]['shot_time'])
     resonant_close.append(np.min(np.abs(project_dict['sims'][i]['responses']['resonant_response_sq']-psi)))
 
@@ -92,15 +114,19 @@ for i in key_list:
     res_plas_list_upper.append(upper_tot_res - upper_vac_res)
     res_plas_list_lower.append(lower_tot_res - lower_vac_res)
 
+
+
+
 plot_quantity_vac=[]; plot_quantity_plas=[]; plot_quantity_tot=[];
 plot_quantity_vac_phase=[]; plot_quantity_plas_phase=[]; plot_quantity_tot_phase=[];
 
 #Get the plot quantities out of the lists from the previous section
 plot_quantity = 'max'
-max_based_on_total=1
+max_based_on_total = 1
 max_loc_list = []; mode_list = []
 upper_values_plasma = []; lower_values_plasma = []
 upper_values_vac = []; lower_values_vac = []
+upper_values_vac_fixed = []; lower_values_vac_fixed = []
 for i in range(0,len(amps_vac_comp)):
     if plot_quantity == 'average':
         plot_quantity_vac.append(np.sum(np.abs(amps_vac_comp[i])**2)/len(amps_vac_comp[i]))
@@ -113,7 +139,7 @@ for i in range(0,len(amps_vac_comp)):
         plot_quantity_tot_phase.append(0)
 
     elif plot_quantity == 'max':
-        allowable_indices = np.array(mk_list[i])>(np.array(q_val_list[i])*(n+2))
+        allowable_indices = np.array(mk_list[i])>(np.array(q_val_list[i])*(n+0))
         if max_based_on_total:
             maximum_val = np.max(np.abs(amps_tot_comp[i])[allowable_indices])
             max_loc = np.argmin(np.abs(np.abs(amps_tot_comp[i]) - maximum_val))
@@ -139,6 +165,10 @@ for i in range(0,len(amps_vac_comp)):
         upper_values_vac.append(amps_vac_comp_upper[i][max_loc])
         lower_values_vac.append(amps_vac_comp_lower[i][max_loc])
 
+        fixed_loc = np.min([np.argmin(np.abs(mk_list[i] - q_val_list[i]*n)) + 5, len(amps_vac_comp_upper[i])-1])
+        upper_values_vac_fixed.append(amps_vac_comp_upper[i][fixed_loc])
+        lower_values_vac_fixed.append(amps_vac_comp_lower[i][fixed_loc])
+
 
 #arange the answers based on q95 value, there is a better way to do this.... using zip
 plot_quantity_plas_arranged = []; plot_quantity_tot_arranged = []; plot_quantity_vac_arranged = []
@@ -146,8 +176,8 @@ plot_quantity_plas_phase_arranged = []; plot_quantity_tot_phase_arranged = []; p
 q95_list_arranged = []; Bn_Li_list_arranged = []; mode_list_arranged = []
 time_list_arranged = []
 q95_list_copy = copy.deepcopy(q95_list)
-key_list_arranged = []
-resonant_close_arranged = []
+Bn_Li_list_copy = copy.deepcopy(Bn_Li_list)
+key_list_arranged = []; resonant_close_arranged = []
 for i in range(0,len(q95_list)):
     cur_loc = np.argmin(q95_list)
     q95_list_arranged.append(q95_list.pop(cur_loc))
@@ -226,8 +256,12 @@ rel_upper_vals_plasma = np.array(upper_values_plasma)
 rel_lower_vals_vac =  np.array(lower_values_vac)
 rel_upper_vals_vac =  np.array(upper_values_vac)
 
+rel_lower_vals_vac_fixed =  np.array(lower_values_vac_fixed)
+rel_upper_vals_vac_fixed =  np.array(upper_values_vac_fixed)
+
 plot_array_plasma = np.ones((phasing_array.shape[0], q95_array.shape[0]),dtype=float)
 plot_array_vac = np.ones((phasing_array.shape[0], q95_array.shape[0]),dtype=float)
+plot_array_vac_fixed = np.ones((phasing_array.shape[0], q95_array.shape[0]),dtype=float)
 
 
 for i, curr_phase in enumerate(phasing_array):
@@ -238,24 +272,75 @@ for i, curr_phase in enumerate(phasing_array):
         phasor = (np.cos(phasing)+1j*np.sin(phasing))
     plot_array_plasma[i,:] = np.abs(rel_upper_vals_plasma + rel_lower_vals_plasma*phasor)
     plot_array_vac[i,:] = np.abs(rel_upper_vals_vac + rel_lower_vals_vac*phasor)
+    plot_array_vac_fixed[i,:] = np.abs(rel_upper_vals_vac_fixed + rel_lower_vals_vac_fixed*phasor)
+
 color_plot = ax[0].pcolor(q95_array, phasing_array, plot_array_plasma, cmap='hot')
+color_plot.set_clim([0, 3])
 color_plot2 = ax[1].pcolor(q95_array, phasing_array, plot_array_vac, cmap='hot')
+#color_plot2.set_clim([0.002, 3])
 ax[0].plot(q95_array, phasing_array[np.argmax(plot_array_plasma,axis=0)],'k.')
 ax[1].plot(q95_array, phasing_array[np.argmax(plot_array_vac,axis=0)],'k.')
 ax[0].plot(q95_array, phasing_array[np.argmin(plot_array_plasma,axis=0)],'b.')
 ax[1].plot(q95_array, phasing_array[np.argmin(plot_array_vac,axis=0)],'b.')
 #color_plot.set_clim()
-ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
+#ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
 ax[0].set_ylabel('Phasing (deg)')
 ax[1].set_ylabel('Phasing (deg)')
 ax[0].set_title('Kink Amplitude - Plasma')
 ax[1].set_title('Kink Amplitude - Vacuum')
-ax[0].set_xlim([2.5,5.8])
+ax[0].set_xlim([2.5,6.0])
 ax[0].set_ylim([np.min(phasing_array), np.max(phasing_array)])
-color_plot.set_clim([0.002, 3])
-pt.colorbar(color_plot, ax = ax[0])
-pt.colorbar(color_plot, ax = ax[1])
+ax[0].plot(np.arange(1,10), np.arange(1,10)*(-35.)+130+180,'b-')
+tmp_xaxis = np.arange(1,10,0.1)
+tmp_yaxis = np.arange(1,10,0.1)*(-35.)+130
+cbar = pt.colorbar(color_plot, ax = ax[0])
+ax[1].set_xlabel(r'$q_{95}$', fontsize = 20)
+cbar.ax.set_ylabel(r'$\delta B_{kink}$ G/kA',fontsize=20)
+cbar = pt.colorbar(color_plot2, ax = ax[1])
+cbar.ax.set_ylabel(r'$\delta B_{vac}^{m=nq+5,n=%d}$ G/kA'%(n,),fontsize=20)
 fig.canvas.draw(); fig.show()
+
+
+#########################
+#Plot for the paper
+fig, ax = pt.subplots(nrows = 2, sharex =1, sharey = 1)
+color_plot = ax[0].pcolor(q95_array, phasing_array, plot_array_plasma, cmap='hot', rasterized= 'True')
+color_plot.set_clim([0, 3])
+color_plot2 = ax[1].pcolor(q95_array, phasing_array, plot_array_vac_fixed, cmap='hot', rasterized = 'True')
+#color_plot2.set_clim([0.002, 3])
+ax[0].plot(q95_array, phasing_array[np.argmax(plot_array_plasma,axis=0)],'k.')
+#ax[1].plot(q95_array, phasing_array[np.argmax(plot_array_vac,axis=0)],'k.')
+ax[0].plot(q95_array, phasing_array[np.argmin(plot_array_plasma,axis=0)],'b.')
+#ax[1].plot(q95_array, phasing_array[np.argmin(plot_array_vac,axis=0)],'b.')
+#color_plot.set_clim()
+#ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
+ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+ax[1].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+#ax[0].set_ylabel('Phasing (deg)')
+#ax[1].set_ylabel('Phasing (deg)')
+
+ax[0].set_title('Kink Amplitude - Plasma')
+ax[1].set_title('Kink Amplitude - Vacuum')
+ax[0].set_xlim([2.5,6.0])
+ax[0].set_ylim([np.min(phasing_array), np.max(phasing_array)])
+ax[0].plot(np.arange(1,10), np.arange(1,10)*(-35.)+130+180,'b-')
+ax[1].plot(np.arange(1,10), np.arange(1,10)*(-35.)+130+180,'b-')
+tmp_xaxis = np.arange(1,10,0.1)
+tmp_yaxis = np.arange(1,10,0.1)*(-35.)+130
+ax[0].plot(tmp_xaxis[tmp_yaxis>0], tmp_yaxis[tmp_yaxis>0],'b-')
+ax[0].plot(tmp_xaxis[tmp_yaxis<0], tmp_yaxis[tmp_yaxis<0]+360,'b-')
+ax[1].plot(tmp_xaxis[tmp_yaxis>0], tmp_yaxis[tmp_yaxis>0],'b-')
+ax[1].plot(tmp_xaxis[tmp_yaxis<0], tmp_yaxis[tmp_yaxis<0]+360,'b-')
+
+cbar = pt.colorbar(color_plot, ax = ax[0])
+ax[1].set_xlabel(r'$q_{95}$', fontsize = 20)
+cbar.ax.set_ylabel(r'$\delta B_{kink}$ G/kA',fontsize=20)
+cbar = pt.colorbar(color_plot2, ax = ax[1])
+cbar.ax.set_ylabel(r'$\delta B_{vac}^{m=nq+5,n=2}$ G/kA',fontsize=20)
+fig.canvas.draw(); fig.show()
+
+
+
 
 
 plot_array_vac_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
@@ -284,7 +369,9 @@ for i, curr_phase in enumerate(phasing_array):
 
 fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
 color_plot = ax[0].pcolor(q95_array, phasing_array, plot_array_vac_res, cmap='hot', rasterized=True)
+ax[0].contour(q95_array,phasing_array, plot_array_vac_res, colors='white')
 color_plot2 = ax[1].pcolor(q95_array, phasing_array, plot_array_vac_res2, cmap='hot', rasterized=True)
+ax[1].contour(q95_array,phasing_array, plot_array_vac_res2, colors='white')
 color_plot.set_clim([0,10])
 color_plot2.set_clim([0,0.75])
 
@@ -308,6 +395,22 @@ cbar.ax.set_ylabel('%s G/kA'%(title_string2))
 #pt.colorbar(color_plot2, ax = ax[1])
 fig.canvas.draw(); fig.show()
 
+
+
+fig, ax = pt.subplots();ax = [ax]
+single_q95_value = 3.5
+tmp_loc = np.argmin(np.abs(q95_array-single_q95_value))
+single_db_res = plot_array_vac_res[:,tmp_loc]
+single_db_res_ave = plot_array_vac_res2[:,tmp_loc]
+single_db_kink = plot_array_plasma[:,tmp_loc]
+#ax[0].plot(phasing_array,single_db_res_ave/np.max(single_db_res_ave), '--', label='db_res_ave')
+ax[0].plot(phasing_array,single_db_res/np.max(single_db_res), '-',label=r'$\delta B_{res}$')
+ax[0].plot(phasing_array,single_db_kink/np.max(single_db_kink), '-.',label=r'$\delta B_{kink}$')
+ax[0].legend(loc='best'); ax[0].grid()
+ax[0].set_xlabel(r'$\Delta \phi_{ul}$ (deg) or time (1/180 s)', fontsize = 20)
+ax[0].set_ylabel('Normalised Amplitude')
+ax[0].set_xlim([0,360]); ax[0].set_ylim([0,1])
+fig.canvas.draw(); fig.show()
 
 
 

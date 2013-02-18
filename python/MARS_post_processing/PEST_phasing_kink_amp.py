@@ -3,19 +3,31 @@ Generates plots of 'kink amplification' as a function of phasing
 Will also create the files for an animation of plasma, vac, and total 
 components in PEST co-ordinates
 
+This generates the plot that is going into Matt's paper
+Shaun Haskey 12/12/2012
 '''
 
 import results_class
 from RZfuncs import I0EXP_calc
+from RZfuncs import I0EXP_calc_real
 import numpy as np
 import matplotlib.pyplot as pt
 import PythonMARS_funcs as pyMARS
 
+SURFMN_coords = 1
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
+#I = np.array([1.,-0.5,-0.5,1,-0.5,-0.5])
+
 I0EXP = I0EXP_calc(N,n,I)
-facn = 1.0; psi = np.sqrt(0.92)
-q_range = [2,4]; ylim = [0,1.4]
+print I0EXP
+I0EXP = I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0)
+print I0EXP
+
+facn = 1.0; psi = 0.846#np.sqrt(0.95)
+#psi = np.sqrt(0.95)
+psi =0.965
+q_range = [2,6]; ylim = [0,3.]
 #phasing_range = [-180.,180.]
 #phasing_range = [0.,360.]
 phasing_range = [-90.,90.]
@@ -44,18 +56,21 @@ lower_data_tot.get_PEST(facn = facn)
 upper_data_vac.get_PEST(facn = facn)
 lower_data_vac.get_PEST(facn = facn)
 
-mk_upper, ss_upper, relevant_values_upper_tot = upper_data_tot.kink_amp(psi, q_range, n = n)
-mk_lower, ss_lower, relevant_values_lower_tot = lower_data_tot.kink_amp(psi, q_range, n = n)
-mk_upper, ss_upper, relevant_values_upper_vac = upper_data_vac.kink_amp(psi, q_range, n = n)
-mk_lower, ss_lower, relevant_values_lower_vac = lower_data_vac.kink_amp(psi, q_range, n = n)
 
-a, upper_vac_res = upper_data_vac.resonant_strength()
-a, lower_vac_res = lower_data_vac.resonant_strength()
-a, upper_tot_res = upper_data_tot.resonant_strength()
-a, lower_tot_res = lower_data_tot.resonant_strength()
+
+mk_upper, ss_upper, relevant_values_upper_tot,tmp_useless = upper_data_tot.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
+mk_lower, ss_lower, relevant_values_lower_tot,tmp_useless = lower_data_tot.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
+mk_upper, ss_upper, relevant_values_upper_vac,tmp_useless = upper_data_vac.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
+mk_lower, ss_lower, relevant_values_lower_vac,tmp_useless = lower_data_vac.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
+
+
+a, upper_vac_res = upper_data_vac.resonant_strength(SURFMN_coords=SURFMN_coords)
+a, lower_vac_res = lower_data_vac.resonant_strength(SURFMN_coords=SURFMN_coords)
+a, upper_tot_res = upper_data_tot.resonant_strength(SURFMN_coords=SURFMN_coords)
+a, lower_tot_res = lower_data_tot.resonant_strength(SURFMN_coords=SURFMN_coords)
 
 number_points = len(relevant_values_lower_vac)
-phasings = np.arange(phasing_range[0], phasing_range[1]+1,0.01)
+phasings = np.arange(phasing_range[0], phasing_range[1]+1,0.1)
 #amps_tot = []; amps_vac = []; amps_plasma = []
 amps_vac_comp = [];amps_tot_comp = [];amps_plasma_comp = []
 if seperate_res_plot:
@@ -79,7 +94,8 @@ for phasing in phasings:
     #amps_tot.append(np.sum(np.abs(relevant_values_upper_tot + relevant_values_lower_tot*phasor))/number_points)
     #amps_plasma.append(np.sum(np.abs((relevant_values_upper_tot-relevant_values_upper_vac) + (relevant_values_lower_tot-relevant_values_lower_vac)*phasor))/number_points)
 
-tmp_loc = np.argmax(np.sum(np.abs(amps_tot_comp),axis=1)/number_points)
+#tmp_loc = np.argmax(np.sum(np.abs(amps_tot_comp),axis=1)/number_points)
+tmp_loc = np.argmax(np.max(np.abs(amps_tot_comp),axis=1)/number_points)
 tmp_max_phasing = phasings[tmp_loc]
 best_harmonic = np.argmax(np.abs(np.array(amps_tot_comp)[tmp_loc,:]))
 
@@ -112,9 +128,11 @@ plot_list = [4]
 for i, j  in enumerate(upper_data_tot.qn):
     if i in plot_list:
         if seperate_res_plot:
-            ax[1].plot(phasings,vac_qn[:,i], color = 'gray', linestyle = '-', label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
+            #ax[1].plot(phasings,vac_qn[:,i], color = 'gray', linestyle = '-', label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
+            ax[1].plot(phasings,vac_qn[:,i], color = 'green', linestyle = '-', label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
         else:
-            ax[0].plot(phasings,vac_qn[:,i], color = 'gray', linestyle = '-',  label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
+            #ax[0].plot(phasings,vac_qn[:,i], color = 'gray', linestyle = '-',  label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
+            ax[0].plot(phasings,vac_qn[:,i], color = 'green', linestyle = '-',  label = 'q=%.2f,m=%d'%(j, upper_data_tot.mq[i]))
         
 if seperate_res_plot:
     ax[1].grid(); leg = ax[1].legend(loc='best', fancybox=True)
@@ -163,13 +181,13 @@ if include_discrete_comparison:
     for i in single_phasings:
         single_data_vac_dict[str(i)].get_PEST(facn = facn)
         single_data_tot_dict[str(i)].get_PEST(facn = facn)
-        mk_upper, ss_upper, relevant_tmp_vac = single_data_vac_dict[str(i)].kink_amp(psi, q_range, n = n)
+        mk_upper, ss_upper, relevant_tmp_vac = single_data_vac_dict[str(i)].kink_amp(psi, q_range, n = n, SURFMN_coords = SURFMN_coords)
         kink_values_vac.append(np.sum(np.abs(relevant_tmp_vac)))
-        mk_upper, ss_upper, relevant_tmp_tot = single_data_tot_dict[str(i)].kink_amp(psi, q_range, n = n)
+        mk_upper, ss_upper, relevant_tmp_tot = single_data_tot_dict[str(i)].kink_amp(psi, q_range, n = n, SURFMN_coords = SURFMN_coords)
         kink_values_tot.append(np.sum(np.abs(relevant_tmp_tot)))
         kink_values_plas.append(np.sum(np.abs(relevant_tmp_tot-relevant_tmp_vac)))
 
-        a, res_tmp_vac = single_data_vac_dict[str(i)].resonant_strength()
+        a, res_tmp_vac = single_data_vac_dict[str(i)].resonant_strength(SURFMN_coords = SURFMN_coords)
         #vac_qn.append(np.abs(upper_vac_res + lower_vac_res*phasor))
         resonant_values_vac.append(np.abs(res_tmp_vac))
 
@@ -198,8 +216,8 @@ if include_discrete_comparison:
     for i,j in enumerate(single_phasings):
         ax[1].plot(plot_angles[i]*np.ones(len(resonant_values_vac[i,:])), resonant_values_vac[i,:], 'ys')
 
-ax[0].set_xlabel('Phasing (deg)')
-ax[0].set_ylabel('Kink amplitude')
+ax[0].set_xlabel(r'$\Delta \phi_{ul}$ (n=2) (deg)',fontsize = 14)
+ax[0].set_ylabel('Amplitude (G/kA)', fontsize = 14)
 
 ax[0].set_xlim(phasing_range)
 ax[0].set_ylim(ylim)

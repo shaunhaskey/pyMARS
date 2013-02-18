@@ -46,7 +46,7 @@ def return_probe_values(project_dict, calc, calc2, iii):
     Li_array = num.array(Li_list)
     coil1_array = num.array(coil1)
     coil1_abs_array = num.abs(num.array(coil1))
-    coil1_angle_array = num.angle(num.array(coil1))*180./num.pi
+    coil1_angle_array = num.angle(num.array(coil1),deg=True)#*180./num.pi
     serial_array = num.array(serial_list)
     return project_dict, q95_array, Bn_Div_Li_array, Bn_array, Li_array,coil1, coil1_abs_array, coil1_angle_array, serial_list
 

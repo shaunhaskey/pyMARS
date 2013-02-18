@@ -5,6 +5,7 @@ These plots are for comparison with SURFMN plots
 
 from  results_class import *
 from RZfuncs import I0EXP_calc
+from RZfuncs import I0EXP_calc_real
 import numpy as np
 import matplotlib.pyplot as pt
 
@@ -15,10 +16,10 @@ n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I0EXP = I0EXP_calc(N,n,I)
 facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
-
+I0EXP = I0EXP_calc_real(n,I)
 #I0EXP = 1.0e+3*3.**1.5/(2.*np.pi)
 #I0EXP = 1.0e+3*0.954 #PMZ ideal
-I0EXP = 1.0e+3*0.863 #PMZ real
+#I0EXP = 1.0e+3*0.863 #PMZ real
 #I0EXP = 1.0e+3*0.827 #MPM ideal
 #I0EXP = 1.0e+3*0.748 #MPM real
 #I0EXP = 1.0e+3*0.412 #MPM n4 real
@@ -39,7 +40,8 @@ print I0EXP, 1.0e+3 * 3./np.pi
 
 #d = data('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.p/', I0EXP=I0EXP)
 
-d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_lower.p',I0EXP=I0EXP)
+##Jan 2
+#d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_lower.p',I0EXP=I0EXP)
 #d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
 
 #d = data('/home/srh112/NAMP_datafiles/mars/shot146382_single_n4/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
@@ -48,8 +50,29 @@ d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa
 #d = data('/home/srh112/NAMP_datafiles/mars/shot146398_0_MARS_SURFMN/qmult1.000/exp1.000/marsrun/RUNrfa.vac', I0EXP=I0EXP)
 
 
+
+########These are for checking the psi_N offset between SURMN and MARS-F
+#d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_003/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_006/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_010/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_020/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_003_res_wall/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/146382_thetac_003_high_freq/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+
 #c = data('/home/srh112/code/pyMARS/other_scripts/shot146382_single2/qmult1.000/exp1.000/marsrun/RUNrfa.p',I0EXP=I0EXP)
 #d = data('/home/srh112/code/pyMARS/other_scripts/shot146382_single2/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#####Offset check using more dense gridding with 146388 ########
+# Note for 146388 usre this surfmn_file = '/home/srh112/NAMP_datafiles/SURFMN/SURF146388.03233.ph000.pmz/surfmn.out.idl3d
+#d = data('/home/srh112/NAMP_datafiles/mars/grid_check1/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/grid_check2/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/grid_check3/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/grid_check10/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/shot146382_single2_R0EXT_2/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/shot146382_single2/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#####Offset check using more dense gridding with 146382 ########
+#d = data('/home/srh112/NAMP_datafiles/mars/shot146382_REXP_2/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+#d = data('/home/srh112/NAMP_datafiles/mars/shot146382_REXP_7/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
+d = data('/home/srh112/NAMP_datafiles/mars/shot146382_NVEXP_4/qmult1.000/exp1.000/marsrun/RUNrfa.vac',I0EXP=I0EXP)
 
 
 #c = data('/home/srh112/code/pyMARS/shot146388_single2/qmult1.000/exp1.000/marsrun/RUNrfa.p', I0EXP = I0EXP)
@@ -63,7 +86,11 @@ d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa
 d.get_PEST(facn = facn)
 #d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/mars_files/RUNrfa.vac/spectral_info_pmz.h5', ss_squared = 0)
 
-d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/SURF146382.03230.ph000.pmz/surfmn.out.idl3d', ss_squared = 0, n=2)
+
+
+d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/SURF146382.03230.ph000.pmz/surfmn.out.idl3d', ss_squared = 0, n=2, single_mode_plots2 = [1,3,9])
+
+#d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/NAMP_datafiles/SURFMN/SURF146388.03233.ph000.pmz/surfmn.out.idl3d', ss_squared = 0, n=2, single_mode_plots2 = [1,3,9])
 
 
 
@@ -71,7 +98,6 @@ d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/Desktop/Test
 
 # c.amp_plot.set_clim([0,10])
 # c.fig.canvas.draw()
-
 
 # probe  = [ '67A', '66M', '67B', 'ESL', 'ISL','UISL','LISL','Inner_pol','Inner_rad']
 # #probe type 1: poloidal field, 2: radial field
