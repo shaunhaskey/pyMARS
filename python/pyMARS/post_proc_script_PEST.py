@@ -8,7 +8,7 @@ import RZfuncs as RZfuncs
 project_name = sys.argv[1]
 upper_and_lower = int(sys.argv[2])
 
-def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list = [0.92]):
+def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list = [0.92], SURFMN_coords = 1):
     link_RMZM = 0
     for i in project_dict['sims'].keys():
         project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
@@ -21,6 +21,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
         I0EXP = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
 
         if upper_and_lower == 1:
+            #create the data classes for all 4 cases
             directory = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
             upper_data_tot = results_class.data(directory, I0EXP=I0EXP)
             directory = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
@@ -37,10 +38,10 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
             lower_data_vac.get_PEST(facn = facn)
 
             print 'getting resonant_strength data'
-            upper_vac_res_integral, upper_vac_res_discrete = upper_data_vac.resonant_strength(n = n)
-            lower_vac_res_integral, lower_vac_res_discrete = lower_data_vac.resonant_strength(n = n)
-            upper_tot_res_integral, upper_tot_res_discrete = upper_data_tot.resonant_strength(n = n)
-            lower_tot_res_integral, lower_tot_res_discrete = lower_data_tot.resonant_strength(n = n)
+            upper_vac_res_integral, upper_vac_res_discrete = upper_data_vac.resonant_strength(n = n, SURFMN_coords=SURFMN_coords)
+            lower_vac_res_integral, lower_vac_res_discrete = lower_data_vac.resonant_strength(n = n, SURFMN_coords=SURFMN_coords)
+            upper_tot_res_integral, upper_tot_res_discrete = upper_data_tot.resonant_strength(n = n, SURFMN_coords=SURFMN_coords)
+            lower_tot_res_integral, lower_tot_res_discrete = lower_data_tot.resonant_strength(n = n, SURFMN_coords=SURFMN_coords)
 
             project_dict['sims'][i]['responses']={}
 
@@ -58,14 +59,17 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
             project_dict['sims'][i]['responses']['resonant_response_qn'] = copy.deepcopy(upper_data_tot.qn)
             project_dict['sims'][i]['responses']['resonant_response_sq'] = copy.deepcopy(upper_data_tot.sq)
 
+
+            #start doing the kink amplitude calculations - this is psi dependent
+            #do it for all items in psi_list
             for psi in psi_list:
                 current_label = str(psi)
                 project_dict['sims'][i]['responses'][current_label]={}
                 print 'getting kink data'
-                mk_upper, ss_upper, relevant_values_upper_tot, q_val_upper_tot = upper_data_tot.kink_amp(psi, q_range, n = n)
-                mk_lower, ss_lower, relevant_values_lower_tot, q_val_lower_tot = lower_data_tot.kink_amp(psi, q_range, n = n)
-                mk_upper, ss_upper, relevant_values_upper_vac, q_val_upper_vac = upper_data_vac.kink_amp(psi, q_range, n = n)
-                mk_lower, ss_lower, relevant_values_lower_vac, q_val_lower_vac = lower_data_vac.kink_amp(psi, q_range, n = n)
+                mk_upper, ss_upper, relevant_values_upper_tot, q_val_upper_tot = upper_data_tot.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
+                mk_lower, ss_lower, relevant_values_lower_tot, q_val_lower_tot = lower_data_tot.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
+                mk_upper, ss_upper, relevant_values_upper_vac, q_val_upper_vac = upper_data_vac.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
+                mk_lower, ss_lower, relevant_values_lower_vac, q_val_lower_vac = lower_data_vac.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
 
                 #record the kink results
                 project_dict['sims'][i]['responses'][current_label]['vacuum_kink_response_upper'] = copy.deepcopy(relevant_values_upper_vac)
@@ -89,8 +93,8 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
 
             project_dict['sims'][i]['responses']={}
             print 'getting resonant_strength data'
-            a, single_vac_res = single_data_vac.resonant_strength()
-            a, single_tot_res = single_data_tot.resonant_strength()
+            a, single_vac_res = single_data_vac.resonant_strength(n=n, SURFMN_coords=SURFMN_coords)
+            a, single_tot_res = single_data_tot.resonant_strength(n=n, SURFMN_coords=SURFMN_coords)
             
             #record the kink results
             project_dict['sims'][i]['responses']['vacuum_resonant_response_single'] = copy.deepcopy(single_vac_res)
@@ -103,8 +107,8 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, psi_list
                 project_dict['sims'][i]['responses'][current_label]={}
 
                 print 'getting kink data'
-                mk_upper, ss_upper, relevant_values_single_tot, q_val = single_data_tot.kink_amp(psi, q_range, n = n)
-                mk_upper, ss_upper, relevant_values_single_vac, q_val = single_data_vac.kink_amp(psi, q_range, n = n)
+                mk_upper, ss_upper, relevant_values_single_tot, q_val = single_data_tot.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
+                mk_upper, ss_upper, relevant_values_single_vac, q_val = single_data_vac.kink_amp(psi, q_range, n = n, SURFMN_coords=SURFMN_coords)
 
                 #record the kink results
                 project_dict['sims'][i]['responses'][current_label]['vacuum_kink_response_single'] = copy.deepcopy(relevant_values_single_vac)
