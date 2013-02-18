@@ -43,6 +43,12 @@ CHEASE_execution_script = parser.get('execution_scripts', 'CHEASE_execution_scri
 
 #template_names
 CORSICA_template_name = parser.get('template_names', 'CORSICA_template_name')
+try:
+    CORSICA_template_name2 = parser.get('template_names', 'CORSICA_template_name2')
+except ConfigParser.NoOptionError, e:
+    print 'Second CORSICA template not named, setting to same as first name'
+    CORSICA_template_name2 = CORSICA_template_name
+
 CHEASE_template_name = parser.get('template_names', 'CHEASE_template_name')
 MARS_template_name = parser.get('template_names', 'MARS_template_name')
 
@@ -268,7 +274,8 @@ if start_from_step == 1:
     #p_string,q_string,len_p_list = cont_funcs.corsica_qmult_pmult()
 
     #creating lots of directories for the various runs of CORSICA
-    corsica_run_on_venus=0
+    corsica_run_on_venus=1
+    CORSICA_workers_tmp=10
     if multiple_efits == 1:
         for i in range(0, len(project_dict['details']['shot_time'])):
             cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['multiple_efit'][i], project_dict['details']['template_dir'] + CORSICA_template_name, [str(project_dict['details']['shot_time'][i])], corsica_settings[0])
@@ -277,7 +284,7 @@ if start_from_step == 1:
         #elif CORSICA_workers>1:
     elif corsica_run_on_venus:
         #setup the prerun directory
-        cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + '/equal_spacing_pt1.bas', ['prerun'], corsica_settings[0])
+        cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, ['prerun'], corsica_settings[0])
         #run prerun
         cont_funcs.corsica_qsub(corsica_base_dir + '/prerun/', 'corsica.job')
         #find out when prerun is finished
@@ -286,9 +293,9 @@ if start_from_step == 1:
         #read in all the different jobs to do
         #make all the seperate directories
         corsica_directory_list = []
-        for i in range(0,CORSICA_workers): 
+        for i in range(0,CORSICA_workers_tmp): 
             corsica_directory_list.append("worker"+str(i))
-            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + '/equal_spacing_pt2.bas', [corsica_directory_list[-1]], corsica_settings[0])
+            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name2, [corsica_directory_list[-1]], corsica_settings[0])
         cont_funcs.read_qmult_pmult_values(corsica_base_dir + '/prerun/', corsica_base_dir, corsica_directory_list)
         #run all the seperate directories
         for i in corsica_directory_list: cont_funcs.corsica_qsub(corsica_base_dir + '/'+i, '/corsica.job')
