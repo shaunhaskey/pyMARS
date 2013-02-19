@@ -68,7 +68,7 @@ class data():
     def __init__(self, directory,Nchi=513,link_RMZM=1, I0EXP=1.0e+3 * 3./np.pi, spline_B23=2):
         self.directory = copy.deepcopy(directory)
         self.Nchi = copy.deepcopy(Nchi)
-        self.link_RMZM = copy.deepcopy(link_RMZM)
+        #self.link_RMZM = copy.deepcopy(link_RMZM)
         self.I0EXP = copy.deepcopy(I0EXP)
         self.spline_B23 = spline_B23
         self.extract_single()
@@ -79,10 +79,6 @@ class data():
         self.chi.resize(1,len(self.chi))
         self.phi = np.linspace(0,2.*np.pi,self.Nchi)
         self.phi.resize(len(self.phi),1)
-
-        #file_name = 'RMZM_F'
-        #if self.link_RMZM ==1:
-        #    os.system('ln -f -s ../../cheaserun/RMZM_F RMZM_F')
 
         file_name = '../../cheaserun/RMZM_F'
         self.RM, self.ZM, self.Ns, self.Ns1, self.Ns2, self.Nm0, self.R0EXP, self.B0EXP, self.s = readRMZM(file_name)
