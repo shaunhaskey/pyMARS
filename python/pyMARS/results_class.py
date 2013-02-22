@@ -346,6 +346,8 @@ class data():
         image1.set_clim([0,np.max(np.abs(self.SURFMN_zdat))])
         image1.set_clim([0, 1.5])
         cb = pt.colorbar(mappable=image1, ax = ax_tmp[0])
+        #from matplotlib.ticker import MaxNLocator
+        #cb.locator = MaxNLocator( nbins = 6)
         cb.ax.set_ylabel('G/kA')
         cb = pt.colorbar(mappable=image2, ax = ax_tmp[1])
         cb.ax.set_ylabel('G/kA')
