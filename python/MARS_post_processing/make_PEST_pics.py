@@ -66,7 +66,7 @@ d_upper_v.get_PEST(facn = facn)
 d_lower_v.get_PEST(facn = facn)
 
 subplot_phasings = 1
-subplot_plot = 'total'
+subplot_plot = 'vac'
 if subplot_phasings:
     phasings = [0,90,180,270]
     fig,ax = pt.subplots(nrows = 2, ncols = 2, sharex =1, sharey = 1)
@@ -104,7 +104,7 @@ if subplot_phasings:
 
     fig.canvas.draw(); fig.show()
 
-animation_phasings = 0
+animation_phasings = 1
 if animation_phasings:
     phasings = range(0,360,15)
     phasings = [0]
@@ -127,11 +127,11 @@ if animation_phasings:
         combined_t.BnPEST = BnPEST_t
         combined_v.BnPEST = BnPEST_v
         combined_p.BnPEST = BnPEST_t-BnPEST_v
-        contour_levels = np.linspace(0,3.0,7)
-        contour_levels = np.linspace(0,6.0,7)
-        color_plot_v = combined_v.plot_BnPEST(ax[0], n=n, inc_contours = 1, contour_levels=contour_levels, increase_grid_BnPEST = 1)
-        color_plot_p = combined_p.plot_BnPEST(ax[1], n=n, inc_contours = 1, contour_levels=contour_levels, increase_grid_BnPEST = 1)
-        color_plot_t = combined_t.plot_BnPEST(ax[2], n=n, inc_contours = 1, contour_levels=contour_levels,increase_grid_BnPEST = 1)
+        contour_levels1 = np.linspace(0,3.0,7)
+        contour_levels2 = np.linspace(0,5.0,7)
+        color_plot_v = combined_v.plot_BnPEST(ax[0], n=n, inc_contours = 1, contour_levels=contour_levels1, increase_grid_BnPEST = 1)
+        color_plot_p = combined_p.plot_BnPEST(ax[1], n=n, inc_contours = 1, contour_levels=contour_levels2, increase_grid_BnPEST = 1)
+        color_plot_t = combined_t.plot_BnPEST(ax[2], n=n, inc_contours = 1, contour_levels=contour_levels2,increase_grid_BnPEST = 1)
 
         color_plots = [color_plot_v, color_plot_p, color_plot_t]
         titles = ['Vacuum','Plasma','Total']
@@ -142,9 +142,10 @@ if animation_phasings:
             ax[tmp_loc].set_xlabel('m')
             #ax[tmp_loc].hline(np.sqrt(0.95),-29,29,colors='b')
         ax[0].set_ylabel(r'$\sqrt{\psi_N}$', fontsize = 14)
-        cbar.ax.set_ylabel(r'$\delta B_r^{m,2}$ (G/kA)', fontsize = 14)
-        ax[0].set_xlim([0,29])
-        ax[0].set_ylim([0.4,1])
+        #cbar.ax.set_ylabel(r'$\delta B_r^{m,2}$ (G/kA)', fontsize = 14)
+        ax[0].set_xlim([0,15])
+        ax[0].set_ylim([0.4,0.995])
+        pt.subplots_adjust(wspace = .05)
         #fig.set_size_inches([ 17. ,   4.])
         #fig.savefig('/home/srh112/code/NAMP_analysis/python/MARS_post_processing/plas_%03d.png'%(phasing,), bbox_inches = 'tight')
         fig.canvas.draw(); fig.show()
@@ -155,5 +156,8 @@ if animation_phasings:
     #ax.set_ylabel(r'$\sqrt{\psi_N}$', fontsize = 14)
     #cbar.ax.set_ylabel('G/kA')
 
-
-    
+tmp_fig, tmp_ax = pt.subplots()
+#cbar = pt.colorbar(color_plots[0], ax = tmp_ax,orientation='horizontal')
+cbar = pt.colorbar(color_plots[0], ax = tmp_ax,orientation='horizontal')
+cbar.ax.set_xlabel('G/kA')
+fig_tmp.canvas.draw(); fig_tmp.show()

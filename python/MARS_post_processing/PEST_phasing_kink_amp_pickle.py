@@ -19,6 +19,8 @@ import matplotlib.cm as cm
 file_name = '/home/srh112/NAMP_datafiles/mars/q95_scan_fine/shot146394_3000_q95_fine_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing/equal_spacing_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacingV2/equal_spacingV2_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_146394/equal_spacing_146394_post_processing_PEST.pickle'
+
 #file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4/equal_spacing_n4_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4_V2/equal_spacing_n4_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/equal_spacing_n4_V2/equal_spacing_n4_post_processing_PEST.pickle'
@@ -56,12 +58,17 @@ def no_wall_limit(q95_list, beta_n_list):
     '''
     q95 = np.array(q95_list)
     bn = np.array(beta_n_list)
-    q95_values = set(q95_list)
+    q95_values = list(set(q95_list))
+    q95_values.sort()
     xaxis = []; yaxis = []; yaxis2 = []
     for i in q95_values:
+        print i
         xaxis.append(i)
         yaxis.append(np.max(bn[q95==i]))
-        increment = yaxis[-1] - np.max(bn[(q95==i) & (bn!=yaxis[-1])])
+        if np.sum(q95==i)>=2:
+            increment = yaxis[-1] - np.max(bn[(q95==i) & (bn!=yaxis[-1])])
+        else:
+            increment=0
         yaxis2.append(yaxis[-1]+increment)
     tmp1 = sorted(zip(xaxis,yaxis,yaxis2))
     xaxis = [tmp for (tmp,tmp2,tmp3) in tmp1]

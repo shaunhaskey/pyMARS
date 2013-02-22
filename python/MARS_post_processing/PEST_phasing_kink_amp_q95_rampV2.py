@@ -26,7 +26,6 @@ file_name2 = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan3_n4/detailed_q9
 file_name2 = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan_n4_lower_BetaN/detailed_q95_scan_n4_lower_BetaN_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan_n2_lower_BetaN/detailed_q95_scan_n2_lower_BetaN_post_processing_PEST.pickle'
 
-
 #file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan_n2_146382/detailed_q95_scan_n2_146382_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan_n2_146382_NVEXP_4/detailed_q95_scan_n2_146382_NVEXP_4_post_processing_PEST.pickle'
 
@@ -70,7 +69,6 @@ key_list = project_dict['sims'].keys()
 #extract the relevant data from the pickle file and put it into lists
 #res_vac_list_upper = []; res_vac_list_lower = []
 #res_plas_list_upper = []; res_plas_list_lower = []
-
 
 def extract_q95_Bn2(tmp_dict):
     '''
@@ -125,7 +123,6 @@ def extract_dB_kink(tmp_dict, psi):
     amps_plas_comp_upper = []; amps_plas_comp_lower = []
     amps_tot_comp_upper = []; amps_tot_comp_lower = []
     mk_list = [];  q_val_list = []; resonant_close = []
-
     for i in tmp_dict['sims'].keys():
         relevant_values_upper_tot = tmp_dict['sims'][i]['responses'][str(psi)]['total_kink_response_upper']
         relevant_values_lower_tot = tmp_dict['sims'][i]['responses'][str(psi)]['total_kink_response_lower']
@@ -142,9 +139,7 @@ def extract_dB_kink(tmp_dict, psi):
         amps_vac_comp_lower.append(relevant_values_lower_vac)
         amps_tot_comp_upper.append(relevant_values_upper_tot)
         amps_tot_comp_lower.append(relevant_values_lower_tot)
-
     return amps_vac_comp_upper, amps_vac_comp_lower, amps_plas_comp_upper, amps_plas_comp_lower, amps_tot_comp_upper, amps_tot_comp_lower, mk_list, q_val_list, resonant_close
-
 
 def apply_phasing(upper, lower, phasing, n, phase_machine_ntor = 1):
     '''
@@ -158,6 +153,7 @@ def apply_phasing(upper, lower, phasing, n, phase_machine_ntor = 1):
     for i in range(0,len(upper)):
         answer.append(upper[i] + lower[i] * phasor)
     return answer
+
 
 def calculate_db_kink(mk_list, q_val_list, n, reference, to_be_calculated):
     '''
@@ -242,7 +238,6 @@ def return_res_phasing_dependence(q95_list_copy, lower_values_plasma, upper_valu
     plot_array_vac_fixed_phase = np.ones((phasing_array.shape[0], q95_array.shape[0]),dtype=float)
     plot_array_plasma_fixed_phase = np.ones((phasing_array.shape[0], q95_array.shape[0]),dtype=float)
 
-
     for i, curr_phase in enumerate(phasing_array):
         phasing = curr_phase/180.*np.pi
         if phase_machine_ntor:
@@ -254,14 +249,12 @@ def return_res_phasing_dependence(q95_list_copy, lower_values_plasma, upper_valu
         plot_array_vac_fixed[i,:] = np.abs(rel_upper_vals_vac_fixed + rel_lower_vals_vac_fixed*phasor)
         plot_array_plasma_fixed[i,:] = np.abs(rel_upper_vals_plas_fixed + rel_lower_vals_plas_fixed*phasor)
 
-
         plot_array_plasma_phase[i,:] = np.angle(rel_upper_vals_plasma + rel_lower_vals_plasma*phasor,deg=True)
         plot_array_vac_phase[i,:] = np.angle(rel_upper_vals_vac + rel_lower_vals_vac*phasor,deg=True)
         plot_array_vac_fixed_phase[i,:] = np.angle(rel_upper_vals_vac_fixed + rel_lower_vals_vac_fixed*phasor,deg=True)
         plot_array_plasma_fixed_phase[i,:] = np.angle(rel_upper_vals_plas_fixed + rel_lower_vals_plas_fixed*phasor,deg=True)
 
     return plot_array_plasma, plot_array_vac, plot_array_vac_fixed, q95_array, phasing_array, plot_array_plasma_fixed, plot_array_plasma_phase, plot_array_vac_phase, plot_array_vac_fixed_phase, plot_array_plasma_fixed_phase
-
 
 def dB_kink_phasing_dependence(phasing_array, q95_array, res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower):
     plot_array_vac_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
@@ -287,7 +280,6 @@ def dB_kink_phasing_dependence(phasing_array, q95_array, res_vac_list_upper, res
         plot_array_plas_res2[i,:] = tmp_plas_list2
     return plot_array_vac_res, plot_array_plas_res, plot_array_vac_res2, plot_array_plas_res2
 
-
 def get_reference(upper, lower, phasing_list, n, phase_machine_ntor = 1):
     '''
     Appy a phasing between an upper and lower array quantity
@@ -303,10 +295,6 @@ def get_reference(upper, lower, phasing_list, n, phase_machine_ntor = 1):
             tmp.append(upper[i] + lower[i] * phasor)
         answer.append(np.array(tmp))
     return answer
-
-
-
-
 
 def do_everything(file_name, psi, phasing,phase_machine_ntor):
     project_dict = pickle.load(file(file_name,'r'))
