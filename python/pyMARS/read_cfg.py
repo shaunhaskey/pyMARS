@@ -302,7 +302,7 @@ if start_from_step == 1:
         cont_funcs.read_qmult_pmult_values(corsica_base_dir + '/prerun/', corsica_base_dir, corsica_directory_list)
         print "runs have been setup pt2"
         #run all the seperate directories
-        for i in corsica_directory_list: cont_funcs.corsica_qsub(corsica_base_dir + '/'+i, '/corsica.job')
+        for i in corsica_directory_list: cont_funcs.corsica_qsub(corsica_base_dir + '/'+i, 'corsica.job')
         print "run jobs submitted to venus"
         #check everything is finished
         print "waiting for jobs to finish..."

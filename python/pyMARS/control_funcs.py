@@ -47,19 +47,24 @@ def copy_files_combine_stab_setups(base_directory, new_directories, final_direct
     SH: Feb 18 2013
     '''
     overal_list = []
+    first_time = 1
     for i in new_directories:
         #copy EXPEQ files across
         os.system('cp '+base_directory+'/'+i+'/EXPEQ* ' + final_directory)
         #read in each individual stab_setup_results file
         tmp_file = file(base_directory+'/'+i+'/stab_setup_results.dat','r')
-        tmp_data = tmp_file.readlines()[3:]
+        #first time to include the header
+        if first_time:
+            tmp_data = tmp_file.readlines()
+        else:
+            tmp_data = tmp_file.readlines()[3:]
         tmp_file.close()
         for j in tmp_data:
             overal_list.append(j)
 
     #output the final stab_setup_results file
     tmp_file = file(final_directory+'/stab_setup_results.dat','w')
-    tmp_file.write_lines(overal_list)
+    tmp_file.writelines(overal_list)
     tmp_file.close()
     
 
