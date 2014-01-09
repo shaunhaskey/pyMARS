@@ -140,7 +140,10 @@ print FEEDI_string
 MARS_settings['<<FEEDI>>'] = FEEDI_string
 for i,j in parser.items('MARS_settings2'):
     print i, j
-    MARS_settings[i] = int(j)
+    try:
+        MARS_settings[i] = int(j)
+    except ValueError:
+        MARS_settings[i] = float(j)
 
 print MARS_settings
 #cleaning up to save space

@@ -140,7 +140,10 @@ print FEEDI_string
 MARS_settings['<<FEEDI>>'] = FEEDI_string
 for i,j in parser.items('MARS_settings2'):
     print i, j
-    MARS_settings[i] = int(j)
+    if int(j)==float(j):
+        MARS_settings[i] = int(j)
+    else:
+        MARS_settings[i] = float(j)
 
 print MARS_settings
 #cleaning up to save space
@@ -284,13 +287,13 @@ if start_from_step == 1:
         #elif CORSICA_workers>1:
     elif CORSICA_workers>1:
         #setup the prerun directory
-        #cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, ['prerun'], corsica_settings[0])
+        cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, ['prerun'], corsica_settings[0])
         #run prerun
         print "submitting scaling job"
-        #cont_funcs.corsica_qsub(corsica_base_dir + '/prerun/', 'corsica.job')
+        cont_funcs.corsica_qsub(corsica_base_dir + '/prerun/', 'corsica.job')
         #find out when prerun is finished
         print "start waiting for scaling job to finish..."
-        #cont_funcs.check_corsica_finished(corsica_base_dir + '/prerun/', "corsica_finished")
+        cont_funcs.check_corsica_finished(corsica_base_dir + '/prerun/', "corsica_finished")
         print "scaling job finished"
         #read in all the different jobs to do
         #make all the seperate directories
