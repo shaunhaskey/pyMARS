@@ -5,4 +5,7 @@
 #images
 *.png
 *.gif
+*.eps
+*.pdf
+*.svg
 '*#'

@@ -56,6 +56,7 @@ def copy_files_combine_stab_setups(base_directory, new_directories, final_direct
         #first time to include the header
         if first_time:
             tmp_data = tmp_file.readlines()
+            first_time = 0
         else:
             tmp_data = tmp_file.readlines()[3:]
         tmp_file.close()

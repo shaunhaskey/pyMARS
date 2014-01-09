@@ -62,8 +62,6 @@ def extract_plotk_results():
     return m, mode_amps
 
 
-
-
 class data():
     def __init__(self, directory,Nchi=513,link_RMZM=1, I0EXP=1.0e+3 * 3./np.pi, spline_B23=2):
         self.directory = copy.deepcopy(directory)
@@ -205,7 +203,7 @@ class data():
         R_Z_PEST = np.ones([len(R_EQAC.flatten()),2],dtype='float')
         R_Z_PEST[:,0] = R_PEST.flatten()
         R_Z_PEST[:,1] = Z_PEST.flatten()
-        #this section is to make it work in griddata
+        #this section is to make it work inthe griddata function
 
         BnPEST  = griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
         BnPEST.resize(BnEQAC.shape)
@@ -245,22 +243,18 @@ class data():
         tmp = self.A[:self.BnPEST.shape[0]]
         tmp.resize((self.BnPEST.shape[0],1))
         self.BnPEST_SURF = self.BnPEST*4.*(np.pi)**2/(tmp)
+        self.ss_plas_edge = np.argmin(np.abs(self.ss-1.0))
+
 
     def resonant_strength(self, min_s = 0, power = 1, n=2, SURFMN_coords = 0):
         '''
         Calculate dBres
+        Finds the amplitude at each of the resonant harmonics (temp_discrete)
+        Finds the integral of the resonant line
+        SH : 26Feb2013
         '''
         os.chdir(self.directory) 
-        #os.system('ln -sf PROFEQ.OUT PROFEQ_PEST')
-        #file_name = 'PROFEQ_PEST'
 
-        #file_name = 'PROFEQ.OUT'
-        #qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
-        #self.qn = qn
-        #self.mq = mq
-        #self.sq = sq
-        #self.q_profile = q
-        #self.q_profile_s = s
         self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         #qn_grid, s_grid = np.meshgrid(self.q_profile*n, self.s.flatten())
@@ -283,11 +277,15 @@ class data():
 
     def extract_q_profile_information(self, n=2, file_name='PROFEQ.OUT'):
         '''Extract the q profile from file_name
+        qn: q at the resonant surfaces
+        sq: s at the resonant surfaces
+        mq: m at the resonant surfaces
+        i.e mq=n qn (sq)
+        also returns
+        q value on the s grid, q_profile, and q_profile_s (sgrid locations)
+        SH : 26Feb2013
         '''
         os.chdir(self.directory) 
-        #os.system('ln -f -s PROFEQ.OUT PROFEQ_PEST')
-        #file_name = 'PROFEQ_PEST'
-        #file_name = 'PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk, file_name=file_name, n=n)
         self.qn = qn
         self.sq = sq
@@ -296,19 +294,35 @@ class data():
         self.mq = mq
         
 
-    def kink_amp(self, psi, q_range, n = 2, SURFMN_coords = 0):
+    def kink_amp(self, s_surface, q_range, n = 2, SURFMN_coords = 0):
         '''Calculate dBkink
+        Returns the harmonics that are between n q_range[0] < m < n q_range[1]
+        at surface s= s_surface
+
+        if SURFMN_coords=1, the calculation is done in BnPEST in SURFMN
+        coordinates instaed of MARS-F coordinates
+
+        returns m values, s value, amplitudes, q value at the surface of interest
         '''
+
+        #Get q profile information, and find the surface we are interested in
         self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
-        s_loc = np.argmin(np.abs(self.ss-psi))
+        s_loc = np.argmin(np.abs(self.ss-s_surface))
+
+        #q value at the relevant surface
         relevant_q = self.q_profile[s_loc]
         print np.max(self.mk), q_range[0]*relevant_q, q_range[1]*relevant_q
+
+        #indices of the minimum m and maximum m that we are interested in
         lower_bound = np.argmin(np.abs(self.mk.flatten() - q_range[0]*relevant_q))
         upper_bound = np.argmin(np.abs(self.mk.flatten() - q_range[1]*relevant_q))
         print 'kink_amp: s_loc: %d, self.ss_val: %.2f, self.q_profile_s: %.2f'%(s_loc, self.ss[s_loc], self.q_profile[s_loc])
+        #make sure upper bound isn't larger than the values available
         upper_bound_new = np.min([upper_bound, len(self.mk.flatten())-1])
         print lower_bound, upper_bound, upper_bound_new
         print 'relevant_q: %.2f, bounds: %d %d, values: %d, %d'%(relevant_q, lower_bound, upper_bound_new, self.mk.flatten()[lower_bound], self.mk.flatten()[upper_bound_new])
+
+        #extract the relevant values
         if SURFMN_coords:
             relevant_values = self.BnPEST_SURF[s_loc,lower_bound:upper_bound_new]
         else:
@@ -324,7 +338,7 @@ class data():
         '''
 
         import matplotlib.pyplot as pt
-        fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1, sharey=1)
+        fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=True, sharey=True)
         image2 = ax_tmp[1].pcolor(mk.flatten(),ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
         ax_tmp[1].contour(mk.flatten(),ss[:ss_plas_edge].flatten(), tmp_plot_quantity, colors='white')
         ax_tmp[1].set_title('MARS-F, n=%d'%(n,))
@@ -419,7 +433,7 @@ class data():
 
         sqrt_modes = int(np.sqrt(len(single_mode_plots)))
 
-        single_m_fig, single_m_ax = pt.subplots(nrows = sqrt_modes, ncols = sqrt_modes, sharey=1, sharex = 1)
+        single_m_fig, single_m_ax = pt.subplots(nrows = sqrt_modes, ncols = sqrt_modes, sharey=True, sharex = True)
         single_m_fig2, single_m_ax2 = pt.subplots()
         for tmp_ax_label in single_m_ax[:,0]:
             tmp_ax_label.set_ylabel('Mode Amp G/kA')
@@ -454,7 +468,7 @@ class data():
                     else:
                         tmp_surfmn_z = zdat_tmp*self.SURFMN_A/((2*np.pi)**2)
                     single_m_ax[tmp_single_loc].plot(tmp_surfmn_s, tmp_surfmn_z[tmp_surfmn_loc,:], tmp_styles[tmp_i], label = '%s'%('SURFMN, n=%d'%(tmp_n),))
-                    if (tmp_n == 2) & (tmp_m in single_mode_plots2):
+                    if (tmp_n == n) & (tmp_m in single_mode_plots2):
                         single_m_ax2.plot(tmp_surfmn_s, tmp_surfmn_z[tmp_surfmn_loc,:], tmp_styles[tmp_i], label = '%s'%('SURFMN, n=%d'%(tmp_n),))
             single_m_ax[tmp_single_loc].grid(b=True)
             single_m_ax2.grid(b=True)
@@ -477,7 +491,7 @@ class data():
         SH : 14Feb2013
         '''
         import h5py
-        #fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1, sharey=1)
+        #fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=True, sharey=True)
         if surfmn_file[-2:] == 'h5':
             print 'getting data from h5'
             tmp_file = h5py.File(surfmn_file)
@@ -636,7 +650,7 @@ class data():
     def plot_radial_lines_overlay(self, start_mode, end_mode, top_m, top_s, top_z, plot_quantity_top, bottom_m, bottom_s, bottom_z, plot_quantity_bottom, mk, ss, ss_plas_edge, BnPEST):
         import matplotlib.pyplot as pt
 
-        fig_tmp10, ax_tmp10 = pt.subplots(nrows = 2, sharex = 1)
+        fig_tmp10, ax_tmp10 = pt.subplots(nrows = 2, sharex = True)
         #start_mode = -20; end_mode = 25
         colormap = pt.cm.jet
         tmp_color = ax_tmp10[0].pcolor(np.array([[start_mode,end_mode],[start_mode,end_mode]]),cmap=colormap)
@@ -648,7 +662,7 @@ class data():
 
         ax_tmp10[1].set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, start_mode + (end_mode))])
         ax_tmp10[0].set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, start_mode + (end_mode))])
-        fig_tmp100, ax_tmp100 = pt.subplots(nrows = 2, sharex = 1)
+        fig_tmp100, ax_tmp100 = pt.subplots(nrows = 2, sharex = True)
 
         for tmp_m in range(start_mode,end_mode):
             correction_factor = 1.
@@ -707,6 +721,43 @@ class data():
         fig_tmp10.canvas.draw(); fig_tmp10.show()
         fig_tmp100.canvas.draw(); fig_tmp100.show()
 
+    def load_SURFMN_data(self, surfmn_file, n, horizontal_comparison=0, PEST_comparison=0, single_radial_mode_plots=0, all_radial_mode_plots=0):
+        self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
+        self.get_SURFMN_data(surfmn_file, n)
+
+        #This is if we want to plot SURFMN data in MARS-F coords
+        self.SURFMN_A = griddata(self.ss[:181],self.A.flatten()[:181], self.SURFMN_ydat[0,:],method='linear')
+        tmp_plot_quantity = (np.abs(self.BnPEST[:self.ss_plas_edge,:]).transpose()/(self.A[:self.ss_plas_edge]/(4*np.pi**2))).transpose()
+        print 'tmp plot shape', tmp_plot_quantity.shape, self.mk.flatten().shape, self.ss[:self.ss_plas_edge].flatten().shape
+        if PEST_comparison:
+            self.plot_SURFMN_MARS_F_comparison(self.mk, self.ss, tmp_plot_quantity, self.ss_plas_edge, n)
+        #horizontal cut of comparison between MARS-F and SURFMN
+        if horizontal_comparison:
+            self.plot_SURFMN_MARS_F_horizontal_cut(self.BnPEST, self.ss, self.ss_plas_edge, self.mk, psi_list=[0.92])
+
+
+        plot_quantity_top = 'MARS-F'
+        plot_quantity_bottom = 'SURFMN'
+        #make the radial comparison plots that I sent to Yueqiang when trying to get co-ordinates right
+        top_z_S, top_m, top_s, top_z_M = self.pick_plot_quantity(plot_quantity_top, self.mk, self.ss_plas_edge, self.BnPEST)
+        bottom_z_S, bottom_m, bottom_s, bottom_z_M = self.pick_plot_quantity(plot_quantity_bottom, self.mk, self.ss_plas_edge, self.BnPEST)
+
+        SURFMN_coords = 1
+        if SURFMN_coords:
+            top_z = top_z_S
+            bottom_z = bottom_z_S
+        else:
+            top_z = top_z_M
+            bottom_z = bottom_z_M
+        start_mode = -20; end_mode = 25
+        single_mode_plots = range(1,3**2+1)
+        single_mode_plots2 = [1,3,9]
+        if single_radial_mode_plots:
+            self.plot_SURFMN_MARS_F_radial_comparison(top_s, top_z, top_m, single_mode_plots, plot_quantity_top, n, single_mode_plots2, SURFMN_coords, surfmn_file)
+        if all_radial_mode_plots:
+            self.plot_radial_lines_overlay(start_mode, end_mode, top_m, top_s, top_z, plot_quantity_top, bottom_m, bottom_s, bottom_z, plot_quantity_bottom, self.mk, self.ss, self.ss_plas_edge, self.BnPEST)
+
+
 
     def plot1(self, suptitle='', title='', fig_name = '', fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid_BnPEST = 0, single_mode_plots = range(1,3**2+1), single_mode_plots2 = [1,5,9]):
         os.chdir(self.directory) 
@@ -756,7 +807,7 @@ class data():
             if get_plotk_results:
                 self.get_plotk_data(make_plot=1)
             start_mode = -20; end_mode = 25
-            #fig_tmp100, ax_tmp100 = pt.subplots(nrows = 2, sharex = 1)
+            #fig_tmp100, ax_tmp100 = pt.subplots(nrows = 2, sharex = True)
             plot_quantity_top = 'MARS-F'
             plot_quantity_bottom = 'SURFMN'
             

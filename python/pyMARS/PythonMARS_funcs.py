@@ -498,8 +498,12 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     vtorn=vtor0/v0a
 
 #    nichz = N_ELEMENTS(ichz)
-    omega = ichz/f_v0a
-    output_string = ['From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro']
+
+    #omega = ichz/f_v0a
+    #Fixed based on email from Matt on 8/1/2014
+    omega = 2.0*np.pi*ichz*taua
+
+    output_string = ['From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro with mod from 8/1/2014']
     output_string.append('=======================================')
     output_string.append('Input values')
     output_string.append('=======================================')

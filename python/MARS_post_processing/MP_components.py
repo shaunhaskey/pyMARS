@@ -100,21 +100,51 @@ fig, ax = pt.subplots(nrows = 3)
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 
-I0EXP,fft_freq_1, values_1 = RZfuncs.I0EXP_calc_real(n,I, produce_plot=1, plot_axes = ax)
+I0EXP,fft_freq_1, values_1 = RZfuncs.I0EXP_calc_real(n,I, produce_plot=1, plot_axes = ax, return_components=1)
 
-#fig.canvas.draw(); fig.show()
+fig.canvas.draw(); fig.show()
 
 
 
-m = -10; r_val = 0.95
+m = 10; r_val = 0.92
 adat, relevant_n, ns = extract_surfmn_data_m('/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/SURF146382.03230.ph000.pmz/surfmn.out.idl3d', m, r_val)
 ax[2].stem(range(0,len(relevant_n.flatten())), relevant_n.flatten())
 ax[2].set_xlim([0,11])
-for i in ax:
-    i.set_xlabel('')
-    i.set_ylabel('')
-    i.set_title('')
-#ax[2].set_xlabel('n')
-#ax[2].set_ylabel('Mode Amplitude G/kA')
+#for i in ax:
+#    i.set_xlabel('')
+#    i.set_ylabel('')
+#    i.set_title('')
+ax[2].set_xlabel('n')
+ax[2].set_ylabel('Amplitude (G/kA)')
 #ax[2].set_title(r'm=%d, $\sqrt{\psi_N}=%.2f$'%(m, r_val))
 fig.canvas.draw(); fig.show()
+
+#make an animation.....
+make_animation = 0
+if make_animation:
+    N = 6; n = 2
+    I = np.array([1.,-1.,0.,1,-1.,0.])
+    pmz = 1
+    if pmz:
+        phasings = np.array([0,180,180+90, 360, 180, 180+90])
+    else:
+        phasings = np.arange(0,720,120)
+    phasings = phasings/180.*np.pi
+
+    time_segments = np.linspace(0,0.1,20)
+    frequency = 10.*2.*np.pi
+    count = 0
+    for time_tmp in time_segments:
+        I =  np.cos(phasings + frequency*time_tmp)
+        print I
+        fig, ax = pt.subplots(nrows = 2)
+        I0EXP,fft_freq_1, values_1 = RZfuncs.I0EXP_calc_real(n,I, produce_plot=1, plot_axes = ax, return_components=1)
+        print I0EXP
+        fig.canvas.draw();fig.show()
+        fig.savefig('pics_%02d.png'%count)
+        fig.clf(); pt.close(fig)
+        count+=1
+    #fig.canvas.draw(); fig.show()
+
+
+

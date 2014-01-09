@@ -23,7 +23,7 @@ def I0EXP_calc(N,n,I):
     print 'I0EXP :', I0EXP
     return I0EXP
 
-def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None):
+def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None, return_components =0):
     '''
     SH : 19Nov2012
     For given coil currents described by list I, and coil geometry described in
@@ -31,7 +31,7 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None):
     '''
     phi_zero = mag_details.coils.phi('I_coils_upper')/180.*np.pi
     phi_range = mag_details.coils.width('I_coils_upper')/180.*np.pi
-    phi_tmp = np.linspace(0,2.*np.pi,100000)
+    phi_tmp = np.linspace(0,2.*np.pi,discrete_pts)
     current_output = phi_tmp * 0
 
     for i, phi in enumerate(phi_zero):
@@ -52,6 +52,7 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None):
         else:
             ax = plot_axes
         ax[0].plot(phi_tmp*180./np.pi, current_array)
+        #ax[0].plot(current_array,'.-')
         for i, phi in enumerate(phi_zero):
             phi_tmp1 = phi_zero[i]/np.pi*180.
             phi_range_tmp = phi_range[i]/np.pi*180.
@@ -63,19 +64,23 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None):
         ax[0].set_ylim([-1.1,1.1])
         ax[0].set_xlim([0,360])
         ax[0].set_xlabel(r'$\phi$ (deg)',fontsize = 14)
-        ax[0].set_ylabel('Current (a.u)')
-        
-        ax[1].set_xlabel('Toroidal Mode Number (n)')
-        ax[1].set_ylabel('Current (a.u)')
+        ax[0].set_ylabel('Current (kA)')
+        ax[1].set_xlabel('n')
+        ax[1].set_ylabel('Current (kA)')
         start_loc = np.argmin(np.abs(current_fft_freq-0))
-        end_loc = np.argmin(np.abs(current_fft_freq-14))
+        end_loc = np.argmin(np.abs(current_fft_freq-100))
+        print start_loc, end_loc
         ax[1].stem(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), 'b-')
+        #ax[1].plot(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), 'o')
+        #ax[1].plot(current_fft_freq, 2.*np.abs(current_fft/len(current_fft)), 'o')
         ax[1].set_xlim([0,11])
         ax[1].set_ylim([0,1.1])
         if plot_axes == None:
             fig.canvas.draw(); fig.show()
-    return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3
-    #return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3, current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft))
+    if return_components:
+        return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3, current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft))
+    else:
+        return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3
 
 
 
