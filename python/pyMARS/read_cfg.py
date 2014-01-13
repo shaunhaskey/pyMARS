@@ -462,7 +462,7 @@ if start_from_step <=5 and end_at_step>=5:
         project_dict = pyMARS.read_data(project_dir + project_name+'_post_RMZM.pickle')
 
 
-    project_dict = cont_funcs.setup_mars_func(project_dict, upper_and_lower = upper_and_lower, MARS_template_name = MARS_template_name, multiple_efits = multiple_efits)
+    project_dict = cont_funcs.setup_mars_func(project_dict, upper_and_lower = upper_and_lower, MARS_template_name = MARS_template_name, multiple_efits = multiple_efits, rot_scan_list=rot_scan_list,res_scan_list=res_scan_list)
 
     #Save the data structure so that it can be read by the next step
     pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_setup.pickle')
