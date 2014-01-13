@@ -7,7 +7,7 @@ import pickle, time, os,sys, copy
 import numpy as num
 import ConfigParser
 import numpy as num
-
+import numpy as np
 config_filename = sys.argv[1]
 parser = ConfigParser.SafeConfigParser()
 parser.optionxform=str
