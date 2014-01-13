@@ -23,6 +23,40 @@ except ConfigParser.NoOptionError, e:
     print 'Couldnt find multiple_efits - setting it to 0', e
     multiple_efits = 0
 
+try:
+    rotation_scan = int(parser.get('process_control', 'rotation_scan'))
+    rotation_start = float(parser.get('process_control', 'rotation_scan_start'))
+    rotation_end = float(parser.get('process_control', 'rotation_scan_end'))
+    rotation_num = float(parser.get('process_control', 'rotation_scan_number'))
+except ConfigParser.NoOptionError, e:
+    print 'Couldnt find multiple_efits - setting it to 0', e
+    rotation_scan = 0; rotation_start  = 0; rotation_end = 1; rotation_num = 0
+
+try:
+    resistivity_scan = int(parser.get('process_control', 'resistivity_scan'))
+    resistivity_start = float(parser.get('process_control', 'resistivity_scan_start'))
+    resistivity_end = float(parser.get('process_control', 'resistivity_scan_end'))
+    resistivity_num = float(parser.get('process_control', 'resistivity_scan_number'))
+except ConfigParser.NoOptionError, e:
+    print 'Couldnt find multiple_efits - setting it to 0', e
+    resistivity_scan = 0; resistivity_start = 0; resistivity_end = 0; resistivity_num = 0
+if resistivity_scan:
+    res_scan_list = np.linspace(resistivity_start, resistivity_end, resistivity_num, end=True)
+else:
+    res_scan_list = None
+if rotation_scan:
+    rot_scan_list = np.linspace(rotation_start, rotation_end, rotation_num, end=True)
+else:
+    rot_scan_list = None
+print 'resistivity_scan {}; resistivity_start  {}; resistivity_end {}; resistivity_num {}'.format(rotation_scan, rotation_start, rotation_end, rotation_num )
+print res_scan_list
+print 'rotation_scan {}; rotation_start  {}; rotation_end {}; rotation_num {}'.format(rotation_scan, rotation_start, rotation_end, rotation_num )
+print rot_scan_list
+
+if rotation_scan and resistivity_scan:
+    print "cant do rotation and resistivity scans at the same time... choose again...."
+    raise(ValueError)
+
 #directory details
 project_name = parser.get('directory_details', 'project_name')
 base_directory = parser.get('directory_details', 'base_directory')

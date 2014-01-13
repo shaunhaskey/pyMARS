@@ -32,7 +32,7 @@ facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
 # #d.plot1(inc_phase=0,clim_value=[0,0.6], surfmn_file = '/home/srh112/Desktop/Test_Case/RZPlot_PEST_Test/SURF146382.03230.ph000.pmz/surfmn.out.idl3d', ss_squared = 0, n=n, single_mode_plots2 = [1,3,9])
 
 
-single = 1
+single = 0
 if single:
     dir_loc ='/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.vac' 
     dir_loc ='/home/srh112/NAMP_datafiles/mars/plotk_rzplot/146382/qmult1.000/exp1.000/marsrun/RUNrfa.p' 
@@ -52,7 +52,7 @@ if single:
     cbar.ax.set_ylabel('G/kA')
     fig.canvas.draw(); fig.show()
 
-1/0
+
 #d = data(,I0EXP=I0EXP)
 #d = data('/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_lower.p',I0EXP=I0EXP)
 
@@ -63,10 +63,12 @@ if single:
 #dir_loc_upper ='/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_upper.p'
 
 #various simulation directories to get the components
-dir_loc_lower_t ='/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/RUN_rfa_lower.p'
-dir_loc_upper_t ='/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/RUN_rfa_upper.p'
-dir_loc_lower_v ='/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/RUN_rfa_lower.vac'
-dir_loc_upper_v ='/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/RUN_rfa_upper.vac'
+base_dir = '/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/'
+#base_dir = '/home/srh112/NAMP_datafiles/mars/single_run_through_test_142614_V2/qmult1.000/exp1.000/marsrun/'
+dir_loc_lower_t =base_dir + '/RUN_rfa_lower.p'
+dir_loc_upper_t =base_dir + '/RUN_rfa_upper.p'
+dir_loc_lower_v =base_dir + '/RUN_rfa_lower.vac'
+dir_loc_upper_v =base_dir + '/RUN_rfa_upper.vac'
 
 #dir_loc_upper ='/home/srh112/NAMP_datafiles/mars/plotk_rzplot/exp1.303/marsrun/RUN_rfa_upper.p'
 
@@ -81,7 +83,7 @@ d_upper_v.get_PEST(facn = facn)
 d_lower_v.get_PEST(facn = facn)
 
 subplot_phasings = 1
-subplot_plot = 'total'
+subplot_plot = 'plasma'
 if subplot_phasings:
     phasings = [0,90,180,270]
     fig,ax = pt.subplots(nrows = 2, ncols = 2, sharex =True, sharey = True)
@@ -111,7 +113,7 @@ if subplot_phasings:
             color_plots.append(combined.plot_BnPEST(ax[i], n=n, inc_contours = 1))
 
         ax[i].set_title(r'$\Delta \phi_{ul} = %d^o$'%(phasing),fontsize = 18)
-        color_plots[-1].set_clim([0,3.0])
+        color_plots[-1].set_clim([0,6.0])
     ax[0].set_xlim([0,25])
     ax[0].set_ylim([0.4,1])
     #cbar = pt.colorbar(color_plot, ax = ax)
@@ -120,6 +122,7 @@ if subplot_phasings:
     #cbar.ax.set_ylabel('G/kA')
     fig.canvas.draw(); fig.show()
 
+1/0
 animation_phasings = 1
 if animation_phasings:
     phasings = range(0,360,15)

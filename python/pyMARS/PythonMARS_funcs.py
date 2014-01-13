@@ -420,10 +420,10 @@ def mars_link_files(directory, special_dir = ''):
 #Link the PROFDEN, PROFROT, and chease outputs into the mars directory
 def mars_setup_files(master, special_dir = '', upper_and_lower = 0):
     if upper_and_lower==1:
-        master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.p'
-        master['dir_dict']['mars_lower_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.p'
-        master['dir_dict']['mars_upper_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.vac'
-        master['dir_dict']['mars_lower_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.vac'
+        master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper_RES{:.2f}_ROTE{:.2f}.p'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>'])
+        master['dir_dict']['mars_lower_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower_RES{:.2f}_ROTE{:.2f}.p'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>'])
+        master['dir_dict']['mars_upper_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper_RES{:.2f}_ROTE{:.2f}.vac'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>'])
+        master['dir_dict']['mars_lower_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower_RES{:.2f}_ROTE{:.2f}.vac'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>'])
         os.system('mkdir ' + master['dir_dict']['mars_upper_plasma_dir'])
         os.system('mkdir ' + master['dir_dict']['mars_lower_plasma_dir'])
         os.system('mkdir ' + master['dir_dict']['mars_lower_vacuum_dir'])
@@ -433,6 +433,8 @@ def mars_setup_files(master, special_dir = '', upper_and_lower = 0):
         mars_link_files(master['dir_dict']['mars_lower_vacuum_dir'], special_dir = special_dir)
         mars_link_files(master['dir_dict']['mars_upper_vacuum_dir'], special_dir = special_dir)
     else:
+        master['dir_dict']['mars_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.2f}_ROTE{:.2f}.p'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>'])
+        master['dir_dict']['mars_vac_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.2f}_ROTE{:.2f}.vac'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>'])
         mars_link_files(master['dir_dict']['mars_plasma_dir'], special_dir = special_dir)
         mars_link_files(master['dir_dict']['mars_vac_dir'], special_dir = special_dir)
 
