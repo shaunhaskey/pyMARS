@@ -45,7 +45,7 @@ if resistivity_scan:
 else:
     res_scan_list = None
 if rotation_scan:
-    rot_scan_list = np.linspace(rotation_start, rotation_end, rotation_num, endpoint=True)
+    rot_scan_list = np.logspace(rotation_start, rotation_end, rotation_num, endpoint=True)
 else:
     rot_scan_list = None
 print 'resistivity_scan {}; resistivity_start  {}; resistivity_end {}; resistivity_num {}'.format(rotation_scan, rotation_start, rotation_end, rotation_num )

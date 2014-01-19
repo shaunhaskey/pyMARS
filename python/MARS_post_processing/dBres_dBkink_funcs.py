@@ -1,5 +1,196 @@
 import copy
 import numpy as np
+import cPickle as pickle
+
+class test1():
+    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset=[2,0], reference_dB_kink='plas',sort_name = 'q95_list'):
+        self.project_dict = pickle.load(file(file_name,'r'))
+        self.key_list = self.project_dict['sims'].keys()
+        self.n = np.abs(self.project_dict['details']['MARS_settings']['<<RNTOR>>'])
+        self.s_surface = s_surface
+        self.phasing = phasing
+        self.phase_machine_ntor = phase_machine_ntor
+        self.fixed_harmonic = fixed_harmonic
+        self.reference_offset = reference_offset
+        self.reference_dB_kink = reference_dB_kink
+        self.sort_name = sort_name
+        
+        self.extract_q95_Bn(bn_li = 1)
+        self.extract_eta_rote()
+        self.extract_dB_res()
+
+        self.extract_dB_kink()
+        #Create the fixed phasing cases (as set by phasing)
+        self.amps_vac_comp = apply_phasing(self.amps_vac_comp_upper, self.amps_vac_comp_lower, self.phasing, self.n, phase_machine_ntor = self.phase_machine_ntor)
+        self.amps_plas_comp = apply_phasing(self.amps_plas_comp_upper, self.amps_plas_comp_lower, self.phasing, self.n, phase_machine_ntor = self.phase_machine_ntor)
+        self.amps_tot_comp = apply_phasing(self.amps_tot_comp_upper, self.amps_tot_comp_lower, self.phasing, self.n, phase_machine_ntor = self.phase_machine_ntor)
+
+        if self.reference_dB_kink=='plas':
+            self.reference = get_reference(self.amps_plas_comp_upper, self.amps_plas_comp_lower, np.linspace(0,2.*np.pi,100), self.n, phase_machine_ntor = self.phase_machine_ntor)
+        elif self.reference_dB_kink=='tot':
+            self.reference = get_reference(self.amps_tot_comp_upper, self.amps_tot_comp_lower, np.linspace(0,2.*np.pi,100), self.n, phase_machine_ntor = self.phase_machine_ntor)
+
+        #Single cases
+        self.plot_quantity_vac, self.mode_list, self.max_loc_list = calculate_db_kink2(self.mk_list, self.q_val_list, self.n, self.reference, self.amps_vac_comp, reference_offset = self.reference_offset)
+        self.plot_quantity_plas, self.mode_list, self.max_loc_list = calculate_db_kink2(self.mk_list, self.q_val_list, self.n, self.reference, self.amps_plas_comp, reference_offset = self.reference_offset)
+        self.plot_quantity_tot, self.mode_list, self.max_loc_list = calculate_db_kink2(self.mk_list, self.q_val_list, self.n, self.reference, self.amps_tot_comp, reference_offset = self.reference_offset)
+
+        self.upper_values_plasma = self.calculate_db_kink2(self.amps_plas_comp_upper)
+        self.lower_values_plasma = self.calculate_db_kink2(self.amps_plas_comp_lower)
+        self.upper_values_tot = self.calculate_db_kink2(self.amps_tot_comp_upper)
+        self.lower_values_tot = self.calculate_db_kink2(self.amps_tot_comp_lower)
+        self.upper_values_vac = self.calculate_db_kink2(self.amps_vac_comp_upper)
+        self.lower_values_vac = self.calculate_db_kink2(self.amps_vac_comp_lower)
+
+        #Calculate fixed harmonic dBkink based only on vacuum fields, again upper_values.... are 1D array containing the complex amplitude of fixed harmonic
+        self.upper_values_vac_fixed = calculate_db_kink_fixed(self.mk_list, self.q_val_list, self.n, self.amps_vac_comp_upper, self.fixed_harmonic)
+        self.lower_values_vac_fixed = calculate_db_kink_fixed(self.mk_list, self.q_val_list, self.n, self.amps_vac_comp_lower, self.fixed_harmonic)
+        self.upper_values_plas_fixed = calculate_db_kink_fixed(self.mk_list, self.q_val_list, self.n, self.amps_plas_comp_upper, self.fixed_harmonic)
+        self.lower_values_plas_fixed = calculate_db_kink_fixed(self.mk_list, self.q_val_list, self.n, self.amps_plas_comp_lower, self.fixed_harmonic)
+
+        self.plot_quantity_vac_phase = np.angle(self.plot_quantity_vac,deg=True).tolist()
+        self.plot_quantity_plas_phase = np.angle(self.plot_quantity_plas,deg=True).tolist()
+        self.plot_quantity_tot_phase = np.angle(self.plot_quantity_tot,deg=True).tolist()
+        self.plot_quantity_vac = np.abs(self.plot_quantity_vac).tolist()
+        self.plot_quantity_plas = np.abs(self.plot_quantity_plas).tolist()
+        self.plot_quantity_tot = np.abs(self.plot_quantity_tot).tolist()
+
+        self.q95_list_copy = copy.deepcopy(self.q95_list)
+        self.Bn_Li_list_copy = copy.deepcopy(self.Bn_Li_list)
+
+        print self.eta_list
+        list_of_item_names = ['eta_list', 'rote_list', 'q95_list', 'Bn_Li_list', 'plot_quantity_plas','plot_quantity_vac', 'plot_quantity_tot', 'plot_quantity_plas_phase', 'plot_quantity_vac_phase', 'plot_quantity_tot_phase', 'mode_list', 'time_list', 'key_list', 'resonant_close']
+        list_of_items = zip(*[getattr(self,i) for i in list_of_item_names])
+        sort_index = list_of_item_names.index(sort_name)
+        print sort_index
+        tmp = zip(*sorted(list_of_items, key = lambda sort_val:sort_val[sort_index]))
+        output_dict2 = {}
+        for loc, i in enumerate(list_of_item_names): output_dict2[i+'_arranged'] = tmp[loc]
+        for loc, i in enumerate(list_of_item_names): output_dict2[i] = getattr(self,i)
+
+        name_list = ['plot_array_plasma', 'plot_array_vac', 'plot_array_tot', 'plot_array_vac_fixed', 'q95_array', 'phasing_array', 'plot_array_plasma_fixed', 'plot_array_plasma_phase', 'plot_array_vac_phase', 'plot_array_vac_fixed_phase', 'plot_array_plasma_fixed_phase']
+        tmp1 = dB_kink_phasing_dependence(self.q95_list_copy, self.lower_values_plasma, self.upper_values_plasma, self.lower_values_vac, self.upper_values_vac, self.lower_values_tot, self.upper_values_tot, self.lower_values_vac_fixed, self.upper_values_vac_fixed, self.phase_machine_ntor, self.upper_values_plas_fixed, self.lower_values_plas_fixed, self.n, n_phases = 360)
+        for name, var in zip(name_list, tmp1): output_dict2[name]=var
+
+        name_list = ['plot_array_vac_res', 'plot_array_plas_res', 'plot_array_vac_res_ave', 'plot_array_plas_res_ave']
+        tmp1 = dB_res_phasing_dependence(output_dict2['phasing_array'], output_dict2['q95_array'], self.res_vac_list_upper, self.res_vac_list_lower, self.res_plas_list_upper, self.res_plas_list_lower, self.phase_machine_ntor, self.n)
+        for name, var in zip(name_list, tmp1): output_dict2[name]=var
+
+        name_list = ['q95_list_copy', 'max_loc_list', 'upper_values_vac_fixed', 'n', 'lower_values_plasma', 'lower_values_vac']
+        for name in name_list: output_dict2[name]=getattr(self,name)
+
+        self.output_dict = output_dict2
+
+    def calculate_db_kink2(self,to_be_calculated):
+        '''
+        Calculate db_kink based on the maximum value
+        '''
+        answer = []; self.mode_list = []; self.max_loc_list = []
+        print 'starting'
+        for i in range(0,len(self.reference)):
+            #allowable_indices = np.array(mk_list[i])>(np.array(q_val_list[i])*(n+0))
+            not_allowed_indices = np.array(self.mk_list[i])<=(np.array(self.q_val_list[i])*(self.n+self.reference_offset[1])+self.reference_offset[0])
+            tmp_reference = self.reference[i]*1
+            tmp_reference[:,not_allowed_indices] = 0
+
+            tmp_phase_loc,tmp_m_loc = np.unravel_index(np.abs(tmp_reference).argmax(), tmp_reference.shape)
+            print tmp_phase_loc, tmp_m_loc,self.q_val_list[i]*(self.n), self.mk_list[i][tmp_m_loc], int((self.mk_list[i][tmp_m_loc] - self.q_val_list[i]*self.n))
+            maximum_val = tmp_reference[tmp_phase_loc, tmp_m_loc]
+            #maximum_val = np.max(np.abs(reference[i])[allowable_indices])
+            max_loc = tmp_m_loc
+            #max_loc = np.argmin(np.abs(np.abs(reference[i]) - maximum_val))
+            self.max_loc_list.append(max_loc)
+            self.mode_list.append(self.mk_list[i][max_loc])
+            answer.append(to_be_calculated[i][max_loc])
+
+        print 'finishing'
+        return answer
+
+
+    def extract_q95_Bn(self, bn_li = 1):
+        '''
+        extract some various quantities from a standard pyMARS output dictionary
+        '''
+        self.q95_list = []; self.Bn_Li_list = []; self.time_list = []
+        for i in self.project_dict['sims'].keys():
+            self.q95_list.append(self.project_dict['sims'][i]['Q95'])
+            self.time_list.append(self.project_dict['sims'][i]['shot_time'])
+            if bn_li == 1:
+                self.Bn_Li_list.append(self.project_dict['sims'][i]['BETAN']/self.project_dict['sims'][i]['LI'])
+            else:
+                self.Bn_Li_list.append(self.project_dict['sims'][i]['BETAN'])
+    def extract_eta_rote(self,):
+        '''
+        extract some various quantities from a standard pyMARS output dictionary
+        '''
+        self.eta_list = []; self.rote_list = []
+        for i in self.project_dict['sims'].keys():
+            self.eta_list.append(self.project_dict['sims'][i]['MARS_settings']['<<ETA>>'])
+            self.rote_list.append(self.project_dict['sims'][i]['MARS_settings']['<<ROTE>>'])
+
+    def extract_dB_res(self,):
+        '''
+        extract dB_res values from the standard pyMARS output dictionary
+        Maybe change this in future to output the total also
+        '''
+        self.res_vac_list_upper = []; self.res_vac_list_lower = []
+        self.res_tot_list_upper = []; self.res_tot_list_lower = []
+        self.res_plas_list_upper = []; self.res_plas_list_lower = []
+        for i in self.project_dict['sims'].keys():
+            self.upper_tot_res = np.array(self.project_dict['sims'][i]['responses']['total_resonant_response_upper'])
+            self.lower_tot_res = np.array(self.project_dict['sims'][i]['responses']['total_resonant_response_lower'])
+            self.upper_vac_res = np.array(self.project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
+            self.lower_vac_res = np.array(self.project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
+
+            self.res_vac_list_upper.append(self.upper_vac_res)
+            self.res_vac_list_lower.append(self.lower_vac_res)
+            self.res_tot_list_upper.append(self.upper_tot_res)
+            self.res_tot_list_lower.append(self.lower_tot_res)
+            self.res_plas_list_upper.append(self.upper_tot_res - self.upper_vac_res)
+            self.res_plas_list_lower.append(self.lower_tot_res - self.lower_vac_res)
+
+    def extract_dB_kink(self, upper_lower=True):
+        '''
+        extract dB_kink information from a standard pyMARS output dictionary
+        '''
+        if upper_lower:
+            self.amps_vac_comp_upper = []; self.amps_vac_comp_lower = []
+            self.amps_plas_comp_upper = []; self.amps_plas_comp_lower = []
+            self.amps_tot_comp_upper = []; self.amps_tot_comp_lower = []
+        else:
+            self.amps_vac_comp = [];
+            self.amps_plas_comp = [];
+            self.amps_tot_comp = [];
+
+        self.mk_list = [];  self.q_val_list = []; self.resonant_close = []
+        for i in self.project_dict['sims'].keys():
+            tmp = self.project_dict['sims'][i]['responses'][str(self.s_surface)]
+            if upper_lower:
+                self.relevant_values_upper_tot = tmp['total_kink_response_upper']
+                self.relevant_values_lower_tot = tmp['total_kink_response_lower']
+                self.relevant_values_upper_vac = tmp['vacuum_kink_response_upper']
+                self.relevant_values_lower_vac = tmp['vacuum_kink_response_lower']
+            else:
+                self.relevant_values_tot = tmp['total_kink_response_single']
+                self.relevant_values_vac = tmp['vacuum_kink_response_single']
+            self.mk_list.append(tmp['mk'])
+            self.q_val_list.append(tmp['q_val'])
+            self.resonant_close.append(np.min(np.abs(self.project_dict['sims'][i]['responses']['resonant_response_sq']-self.s_surface)))
+            if upper_lower:
+                self.amps_plas_comp_upper.append(self.relevant_values_upper_tot-self.relevant_values_upper_vac)
+                self.amps_plas_comp_lower.append(self.relevant_values_lower_tot-self.relevant_values_lower_vac)
+                self.amps_vac_comp_upper.append(self.relevant_values_upper_vac)
+                self.amps_vac_comp_lower.append(self.relevant_values_lower_vac)
+                self.amps_tot_comp_upper.append(self.relevant_values_upper_tot)
+                self.amps_tot_comp_lower.append(self.relevant_values_lower_tot)
+            else:
+                self.amps_plas_comp.append(self.relevant_values_tot-self.relevant_values_vac)
+                self.amps_vac_comp.append(self.relevant_values_vac)
+                self.amps_tot_comp.append(self.relevant_values_tot)
+
+
+
+
 
 def extract_q95_Bn2(tmp_dict):
     '''
@@ -27,12 +218,23 @@ def extract_q95_Bn(tmp_dict, bn_li = 1):
             Bn_Li_list.append(tmp_dict['sims'][i]['BETAN'])
     return q95_list, Bn_Li_list, time_list
 
-def extract_dB_res(tmp_dict):
+def extract_eta_rote(tmp_dict):
+    '''
+    extract some various quantities from a standard pyMARS output dictionary
+    '''
+    eta_list = []; rote_list = []
+    for i in tmp_dict['sims'].keys():
+        eta_list.append(tmp_dict['sims'][i]['MARS_settings']['<<ETA>>'])
+        rote_list.append(tmp_dict['sims'][i]['MARS_settings']['<<ROTE>>'])
+    return eta_list, rote_list
+
+def extract_dB_res(tmp_dict, return_total = False):
     '''
     extract dB_res values from the standard pyMARS output dictionary
     Maybe change this in future to output the total also
     '''
     res_vac_list_upper = []; res_vac_list_lower = []
+    res_tot_list_upper = []; res_tot_list_lower = []
     res_plas_list_upper = []; res_plas_list_lower = []
     for i in tmp_dict['sims'].keys():
         upper_tot_res = np.array(tmp_dict['sims'][i]['responses']['total_resonant_response_upper'])
@@ -42,9 +244,14 @@ def extract_dB_res(tmp_dict):
 
         res_vac_list_upper.append(upper_vac_res)
         res_vac_list_lower.append(lower_vac_res)
+        res_tot_list_upper.append(upper_tot_res)
+        res_tot_list_lower.append(lower_tot_res)
         res_plas_list_upper.append(upper_tot_res - upper_vac_res)
         res_plas_list_lower.append(lower_tot_res - lower_vac_res)
-    return res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower
+    if return_total:
+        return res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower, res_tot_list_upper, res_tot_list_lower
+    else:
+        return res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower
 
 
 def extract_dB_kink(tmp_dict, s_surface, upper_lower=True):
@@ -254,8 +461,10 @@ def dB_res_phasing_dependence(phasing_array, q95_array, res_vac_list_upper, res_
     #Create the arrays to be populated, q95 columns, phasing rows. 
     plot_array_vac_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
     plot_array_plas_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+    plot_array_tot_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
     plot_array_vac_res_ave = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
     plot_array_plas_res_ave = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+    plot_array_tot_res_ave = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
 
     #Cycle through each phasing and calculate dBres and dBres_ave for each of them
     for i, curr_phase in enumerate(phasing_array):

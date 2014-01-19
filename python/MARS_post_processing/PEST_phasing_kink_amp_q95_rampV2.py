@@ -195,7 +195,7 @@ answers2 = do_everything(file_name2, s_surface, phasing, phase_machine_ntor, fix
 
 if various_line_plots:
     #Shows the location of all the peeling spikes relative to the resonant q surfaces
-    fig_single, ax_single = pt.subplots(nrows = 3, sharex = 1)
+    fig_single, ax_single = pt.subplots(nrows = 3, sharex = True)
     ax_single[0].plot(answers['q95_list_arranged'], answers['resonant_close_arranged'], '.-')
     ax_single[1].plot(answers['q95_list_arranged'], answers['plot_quantity_plas_arranged'], 'o-', label = 'plasma')
     #ax_single[1].plot(answers['q95_array'], answers['plot_array_plasma_fixed'][0,:], 'o-')
@@ -235,7 +235,7 @@ if various_line_plots:
     fig.show()
 
     #plot q95 versus Bn/Li
-    fig, ax = pt.subplots(ncols = 2, sharey=1)
+    fig, ax = pt.subplots(ncols = 2, sharey=True)
     ax[0].plot(answers['q95_list_arranged'], answers['Bn_Li_list_arranged'], 'o-')
     ax[0].set_xlabel('q95')
     ax[0].set_ylabel('Bn/Li')
@@ -247,7 +247,7 @@ if various_line_plots:
 
 if dB_kink_vac_plot:
     #dB_kink and the vacuum harmonic strength of the same m
-    fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True)
     color_plot = ax[0].pcolor(answers['q95_array'], answers['phasing_array'], answers['plot_array_plasma'], cmap='hot')
     color_plot.set_clim([0, 1.5])
     color_plot2 = ax[1].pcolor(answers['q95_array'], answers['phasing_array'], answers['plot_array_vac'], cmap='hot')
@@ -276,7 +276,7 @@ if dB_kink_vac_plot:
 
 if dB_kink_vac_plot_phase:
     #dB_kink and the vacuum harmonic strength of the same m
-    fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True)
     tmp = answers['plot_array_plasma_phase'] - answers['plot_array_vac_phase']
     lower_limit = -20
     tmp[tmp<-10]+=360;tmp[tmp<-10]+=360;tmp[tmp<-10]+=360
@@ -325,7 +325,7 @@ if dB_kink_fixed_vac:
     clim1 = [0,1.5]
     clim2 = [0,0.55]
     cm_to_inch=0.393701
-    fig, ax = pt.subplots(nrows = 2, sharex =1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex =True, sharey = True)
     if publication_images:
         fig.set_figwidth(8.48*cm_to_inch)
         fig.set_figheight(8.48*cm_to_inch)
@@ -388,7 +388,7 @@ if dB_kink_fixed_vac:
 
 
 if n2_n4_dBres_comparison:
-    fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
     color_plot = ax[0].pcolor(answers['q95_array'], answers['phasing_array'], answers['plot_array_vac_res'], cmap='hot', rasterized=True)
     ax[0].contour(answers['q95_array'],answers['phasing_array'], answers['plot_array_vac_res'], colors='white')
     color_plot2 = ax[1].pcolor(answers['q95_array'], answers['phasing_array'], answers['plot_array_vac_res_ave'], cmap='hot', rasterized=True)
@@ -421,7 +421,7 @@ if n2_n4_dBres_comparison:
 #Compare dBres calculated from the plasma and vacuum fields
 #THIS IS NEW FOR NOW
 if n2_n4_dBres_comparison:
-    fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
     color_plot = ax[0].pcolor(answers['q95_array'], answers['phasing_array'], answers['plot_array_vac_res'], cmap='hot', rasterized=True)
     ax[0].contour(answers['q95_array'],answers['phasing_array'], answers['plot_array_vac_res'], colors='white')
     color_plot2 = ax[1].pcolor(answers['q95_array'], answers['phasing_array'], answers['plot_array_plas_res'], cmap='hot', rasterized=True)
@@ -553,7 +553,7 @@ if single_res_proportion:
 #dBresn=2/(dBresn=2 + dBresn=4) and the dBres ave equivalent also
 db_res_dB_res_ave_proportion = 1
 if db_res_dB_res_ave_proportion:
-    fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
     color_plot = ax[0].pcolor(answers['q95_array'][truth_array], answers['phasing_array'], quant1, cmap='hot', rasterized=True)
     ax[0].contour(answers['q95_array'][truth_array],answers['phasing_array'], quant2, colors='white')
     color_plot2 = ax[1].pcolor(answers['q95_array'][truth_array], answers['phasing_array'], quant2, cmap='hot', rasterized=True)
@@ -578,9 +578,12 @@ if db_res_dB_res_ave_proportion:
     #cbar.ax.set_ylabel('G/kA',fontsize = 16)
     fig.canvas.draw(); fig.show()
 
-#plot of dBkink2 and dBkink2 + dBkink4
+
+
+#plot of dBkink2 and dBkink2 + dBkink4 
+#plot of db_res n=2 and db_res n=2 + db_res n=4
 if dB_res_n2_dB_res_sum:
-    fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
     color_plot = ax[0].pcolor(answers['q95_array'][truth_array], answers['phasing_array'], answers['plot_array_vac_res'][:,truth_array], cmap='hot', rasterized=True)
     ax[0].contour(answers['q95_array'][truth_array],answers['phasing_array'], answers['plot_array_vac_res'][:,truth_array], colors='white')
     color_plot2 = ax[1].pcolor(answers['q95_array'][truth_array], answers['phasing_array'], dB_res_sum, cmap='hot', rasterized=True)
@@ -607,7 +610,7 @@ if dB_res_n2_dB_res_sum:
 
 #plot of dBkink2 and dBkink2 + dBkink4
 if dBkink2_dBkink_sum:
-    fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
     color_plot = ax[0].pcolor(answers['q95_array'][truth_array], answers['phasing_array'], answers['plot_array_tot'][:,truth_array], cmap='hot', rasterized=True)
     #ax[0].contour(answers['q95_array'][truth_array],answers['phasing_array'], answers['plot_array_tot'][:,truth_array], colors='white')
     color_plot2 = ax[1].pcolor(answers['q95_array'][truth_array], answers['phasing_array'], dB_kink_sum, cmap='hot', rasterized=True)
@@ -640,7 +643,7 @@ if dBres_n2_n4_complete_comparison:
     #This figure is in the paper
     clim1 = [0,1]
 
-    fig, ax = pt.subplots(nrows = 2, ncols=2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, ncols=2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
     pt.subplots_adjust(wspace = .1,hspace=0.25)
     if publication_images:
         fig.set_figwidth(8.48*cm_to_inch)
@@ -700,7 +703,7 @@ if dBres_n2_n4_complete_comparison:
 if dBres_n2_n4_complete_comparison:
     #dBkink n=2, dBkink n=4, dBkink sum and dBkink proportion
     #This figure is in the paper
-    fig, ax = pt.subplots(nrows = 2, ncols=2, sharex = 1, sharey = 1); #ax = [ax]#nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, ncols=2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
     color_plot = ax[1,0].pcolor(answers['q95_array'][truth_array], answers['phasing_array'], answers['plot_array_plasma'][:,truth_array], cmap='hot', rasterized=True)
     #ax[0,0].contour(answers['q95_array'][truth_array],answers['phasing_array'], answers['plot_array_vac_res_ave'][:,truth_array], colors='white')
     cbar = pt.colorbar(color_plot, ax = ax[1,0])
@@ -784,7 +787,7 @@ single_q95_values = np.linspace(3,5,15)
 include_line_plots_n2_n4 = 0
 if include_line_plots_n2_n4:
     for single_q95_value in single_q95_values:
-        fig, ax = pt.subplots(nrows = 2, sharex = 1)
+        fig, ax = pt.subplots(nrows = 2, sharex = True)
         tmp_loc = np.argmin(np.abs(answers['q95_array']-single_q95_value))
         single_db_res = answers['plot_array_vac_res'][:,tmp_loc]
         single_db_res_ave = answers['plot_array_vac_res_ave'][:,tmp_loc]
@@ -856,7 +859,7 @@ if plot_PEST_pics:
         print plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], s_surface, mode_list_arranged[i]
         suptitle = '%s key: %d, q95: %.2f, max_amp: %.2f, s_surface: %.2f, m_max: %d'%(plot_quantity, i, q95_list_arranged[i], plot_quantity_plas_arranged[i], s_surface, mode_list_arranged[i])
         include_phase = 1
-        fig, ax = pt.subplots(nrows = include_phase + 1, sharex = 1, sharey = 1)
+        fig, ax = pt.subplots(nrows = include_phase + 1, sharex = True, sharey = True)
         if include_phase == 0: ax = [ax]
         if n==2:
             contour_levels = np.linspace(0,5.0,7)

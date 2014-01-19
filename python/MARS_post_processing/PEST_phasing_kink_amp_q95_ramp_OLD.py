@@ -496,3 +496,31 @@ if plot_PEST_pics:
         #upper.plot1(suptitle = suptitle,inc_phase=0, clim_value=[0,2], ss_squared = 0, fig_show=0,fig_name='/u/haskeysr/%03d_q95_scan.png'%(i))
 
 
+#plot of dBkink2 and dBkink2 + dBkink4 
+#plot of db_res n=2 and db_res n=2 + db_res n=4
+dB_res_n2_dB_res_sum = 1
+if dB_res_n2_dB_res_sum:
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
+    color_plot = ax[0].pcolor(answers['res_array'][truth_array], answers['phasing_array'], answers['plot_array_vac_res'][:,truth_array], cmap='hot', rasterized=True)
+    ax[0].contour(answers['q95_array'][truth_array],answers['phasing_array'], answers['plot_array_vac_res'][:,truth_array], colors='white')
+    color_plot2 = ax[1].pcolor(answers['q95_array'][truth_array], answers['phasing_array'], dB_res_sum, cmap='hot', rasterized=True)
+    ax[1].contour(answers['q95_array'][truth_array],answers['phasing_array'], dB_res_sum, colors='white')
+    #color_plot.set_clim([0,1])
+    #color_plot2.set_clim([0,1])
+    title_string1 = 'Total Forcing'
+    title_string2 = 'Average Forcing'
+    ax[0].set_xlim([2.6, 6])
+    ax[0].set_ylim([np.min(answers['phasing_array']), np.max(answers['phasing_array'])])
+    ax[1].set_xlabel(r'$q_{95}$', fontsize=20)
+    ax[0].set_title(r'$\delta B_{res}^{n=2}$',fontsize=20)
+    ax[1].set_title(r'$\delta B_{res}^{n=2} + \delta B_{res}^{n=4}$',fontsize=20)
+    ax[1].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+    ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+    # ax.set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+    #ax[0].set_ylabel('Phasing (deg)')
+    #ax[1].set_ylabel('Phasing (deg)')
+    cbar = pt.colorbar(color_plot, ax = ax[0])
+    #cbar.ax.set_ylabel('G/kA',fontsize = 16)
+    cbar = pt.colorbar(color_plot2, ax = ax[1])
+    #cbar.ax.set_ylabel('G/kA',fontsize = 16)
+    fig.canvas.draw(); fig.show()

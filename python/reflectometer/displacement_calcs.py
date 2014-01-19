@@ -211,7 +211,7 @@ if boundary_x != None:
     #print I_coil_x[0], I_coil_x[-1], start_time, end_time
 
 #time domain plots
-fig_time, ax_time = pt.subplots(nrows=3, sharex=1)
+fig_time, ax_time = pt.subplots(nrows=3, sharex=True)
 fig2 = pt.figure()
 
 #frequency domain plots - constant density lines
@@ -244,7 +244,7 @@ const_rad = np.zeros((len(plot_radius),end_loc-start_loc),dtype=float)
 
 
 if plot_profiles == 1:
-    tmp_fig, tmp_ax = pt.subplots(nrows = 2, sharex=1, sharey = 1)
+    tmp_fig, tmp_ax = pt.subplots(nrows = 2, sharex=True, sharey = True)
 
 non_monoton = 0; non_monoton_fixed = 0
 
@@ -354,8 +354,8 @@ if plot_profiles == 1:
 #plot the gridded data and raw data as pcolor plots
 if grid_plot == 1:
     lim1 = [0,6.4e19]
-    clr_fig, clr_ax = pt.subplots(nrows=3, sharex=1)
-    clr_ax[0].set_title('grid_data and raw data')
+    clr_fig, clr_ax = pt.subplots(nrows=3, sharex=True)
+    clr_ax[0].set_title('griddata and raw data')
     clr_plot = clr_ax[0].pcolor(time_base[::10], plot_densities, const_dens[:,::10], cmap = 'spectral')
     pt.colorbar(clr_plot, ax=clr_ax[0])
     #clr_plot.set_clim(lim1)
@@ -371,7 +371,7 @@ if grid_plot == 1:
 
 #create the single plot of the gridded data
 if single_clr_plot == 1:
-    tmp_fig, tmp_ax = pt.subplots(nrows = 2, sharex = 1)
+    tmp_fig, tmp_ax = pt.subplots(nrows = 2, sharex = True)
     clr_plot1 = tmp_ax[0].pcolor(time_base[::10], plot_radius, const_rad[:,::10], cmap = 'jet')
     clr_plot2 = tmp_ax[1].pcolor(time_base[::10], plot_densities, const_dens[:,::10], cmap = 'jet')
 
@@ -463,7 +463,7 @@ def perform_fft_calc(const_dens, const_rad, I_coil_interp, I_coil_freq, time_bas
 
 
 def step_through(cycles, overlap, I_coil_freq, time_base):
-    tmp_fig, tmp_ax = pt.subplots(nrows = 4, sharex = 1)
+    tmp_fig, tmp_ax = pt.subplots(nrows = 4, sharex = True)
     tmp_time = 1./I_coil_freq * cycles * 1000.
     increment = np.argmin(np.abs(time_base - (time_base[0]+tmp_time)))
     start_pos = 0
@@ -649,7 +649,7 @@ for i in [start_loc+10, int((start_loc+end_loc)/2), end_loc-10]:
 fig_delta.canvas.draw(); fig_delta.show()
 
 #plot to show the comparison between the two ways of calculating the
-fig_tmp10, ax_tmp10 = pt.subplots(nrows = 4, sharex = 1)
+fig_tmp10, ax_tmp10 = pt.subplots(nrows = 4, sharex = True)
 #for i in [start_loc+10, int((start_loc+end_loc)/2), end_loc-10]:
 for i in [int((start_loc+end_loc)/2)]:
     input_dens = np.flipud(n_data[:,i])
@@ -667,7 +667,7 @@ ax_tmp10[0].set_ylabel(r'$d\rho$')
 ax_tmp10[1].set_ylabel(r'$\rho$')
 ax_tmp10[2].set_ylabel(r'$dr/d\rho$')
 ax_tmp10[3].set_ylabel(r'$dr$')
-ax_tmp10[3].plot(radius_list/100., amp_list, 'x-', label='dr_1')
+ax_tmp10[3].plot(radius_list/100., amp_list, 'x-', label='dr1')
 ax_tmp10[3].legend(loc='best')
 fig_tmp10.canvas.draw();fig_tmp10.show()
 
@@ -683,10 +683,10 @@ fig_tmp11.canvas.draw();fig_tmp11.show()
 
 
 if single_clr_plot == 1:
-    #tmp_fig, tmp_ax = pt.subplots(nrows = 2, sharex = 1)
+    #tmp_fig, tmp_ax = pt.subplots(nrows = 2, sharex = True)
     tmp_fig, tmp_ax = pt.subplots()
     tmp_ax = [tmp_ax]
-    clr_plot1 = tmp_ax[0].pcolor(time_base[::10], plot_radius, const_rad[:,::10], cmap = 'jet')
+    clr_plot1 = tmp_ax[0].pcolor(time_base[::10], plot_radius, const_rad[:,::10], cmap = 'spectral')
     clr_plot1.set_rasterized(True)
     #clr_plot2 = tmp_ax[1].pcolor(time_base[::10], plot_densities, const_dens[:,::10], cmap = 'jet')
     #clr_plot2.set_rasterized(True)
@@ -877,7 +877,7 @@ if include_MARS == 1:
 
 
 
-fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1)
+fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=True)
 ax_tmp[0].plot(radius_list, amp_list, 'bx-',label='10Hz reflect')
 ax_tmp[1].plot(radius_list, phase_list, 'bx-',label='10Hz reflect')
 
