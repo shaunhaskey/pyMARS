@@ -420,7 +420,7 @@ def mars_link_files(directory, special_dir = ''):
 #Link the PROFDEN, PROFROT, and chease outputs into the mars directory
 def mars_setup_files(master, special_dir = '', upper_and_lower = 0):
     if upper_and_lower==1:
-        master['dir_dict']['mars_dir'] = master['dir_dict']['exp_dir']+'/RES{:.2f}_ROTE{:.2f}/'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>'])
+        master['dir_dict']['mars_dir'] = master['dir_dict']['exp_dir']+'/RES{:.2f}_ROTE{:.4f}/'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
         master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.p'
         master['dir_dict']['mars_lower_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.p'
         master['dir_dict']['mars_upper_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.vac'
