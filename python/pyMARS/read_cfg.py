@@ -40,12 +40,21 @@ try:
 except ConfigParser.NoOptionError, e:
     print 'Couldnt find multiple_efits - setting it to 0', e
     resistivity_scan = 0; resistivity_start = 0; resistivity_end = 0; resistivity_num = 0
+try:
+    rotation_spacing = str(parser.get('process_control', 'rotation_spacing'))
+except ConfigParser.NoOptionError, e:
+    print 'Couldnt find multiple_efits - setting it to 0', e
+    rotation_spacing = 'lin'
+
 if resistivity_scan:
     res_scan_list = np.linspace(resistivity_start, resistivity_end, resistivity_num, endpoint=True)
 else:
     res_scan_list = None
 if rotation_scan:
-    rot_scan_list = np.logspace(rotation_start, rotation_end, rotation_num, endpoint=True)
+    if rotation_spacing=='log':
+        rot_scan_list = 10**(np.linspace(rotation_start, rotation_end, rotation_num, endpoint=True))
+    else:
+        rot_scan_list = np.linspace(rotation_start, rotation_end, rotation_num, endpoint=True)
 else:
     rot_scan_list = None
 print 'resistivity_scan {}; resistivity_start  {}; resistivity_end {}; resistivity_num {}'.format(rotation_scan, rotation_start, rotation_end, rotation_num )

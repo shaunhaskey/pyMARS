@@ -7,7 +7,7 @@ import pickle, time, os,sys, copy
 import numpy as num
 import ConfigParser
 import numpy as num
-
+import numpy as np
 config_filename = sys.argv[1]
 parser = ConfigParser.SafeConfigParser()
 parser.optionxform=str
@@ -22,6 +22,53 @@ try:
 except ConfigParser.NoOptionError, e:
     print 'Couldnt find multiple_efits - setting it to 0', e
     multiple_efits = 0
+
+try:
+    rotation_scan = int(parser.get('process_control', 'rotation_scan'))
+    rotation_start = float(parser.get('process_control', 'rotation_scan_start'))
+    rotation_end = float(parser.get('process_control', 'rotation_scan_end'))
+    rotation_num = float(parser.get('process_control', 'rotation_scan_number'))
+except ConfigParser.NoOptionError, e:
+    print 'Couldnt find multiple_efits - setting it to 0', e
+    rotation_scan = 0; rotation_start  = 0; rotation_end = 1; rotation_num = 0
+
+try:
+    resistivity_scan = int(parser.get('process_control', 'resistivity_scan'))
+    resistivity_start = float(parser.get('process_control', 'resistivity_scan_start'))
+    resistivity_end = float(parser.get('process_control', 'resistivity_scan_end'))
+    resistivity_num = float(parser.get('process_control', 'resistivity_scan_number'))
+except ConfigParser.NoOptionError, e:
+    print 'Couldnt find multiple_efits - setting it to 0', e
+    resistivity_scan = 0; resistivity_start = 0; resistivity_end = 0; resistivity_num = 0
+try:
+    rotation_spacing = str(parser.get('process_control', 'rotation_spacing'))
+except ConfigParser.NoOptionError, e:
+    print 'Couldnt find multiple_efits - setting it to 0', e
+    rotation_spacing = 'lin'
+
+if resistivity_scan:
+    res_scan_list = np.linspace(resistivity_start, resistivity_end, resistivity_num, endpoint=True)
+else:
+    res_scan_list = None
+if rotation_scan:
+<<<<<<< HEAD
+    rot_scan_list = np.logspace(rotation_start, rotation_end, rotation_num, endpoint=True)
+=======
+    if rotation_spacing=='log':
+        rot_scan_list = 10**(np.linspace(rotation_start, rotation_end, rotation_num, endpoint=True))
+    else:
+        rot_scan_list = np.linspace(rotation_start, rotation_end, rotation_num, endpoint=True)
+>>>>>>> diiid_computers
+else:
+    rot_scan_list = None
+print 'resistivity_scan {}; resistivity_start  {}; resistivity_end {}; resistivity_num {}'.format(rotation_scan, rotation_start, rotation_end, rotation_num )
+print res_scan_list
+print 'rotation_scan {}; rotation_start  {}; rotation_end {}; rotation_num {}'.format(rotation_scan, rotation_start, rotation_end, rotation_num )
+print rot_scan_list
+
+if rotation_scan and resistivity_scan:
+    print "cant do rotation and resistivity scans at the same time... choose again...."
+    raise(ValueError)
 
 #directory details
 project_name = parser.get('directory_details', 'project_name')
@@ -140,9 +187,9 @@ print FEEDI_string
 MARS_settings['<<FEEDI>>'] = FEEDI_string
 for i,j in parser.items('MARS_settings2'):
     print i, j
-    if int(j)==float(j):
+    try:
         MARS_settings[i] = int(j)
-    else:
+    except ValueError:
         MARS_settings[i] = float(j)
 
 print MARS_settings
@@ -428,7 +475,7 @@ if start_from_step <=5 and end_at_step>=5:
         project_dict = pyMARS.read_data(project_dir + project_name+'_post_RMZM.pickle')
 
 
-    project_dict = cont_funcs.setup_mars_func(project_dict, upper_and_lower = upper_and_lower, MARS_template_name = MARS_template_name, multiple_efits = multiple_efits)
+    project_dict = cont_funcs.setup_mars_func(project_dict, upper_and_lower = upper_and_lower, MARS_template_name = MARS_template_name, multiple_efits = multiple_efits, rot_scan_list=rot_scan_list,res_scan_list=res_scan_list)
 
     #Save the data structure so that it can be read by the next step
     pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_setup.pickle')
