@@ -9,6 +9,106 @@ from RZfuncs import *
 import RZfuncs
 import matplotlib
 
+
+def combine_fields_displacement(input_data, attr_name, theta = 0, field_type='plas'):
+    '''Used for combining the displacement fields
+    Should replace with a single phasing function to reduce duplication!
+
+    SRH: 31Jan2014
+    '''
+    print 'combining property : ', attr_name
+    if len(input_data)==2:
+        if field_type=='plas':
+            answer = getattr(input_data[0], attr_name) - getattr(input_data[1], attr_name)
+        elif field_type == 'total':
+            answer = getattr(input_data[0], attr_name)
+        elif field_type == 'vac':
+            answer = getattr(input_data[1], attr_name)
+        print 'already combined, ', field_type
+    elif len(input_data) == 4:
+        if field_type=='plas':
+            lower_data = getattr(input_data[0], attr_name) - getattr(input_data[1], attr_name)
+            upper_data = getattr(input_data[2], attr_name) - getattr(input_data[3], attr_name)
+        elif field_type=='total':
+            lower_data = getattr(input_data[0], attr_name)
+            upper_data = getattr(input_data[2], attr_name)
+        elif field_type=='vac':
+            lower_data = getattr(input_data[1], attr_name)
+            upper_data = getattr(input_data[3], attr_name)
+        answer = upper_data + lower_data*(np.cos(theta)+1j*np.sin(theta))
+        print 'combine %s, theta : %.2f'%(field_type, theta)
+    return answer
+
+def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
+    '''This function finds the average sum of displacement amplitudes between certain values to check for x-point peaking etc...
+    It returns the regions on the LFS, HFS, above and below the midplane.
+
+    run_data is the list of input data results classes [lower_tot,lower_vac,upper_tot,upper_vac]
+    n_zones is the number of regions a measurement is found for
+    phasing_vals is the list of phasings the calculations are performed for
+    ul - not really implemented yet, but says if its upper lower data
+    SRH : 31Jan2014
+    '''
+    plot_field = 'Vn'; field_type = 'total'
+    #run_data = extract_data(base_dir, I0EXP, ul=ul, Nchi=Nchi, get_VPLASMA=1, plas_vac = False)
+
+    output_dict = {}
+    if phasing_vals == None: phasing_vals = [0]
+    grid_r = run_data[0].R*run_data[0].R0EXP
+    grid_z = run_data[0].Z*run_data[0].R0EXP
+
+    #remove grid points outside the plasma
+    plas_r = grid_r[0:run_data[0].Vn.shape[0],:]
+    plas_z = grid_z[0:run_data[0].Vn.shape[0],:]
+
+    upper_values = np.linspace(0,np.max(plas_z[-1,:]),n_zones/2,endpoint = True)
+    lower_values = np.linspace(0,np.min(plas_z[-1,:]),n_zones/2,endpoint = True)
+    output_dict['upper_values'] = upper_values
+    output_dict['lower_values'] = lower_values
+
+    r_vals = plas_r[-1,:]
+    z_vals = plas_z[-1,:]
+    dz = np.diff(z_vals)
+    dl = np.sqrt(np.diff(z_vals)**2 + np.diff(r_vals)**2)
+    angle = np.arctan2(plas_z[-1,:], plas_r[-1,:]-run_data[0].R0EXP)
+    z_vals_red = z_vals[:-1]
+    r_vals_red = r_vals[:-1]
+
+    for theta_deg in phasing_vals:
+        output_dict[theta_deg] = {}
+        cur_dict = output_dict[theta_deg]
+        for side in ['HFS','LFS']:
+            for ab in ['above','below']:
+                cur_dict['disp_{}_{}'.format(ab,side)] = []
+                cur_dict['ang_{}_{}'.format(ab,side)] = []
+        print '===== %d ====='%(theta_deg)
+        theta = float(theta_deg)/180*np.pi;
+        plot_quantity = combine_fields_displacement(run_data, plot_field, theta=theta, field_type=field_type)
+        plot_quantity_red = plot_quantity[-1,:-1]
+        for i in range(1,len(upper_values)):
+            truth = (z_vals_red>=upper_values[i-1])*(z_vals_red<upper_values[i])*(dz<0)
+            cur_dict['disp_above_HFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            cur_dict['ang_above_HFS'].append(np.mean(angle[truth]))
+            #ax.plot(r_vals_red[truth1], z_vals_red[truth1],'--')
+            truth = (z_vals_red>=upper_values[i-1])*(z_vals_red<upper_values[i])*(dz>0)
+            cur_dict['disp_above_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            cur_dict['ang_above_LFS'].append(np.mean(angle[truth]))
+            #ax.plot(r_vals_red[truth2], z_vals_red[truth2],'-')
+        for i in range(1,len(lower_values)):
+            truth = (z_vals_red<lower_values[i-1])*(z_vals_red>=lower_values[i])*(dz<0)
+            #print upper_values[i-1], upper_values[i], np.sum(truth)
+            cur_dict['disp_below_HFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            cur_dict['ang_below_HFS'].append(np.mean(angle[truth]))
+            #ax.plot(r_vals_red[truth1], z_vals_red[truth1],'--')
+            truth = (z_vals_red<lower_values[i-1])*(z_vals_red>=lower_values[i])*(dz>0)
+            cur_dict['disp_below_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            cur_dict['ang_below_LFS'].append(np.mean(angle[truth]))
+            #ax.plot(r_vals_red[truth2], z_vals_red[truth],'-')
+    return output_dict
+
+
+
+
 def combine_data(upper_data, lower_data, phasing):
     phasing = phasing/180.*np.pi
     #print '**********I-coil Phasing******************'

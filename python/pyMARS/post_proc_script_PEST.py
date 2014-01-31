@@ -15,6 +15,7 @@ upper_and_lower = int(sys.argv[2])
 
 def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, s_surface_list = [0.92], SURFMN_coords = 1):
     link_RMZM = 0
+    disp_calcs = 1
     for i in project_dict['sims'].keys():
         print 'working on serial : ', i
         n = np.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>'])
@@ -41,6 +42,12 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, s_surfac
             lower_data_tot.get_PEST(facn = facn)
             upper_data_vac.get_PEST(facn = facn)
             lower_data_vac.get_PEST(facn = facn)
+
+            if disp_calcs:
+                disp_run_list = [lower_data_tot, lower_data_vac, upper_data_tot, upper_data_vac]
+                for i in tmp_cur in disp_run_list: tmp_cur.get_VPLASMA()
+                out = disp_calcs(disp_run_data, n_zones = 20, phasing_vals = [0,45,90,135,180,225,270,315], ul = upper_and_lower)
+                project_dict['sims'][i]['displacement_responses'] = copy.deepcopy(out)
 
             print 'getting resonant_strength data'
             upper_vac_res_integral, upper_vac_res_discrete = upper_data_vac.resonant_strength(n = n, SURFMN_coords=SURFMN_coords)
