@@ -74,7 +74,7 @@ base_dir_list.append('/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qm
 label_list = ['3305', '3815', '3515', 'kinetic']
 include_MARS = 1
 calculate_Vr = 0
-fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex=1)
+fig_tmp, ax_tmp = pt.subplots(nrows = 2, sharex = True)
 for tmp_loc, base_dir in enumerate(base_dir_list):
     try:
         N = 6; n = 2; I = np.array([1.,-1.,0.,1,-1.,0.])
@@ -132,3 +132,25 @@ for tmp_loc, base_dir in enumerate(base_dir_list):
 ax_tmp[0].legend(loc='best')
 ax_tmp[1].legend(loc='best')
 fig_tmp.canvas.draw(); fig_tmp.show()
+
+
+fig,ax = pt.subplots(ncols = 2, sharex = True, sharey = True)
+mesh = ax[0].pcolormesh(plas_r, plas_z, np.real(plot_quantity))
+mesh.set_clim([-0.001,0.001])
+
+fig2, ax2 = pt.subplots()
+for i in range(0,plas_r.shape[0],10): 
+
+    ax[1].plot(plas_r[i,:],plas_z[i,:])
+    norm_z = np.diff(plas_r[i,:])
+    norm_r = -np.diff(plas_z[i,:])
+    dl = np.sqrt(norm_r**2+norm_z**2)
+    norm_r/=dl
+    norm_z/=dl
+    disp_quant = np.real(plot_quantity[i,:])
+    print i
+    ax[1].plot(plas_r[i,:-1]+10*norm_r*disp_quant[:-1],plas_z[i,:-1]+10*norm_z*disp_quant[:-1])
+    ax2.plot(np.real(plot_quantity[i,:]))
+
+fig.canvas.draw();fig.show()
+fig2.canvas.draw();fig2.show()
