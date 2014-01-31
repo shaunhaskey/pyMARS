@@ -46,8 +46,16 @@ except ConfigParser.NoOptionError, e:
     print 'Couldnt find multiple_efits - setting it to 0', e
     rotation_spacing = 'lin'
 
+try:
+    resistivity_spacing = str(parser.get('process_control', 'resistivity_spacing'))
+except ConfigParser.NoOptionError, e:
+    print 'Couldnt find multiple_efits - setting it to 0', e
+    resistivity_spacing = 'lin'
 if resistivity_scan:
-    res_scan_list = np.linspace(resistivity_start, resistivity_end, resistivity_num, endpoint=True)
+    if resistivity_spacing=='log':
+        res_scan_list = 10**(np.linspace(resistivity_start, resistivity_end, resistivity_num, endpoint=True))
+    else:
+        res_scan_list = np.linspace(resistivity_start, resistivity_end, resistivity_num, endpoint=True)
 else:
     res_scan_list = None
 if rotation_scan:
@@ -62,9 +70,9 @@ print res_scan_list
 print 'rotation_scan {}; rotation_start  {}; rotation_end {}; rotation_num {}'.format(rotation_scan, rotation_start, rotation_end, rotation_num )
 print rot_scan_list
 
-if rotation_scan and resistivity_scan:
-    print "cant do rotation and resistivity scans at the same time... choose again...."
-    raise(ValueError)
+# if rotation_scan and resistivity_scan:
+#     print "cant do rotation and resistivity scans at the same time... choose again...."
+#     raise(ValueError)
 
 #directory details
 project_name = parser.get('directory_details', 'project_name')

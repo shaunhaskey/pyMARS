@@ -440,26 +440,40 @@ def RMZM_func_matlab(project_dict, matlab_RZplot_files, main_template):
 ###################################################################
 #step 5
 def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN_template', multiple_efits = 0, rot_scan_list = None, res_scan_list = None):
-    if res_scan_list!=None:
+    if res_scan_list!=None or rot_scan_list!=None:
         project_dict_new = copy.deepcopy(project_dict)
         project_dict_new['sims'] = {}
         new_key = 1
         for i in project_dict['sims'].keys():
+            if res_scan_list == None: res_scan_list = [+project_dict['sims'][i]['MARS_settings']['<<ETA>>']]
+            if rot_scan_list == None: rot_scan_list = [+project_dict['sims'][i]['MARS_settings']['<<ROTE>>']]
             for eta in res_scan_list:
-                project_dict_new['sims'][new_key] = copy.deepcopy(project_dict['sims'][i])
-                project_dict_new['sims'][new_key]['MARS_settings']['<<ETA>>'] = +eta
-                new_key+=1
+                for ROTE in rot_scan_list:
+                    project_dict_new['sims'][new_key] = copy.deepcopy(project_dict['sims'][i])
+                    project_dict_new['sims'][new_key]['MARS_settings']['<<ETA>>'] = +eta
+                    project_dict_new['sims'][new_key]['MARS_settings']['<<ROTE>>'] = +ROTE
+                    new_key+=1
         project_dict = project_dict_new
-    elif rot_scan_list!=None:
-        project_dict_new = copy.deepcopy(project_dict)
-        project_dict_new['sims'] = {}
-        new_key = 1
-        for i in project_dict['sims'].keys():
-            for ROTE in rot_scan_list:
-                project_dict_new['sims'][new_key] = copy.deepcopy(project_dict['sims'][i])
-                project_dict_new['sims'][new_key]['MARS_settings']['<<ROTE>>'] = +ROTE
-                new_key+=1
-        project_dict = project_dict_new
+#     if res_scan_list!=None:
+#         project_dict_new = copy.deepcopy(project_dict)
+#         project_dict_new['sims'] = {}
+#         new_key = 1
+#         for i in project_dict['sims'].keys():
+#             for eta in res_scan_list:
+#                 project_dict_new['sims'][new_key] = copy.deepcopy(project_dict['sims'][i])
+#                 project_dict_new['sims'][new_key]['MARS_settings']['<<ETA>>'] = +eta
+#                 new_key+=1
+#         project_dict = project_dict_new
+#     elif rot_scan_list!=None:
+#         project_dict_new = copy.deepcopy(project_dict)
+#         project_dict_new['sims'] = {}
+#         new_key = 1
+#         for i in project_dict['sims'].keys():
+#             for ROTE in rot_scan_list:
+#                 project_dict_new['sims'][new_key] = copy.deepcopy(project_dict['sims'][i])
+#                 project_dict_new['sims'][new_key]['MARS_settings']['<<ROTE>>'] = +ROTE
+#                 new_key+=1
+#         project_dict = project_dict_new
 
     for i in project_dict['sims'].keys():
         print i
