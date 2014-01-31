@@ -47,7 +47,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, s_surfac
                 disp_run_list = [lower_data_tot, lower_data_vac, upper_data_tot, upper_data_vac]
                 for tmp_cur in disp_run_list: tmp_cur.get_VPLASMA()
                 print 'got VPLASMA, calculating displacements'
-                out = disp_calcs(disp_run_data, n_zones = 20, phasing_vals = [0,45,90,135,180,225,270,315], ul = upper_and_lower)
+                out = results_class.disp_calcs(disp_run_list, n_zones = 20, phasing_vals = [0,45,90,135,180,225,270,315], ul = upper_and_lower)
                 project_dict['sims'][i]['displacement_responses'] = copy.deepcopy(out)
 
             print 'getting resonant_strength data'

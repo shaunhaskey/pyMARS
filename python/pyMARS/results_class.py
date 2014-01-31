@@ -75,8 +75,7 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
     r_vals_red = r_vals[:-1]
 
     for theta_deg in phasing_vals:
-        output_dict[theta_deg] = {}
-        cur_dict = output_dict[theta_deg]
+        cur_dict = {}
         for side in ['HFS','LFS']:
             for ab in ['above','below']:
                 cur_dict['disp_{}_{}'.format(ab,side)] = []
@@ -104,6 +103,8 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
             cur_dict['disp_below_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
             cur_dict['ang_below_LFS'].append(np.mean(angle[truth]))
             #ax.plot(r_vals_red[truth2], z_vals_red[truth],'-')
+        output_dict[theta_deg]=copy.deepcopy(cur_dict)
+    print output_dict[0]['disp_below_HFS'], output_dict[45]['disp_below_HFS']
     return output_dict
 
 
