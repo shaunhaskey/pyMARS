@@ -10,6 +10,8 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan/shot_142614_
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_w_damp2/shot_142614_rote_scan_w_damp2_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_w_damp3/shot_142614_rote_scan_w_damp3_post_processing_PEST.pickle'
 file_name='/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30/shot_142614_rote_res_scan_30x30_post_processing_PEST.pickle'
+
+file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_test/shot_142614_rote_res_scan_test_post_processing_PEST.pickle'
 phasing = 0
 n = 3
 phase_machine_ntor = 0
@@ -20,7 +22,16 @@ reference_offset = [2,0]
 sort_name = 'rote_list'
 
 a = dBres_dBkink.test1(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+fig, ax = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax = ax.flatten()
+fig2, ax2 = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax2 = ax2.flatten()
+phasings_disp = [0,45,90,135,180,225,270,315]
+for i in range(len(phasings_disp)):
+    a.extract_organise_single_disp(phasings_disp[i], ax_line_plots = ax[i], ax_matrix = ax2[i], clim = [0, 0.015])
+fig.canvas.draw(); fig.show()
+fig2.canvas.draw(); fig2.show()
 a.eta_rote_matrix(phasing = 0)
+
+
 1/0
 def do_everything(file_name, s_surface, phasing,phase_machine_ntor, fixed_harmonic = 5, reference_offset=[2,0], reference_dB_kink='plas',sort_name = 'q95_list'):
     project_dict = pickle.load(file(file_name,'r'))
@@ -111,6 +122,8 @@ def do_everything(file_name, s_surface, phasing,phase_machine_ntor, fixed_harmon
 
 answers = do_everything(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name)
 a = dBres_dBkink.test1(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name)
+
+
 answers = a.output_dict
 xaxis = np.array(answers[sort_name+'_arranged'])
 dB_kink_fixed_vac = 1
