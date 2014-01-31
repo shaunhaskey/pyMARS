@@ -1,9 +1,11 @@
 import copy
 import numpy as np
 import cPickle as pickle
+import matplotlib.pyplot as pt
+import scipy.ndimage.filters as scipy_filt
 
 class test1():
-    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset=[2,0], reference_dB_kink='plas',sort_name = 'q95_list'):
+    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset=[2,0], reference_dB_kink='plas',sort_name = 'q95_list', try_many_phasings = True):
         self.project_dict = pickle.load(file(file_name,'r'))
         self.key_list = self.project_dict['sims'].keys()
         self.n = np.abs(self.project_dict['details']['MARS_settings']['<<RNTOR>>'])
@@ -68,18 +70,87 @@ class test1():
         for loc, i in enumerate(list_of_item_names): output_dict2[i+'_arranged'] = tmp[loc]
         for loc, i in enumerate(list_of_item_names): output_dict2[i] = getattr(self,i)
 
-        name_list = ['plot_array_plasma', 'plot_array_vac', 'plot_array_tot', 'plot_array_vac_fixed', 'q95_array', 'phasing_array', 'plot_array_plasma_fixed', 'plot_array_plasma_phase', 'plot_array_vac_phase', 'plot_array_vac_fixed_phase', 'plot_array_plasma_fixed_phase']
-        tmp1 = dB_kink_phasing_dependence(self.q95_list_copy, self.lower_values_plasma, self.upper_values_plasma, self.lower_values_vac, self.upper_values_vac, self.lower_values_tot, self.upper_values_tot, self.lower_values_vac_fixed, self.upper_values_vac_fixed, self.phase_machine_ntor, self.upper_values_plas_fixed, self.lower_values_plas_fixed, self.n, n_phases = 360)
-        for name, var in zip(name_list, tmp1): output_dict2[name]=var
-
-        name_list = ['plot_array_vac_res', 'plot_array_plas_res', 'plot_array_vac_res_ave', 'plot_array_plas_res_ave']
-        tmp1 = dB_res_phasing_dependence(output_dict2['phasing_array'], output_dict2['q95_array'], self.res_vac_list_upper, self.res_vac_list_lower, self.res_plas_list_upper, self.res_plas_list_lower, self.phase_machine_ntor, self.n)
-        for name, var in zip(name_list, tmp1): output_dict2[name]=var
+        if try_many_phasings:
+            name_list = ['plot_array_plasma', 'plot_array_vac', 'plot_array_tot', 'plot_array_vac_fixed', 'q95_array', 'phasing_array', 'plot_array_plasma_fixed', 'plot_array_plasma_phase', 'plot_array_vac_phase', 'plot_array_vac_fixed_phase', 'plot_array_plasma_fixed_phase']
+            tmp1 = dB_kink_phasing_dependence(self.q95_list_copy, self.lower_values_plasma, self.upper_values_plasma, self.lower_values_vac, self.upper_values_vac, self.lower_values_tot, self.upper_values_tot, self.lower_values_vac_fixed, self.upper_values_vac_fixed, self.phase_machine_ntor, self.upper_values_plas_fixed, self.lower_values_plas_fixed, self.n, n_phases = 360)
+            for name, var in zip(name_list, tmp1): output_dict2[name]=var
+            name_list = ['plot_array_vac_res', 'plot_array_plas_res','plot_array_tot_res', 'plot_array_vac_res_ave', 'plot_array_plas_res_ave','plot_array_tot_res_ave']
+            tmp1 = self.dB_res_phasing_dependence(output_dict2['phasing_array'], output_dict2['q95_array'], self.res_vac_list_upper, self.res_vac_list_lower, self.res_plas_list_upper, self.res_plas_list_lower, self.res_tot_list_upper, self.res_tot_list_lower, self.phase_machine_ntor, self.n)
+            for name, var in zip(name_list, tmp1): output_dict2[name]=var
 
         name_list = ['q95_list_copy', 'max_loc_list', 'upper_values_vac_fixed', 'n', 'lower_values_plasma', 'lower_values_vac']
         for name in name_list: output_dict2[name]=getattr(self,name)
-
         self.output_dict = output_dict2
+
+    def eta_rote_matrix(self, phasing = 0, med_filt_value = 1):
+        '''
+        function for plotting resistivity vs rotation scans and
+        including different phasings SRH: 31Jan2014
+        '''
+        print len(self.eta_list), len(self.rote_list), len(self.res_vac_list_upper)
+        print len(set(self.eta_list))
+        print len(set(self.rote_list))
+        eta_vals = sorted(set(self.eta_list))
+        rote_vals = sorted(set(self.rote_list))
+        dB_res_matrix_vac = np.zeros((len(eta_vals),len(rote_vals)),dtype=float)
+        dB_res_matrix_plas = +dB_res_matrix_vac; dB_res_matrix_tot = +dB_res_matrix_vac
+        dB_kink_matrix = +dB_res_matrix_vac
+        phasings = [0,45,90,135,180,225,270,315]
+        fig, ax_orig = pt.subplots(ncols = len(phasings)/2, nrows = 2, sharex = True, sharey = True); ax = ax_orig.flatten()
+        fig2, ax2_orig = pt.subplots(ncols = len(phasings)/2, nrows = 2, sharex = True, sharey = True); ax2 = ax2_orig.flatten()
+        cm_to_inch=0.393701
+        fig.set_figwidth(8.48*2*cm_to_inch)
+        fig.set_figheight(8.48*1.1*cm_to_inch)
+        fig2.set_figwidth(8.48*2*cm_to_inch)
+        fig2.set_figheight(8.48*1.1*cm_to_inch)
+        for i, phasing in enumerate(phasings):
+            tmp_vac_res, tmp_plas_res, tmp_tot_res, tmp_vac_ave, tmp_plas_ave,  tmp_tot_ave = self.dB_res_single_phasing(phasing,self.phase_machine_ntor, self.n,self.res_vac_list_upper, self.res_vac_list_lower, self.res_plas_list_upper, self.res_plas_list_lower, self.res_tot_list_upper, self.res_tot_list_lower)
+            
+            name_list = ['plot_array_plasma', 'plot_array_vac', 'plot_array_tot', 'plot_array_vac_fixed', 'q95_array', 'phasing_array', 'plot_array_plasma_fixed', 'plot_array_plasma_phase', 'plot_array_vac_phase', 'plot_array_vac_fixed_phase', 'plot_array_plasma_fixed_phase']
+            tmp_kink = dB_kink_phasing_dependence(self.q95_list_copy, self.lower_values_plasma, self.upper_values_plasma, self.lower_values_vac, self.upper_values_vac, self.lower_values_tot, self.upper_values_tot, self.lower_values_vac_fixed, self.upper_values_vac_fixed, self.phase_machine_ntor, self.upper_values_plas_fixed, self.lower_values_plas_fixed, self.n, n_phases = 360, phasing_array = [phasing])
+            tmp_dB_kink = tmp_kink[0].flatten()
+            print tmp_kink[0].shape
+            xaxis = dB_res_matrix_tot*0
+            yaxis = dB_res_matrix_tot*0
+            for eta, rote, list_index in zip(self.eta_list, self.rote_list, range(len(self.eta_list))):
+                row = eta_vals.index(eta)
+                col = rote_vals.index(rote)
+                #plot_array_vac_res[i,:], plot_array_plas_res[i,:], plot_array_tot_res[i,:], plot_array_vac_res_ave[i,:], plot_array_plas_res_ave[i,:], plot_array_tot_res_ave[i,:] 
+                dB_res_matrix_vac[row, col] = +tmp_vac_ave[list_index]
+                dB_res_matrix_plas[row, col] = +tmp_plas_ave[list_index]
+                dB_res_matrix_tot[row, col] = +tmp_tot_ave[list_index]
+                dB_kink_matrix[row, col] = +tmp_dB_kink[list_index]
+                yaxis[row, col] = +eta
+                xaxis[row, col] = +rote
+            color_ax = ax[i].pcolormesh(xaxis, yaxis, scipy_filt.median_filter(dB_res_matrix_tot,med_filt_value), cmap='spectral', rasterized= 'True')
+            color_ax2 = ax2[i].pcolormesh(xaxis, yaxis, scipy_filt.median_filter(dB_kink_matrix,med_filt_value), cmap='spectral', rasterized= 'True')
+            print color_ax.get_clim()
+            print color_ax2.get_clim()
+            color_ax.set_clim([0,2])
+            color_ax2.set_clim([0,1.5])
+            ax[i].set_xscale('log')
+            ax[i].set_yscale('log')
+            ax2[i].set_xscale('log')
+            ax2[i].set_yscale('log')
+            ax[i].set_title(r'$\Delta \phi = {}^o$'.format(phasing))
+            ax2[i].set_title(r'$\Delta \phi = {}^o$'.format(phasing))
+        ax[-1].set_xlim([1.e-4,1e-1])
+        ax2[-1].set_xlim([1.e-4,1e-1])
+        for i in ax_orig[:,0]:i.set_ylabel('eta')
+        for i in ax_orig[-1,:]:i.set_xlabel('rote')
+        for i in ax2_orig[:,0]:i.set_ylabel('eta')
+        for i in ax2_orig[-1,:]:i.set_xlabel('rote')
+        fig.tight_layout(pad=0.01)
+        fig2.tight_layout(pad=0.01)
+        cbar = pt.colorbar(color_ax, ax = ax.tolist())
+        cbar2 = pt.colorbar(color_ax2, ax = ax2.tolist())
+        #ax.imshow(new_matrix_tot)
+        cbar.set_label(r'$\delta B_{res}$ vac + plasma')
+        cbar2.set_label(r'$\delta B_{kink}$ plasma')
+        fig.savefig('res_rot_scan_dBres.pdf')
+        fig2.savefig('res_rot_scan_dBkink.pdf')
+        fig.canvas.draw(); fig.show()
+        fig2.canvas.draw(); fig2.show()
 
     def calculate_db_kink2(self,to_be_calculated):
         '''
@@ -188,8 +259,162 @@ class test1():
                 self.amps_vac_comp.append(self.relevant_values_vac)
                 self.amps_tot_comp.append(self.relevant_values_tot)
 
+    def dB_res_phasing_dependence(self,phasing_array, q95_array, res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower, res_tot_list_upper, res_tot_list_lower, phase_machine_ntor, n):
+        '''
+        Apply the different upper-lower phasings to the upper and lower runs
+        Can probably do this section faster... 
+        SH: 26Feb2013
+        '''
+        #Create the arrays to be populated, q95 columns, phasing rows. 
+        plot_array_vac_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+        plot_array_plas_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+        plot_array_tot_res = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+        plot_array_vac_res_ave = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+        plot_array_plas_res_ave = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+        plot_array_tot_res_ave = np.ones((phasing_array.shape[0], len(q95_array)),dtype=float)
+
+        #Cycle through each phasing and calculate dBres and dBres_ave for each of them
+        for i, curr_phase in enumerate(phasing_array):
+            plot_array_vac_res[i,:], plot_array_plas_res[i,:], plot_array_tot_res[i,:], plot_array_vac_res_ave[i,:], plot_array_plas_res_ave[i,:], plot_array_tot_res_ave[i,:] = self.dB_res_single_phasing(curr_phase,phase_machine_ntor, n,res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower, res_tot_list_upper, res_tot_list_lower)
+        return plot_array_vac_res, plot_array_plas_res, plot_array_tot_res, plot_array_vac_res_ave, plot_array_plas_res_ave,plot_array_tot_res_ave
+
+    def dB_res_single_phasing(self,curr_phase, phase_machine_ntor, n,res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower, res_tot_list_upper, res_tot_list_lower):
+        print 'phase :', curr_phase
+        phasing = curr_phase/180.*np.pi
+        if phase_machine_ntor:
+            phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
+        else:
+            phasor = (np.cos(phasing)+1j*np.sin(phasing))
+        #phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
+        tmp_vac_list = []; tmp_plas_list = [];tmp_tot_list = []
+        tmp_vac_list2 = []; tmp_plas_list2 = []; tmp_tot_list2 = []
 
 
+        for ii in range(0,len(res_vac_list_upper)):
+            #divisor is for calculating the dBres_ave
+            divisor = len(res_vac_list_upper[ii])
+            tmp_vac_list.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor)))
+            tmp_plas_list.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor)))
+            tmp_tot_list.append(np.sum(np.abs(res_tot_list_upper[ii] + res_tot_list_lower[ii]*phasor)))
+
+            tmp_vac_list2.append(tmp_vac_list[-1]/divisor)
+            tmp_plas_list2.append(tmp_plas_list[-1]/divisor)
+            tmp_tot_list2.append(tmp_tot_list[-1]/divisor)
+            #tmp_vac_list2.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor))/divisor)
+            #tmp_plas_list2.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor))/divisor)
+        return tmp_vac_list, tmp_plas_list, tmp_tot_list, tmp_vac_list2, tmp_plas_list2,  tmp_tot_list2
+
+    def plot_dB_kink_fixed_vac(self,sort_name = 'rote_list', clim1 = None, clim2 = None, xaxis_type = 'linear', xaxis_label = r'$q_{95}$'):
+        xaxis = np.array(self.output_dict[sort_name+'_arranged'])
+        if clim1==None: clim1 = [0,4.5]
+        if clim2==None: clim2 = [0,0.55]
+        cm_to_inch=0.393701
+        fig, ax = pt.subplots(nrows = 2, sharex =True, sharey = True)
+        #if publication_images:
+        #    fig.set_figwidth(8.48*cm_to_inch)
+        #    fig.set_figheight(8.48*cm_to_inch)
+        #color_plot = ax[0].pcolor(np.array(answers['eta_list_arranged']), answers['phasing_array'], answers['plot_array_plasma'], cmap='hot', rasterized= 'True')
+        color_plot = ax[0].pcolormesh(xaxis, self.output_dict['phasing_array'], self.output_dict['plot_array_plasma'], cmap='hot', rasterized= 'True')
+        color_plot.set_clim(clim1)
+        #color_plot2 = ax[1].pcolor(np.array(answers['eta_list_arranged']), answers['phasing_array'], answers['plot_array_vac_fixed'], cmap='hot', rasterized = 'True')
+        color_plot2 = ax[1].pcolormesh(xaxis, self.output_dict['phasing_array'], self.output_dict['plot_array_vac_fixed'], cmap='hot', rasterized = 'True')
+        color_plot2.set_clim(clim2)
+        fig.canvas.draw();fig.show()
+        #ax[0].plot(answers['q95_array'], answers['phasing_array'][np.argmax(answers['plot_array_tot'],axis=0)],'kx')
+        #ax[0].plot(answers['q95_array'], answers['phasing_array'][np.argmin(answers['plot_array_tot'],axis=0)],'b.')
+
+        # suppressed_regions = [[3.81,-30,0.01],[3.48,15,0.1],[3.72,15,0.025],[3.75,0,0.025]]
+        # for i in range(0,len(suppressed_regions)):
+        #     curr_tmp = suppressed_regions[i]
+        #     tmp_angle = curr_tmp[1]*-2.
+        #     if tmp_angle<0:tmp_angle+=360
+        #     if tmp_angle>360:tmp_angle-=360
+
+        #     ax[0].errorbar(curr_tmp[0], tmp_angle, xerr=curr_tmp[2], yerr=0, ecolor='g')
+        #ax[1].plot(answers['q95_array'], answers['phasing_array'][np.argmin(answers['plot_array_vac'],axis=0)],'b.')
+        #color_plot.set_clim()
+        #ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
+        ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)')#,fontsize = 20)
+        ax[1].set_ylabel(r'$\Delta \phi_{ul}$ (deg)')#,fontsize = 20)
+        
+        ax[0].set_xlim([np.min(xaxis), np.max(xaxis)])
+        ax[0].set_ylim([np.min(self.output_dict['phasing_array']), np.max(self.output_dict['phasing_array'])])
+        #ax[0].plot(np.arange(1,10), np.arange(1,10)*(-55.)+180+180,'b-')
+        #ax[1].plot(np.arange(1,10), np.arange(1,10)*(-55.)+180+180,'b-')
+        ax[0].locator_params(nbins=4)
+        ax[1].locator_params(nbins=4)
+
+        cbar = pt.colorbar(color_plot, ax = ax[0])
+        ax[1].set_xlabel(xaxis_label)#, fontsize = 20)
+        cbar.ax.set_ylabel(r'$\delta B_{kink}^{n=%d}$ G/kA'%(self.n,))#,fontsize=20)
+        cbar.ax.set_title('(a)')
+
+        #cbar.set_ticks(np.round(np.linspace(clim1[0], clim1[1],5),decimals=2))
+
+        cbar = pt.colorbar(color_plot2, ax = ax[1])
+        cbar.ax.set_ylabel(r'$\delta B_{vac}^{m=nq+%d,n=%d}$ G/kA'%(self.fixed_harmonic,self.output_dict['n']))#,fontsize=20)
+        cbar.ax.set_title('(b)')
+        #cbar.set_ticks(np.round(np.linspace(clim2[0], clim2[1],5),decimals=2))
+        #cbar.locator.nbins=4
+        #cbar.set_ticks(cbar.ax.get_yticks()[::2])
+        if xaxis_type=='log':
+            ax[0].set_xscale('log')
+            ax[1].set_xscale('log')
+        fig.canvas.draw();
+        fig.savefig('tmp2.eps', bbox_inches='tight', pad_inches=0)
+        fig.savefig('tmp2.pdf', bbox_inches='tight', pad_inches=0)
+        fig.show()
+
+    def dB_res_n2_dB_res_sum(self,sort_name = 'rote_list', clim1 = None, clim2 = None, xaxis_type = 'linear', xaxis_label = r'$q_{95}$'):
+        xaxis = np.array(self.output_dict[sort_name+'_arranged'])
+        fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
+        #color_plot = ax[0].pcolor(np.array(self.output_dict['eta_list']), self.output_dict['phasing_array'], self.output_dict['plot_array_vac_res'], cmap='hot', rasterized=True)
+        #color_plot = ax[1].pcolor(np.array(self.output_dict['eta_list']), self.output_dict['phasing_array'], self.output_dict['plot_array_plas_res'], cmap='hot', rasterized=True)
+        color_plot = ax[0].pcolormesh(xaxis, self.output_dict['phasing_array'], self.output_dict['plot_array_vac_res'], cmap='hot', rasterized=True)
+        if clim1 == None: clim1 = [0,25]
+        if clim2 == None: clim2 = [0,50]
+        color_plot.set_clim(clim1)
+        #color_plot2 = ax[1].pcolormesh(xaxis, self.output_dict['phasing_array'], self.output_dict['plot_array_plas_res'], cmap='hot', rasterized=True)
+        color_plot2 = ax[1].pcolormesh(xaxis, self.output_dict['phasing_array'], self.output_dict['plot_array_tot_res'], cmap='hot', rasterized=True)
+        color_plot2.set_clim(clim2)
+        title_string1 = 'Total Forcing'
+        title_string2 = 'Average Forcing'
+        ax[0].set_xlim([np.min(xaxis), np.max(xaxis)])
+        ax[0].set_ylim([0,360])
+
+        #ax[0].set_ylim([np.min(self.output_dict['phasing_array']), np.max(self.output_dict['phasing_array'])])
+        ax[1].set_xlabel(xaxis_label, fontsize=20)
+        ax[0].set_title(r'$\delta B_{res}^{n=3}$ using vacuum',fontsize=20)
+        ax[1].set_title(r'$\delta B_{res}^{n=3}$ using total',fontsize=20)
+
+        ax[1].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+        ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+        # ax.set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 20)
+        #ax[0].set_ylabel('Phasing (deg)')
+        if xaxis_type=='log':
+            ax[0].set_xscale('log')
+            ax[1].set_xscale('log')
+        #ax[1].set_ylabel('Phasing (deg)')
+        fig2, ax2 = pt.subplots(nrows = 2, sharex = True, sharey = True)
+        ax2[0].plot(xaxis, self.output_dict['plot_array_vac_res'][0,:], '-o',label='0deg res vac')
+        ax2[0].plot(xaxis, self.output_dict['plot_array_plas_res'][0,:], '-o',label='0deg res plas')
+        ax2[0].plot(xaxis, -self.output_dict['plot_array_plas_res'][0,:]+self.output_dict['plot_array_vac_res'][0,:], '-o',label='0deg total')
+        ax2[0].plot(xaxis, self.output_dict['plot_array_tot_res'][0,:], '-o',label='0deg total2')
+        ax2[1].plot(xaxis, self.output_dict['plot_array_vac_res'][180,:], '-o', label='180deg vac')
+        ax2[1].plot(xaxis, self.output_dict['plot_array_plas_res'][180,:], '-o',label='180deg plas')
+        ax2[1].plot(xaxis, -self.output_dict['plot_array_plas_res'][180,:]+self.output_dict['plot_array_vac_res'][180,:], '-o', label='180deg total')
+        ax2[1].plot(xaxis, self.output_dict['plot_array_tot_res'][180,:], '-o', label='180deg total2')
+        if xaxis_type=='log':
+            ax2[0].set_xscale('log')
+            ax2[1].set_xscale('log')
+        ax2[0].legend(loc='best')
+        #ax2.plot(np.array(self.output_dict['eta_list']), self.output_dict['plot_array_total_res'][0,:], '-o')
+        fig2.canvas.draw();fig2.show()
+        cbar = pt.colorbar(color_plot, ax = ax[0])
+        cbar.ax.set_ylabel('G/kA',fontsize = 16)
+        cbar = pt.colorbar(color_plot2, ax = ax[1])
+        cbar.ax.set_ylabel('G/kA',fontsize = 16)
+        fig.canvas.draw(); fig.show()
 
 
 def extract_q95_Bn2(tmp_dict):
@@ -369,7 +594,7 @@ def calculate_db_kink_fixed(mk_list, q_val_list, n, to_be_calculated, n_plus):
     return answer
 
 
-def dB_kink_phasing_dependence(q95_list_copy, lower_values_plasma, upper_values_plasma, lower_values_vac, upper_values_vac, lower_values_tot, upper_values_tot, lower_values_vac_fixed, upper_values_vac_fixed, phase_machine_ntor, upper_values_plas_fixed, lower_values_plas_fixed, n, n_phases = 360):
+def dB_kink_phasing_dependence(q95_list_copy, lower_values_plasma, upper_values_plasma, lower_values_vac, upper_values_vac, lower_values_tot, upper_values_tot, lower_values_vac_fixed, upper_values_vac_fixed, phase_machine_ntor, upper_values_plas_fixed, lower_values_plas_fixed, n, n_phases = 360, phasing_array=None):
     '''
     Calculate dBkink upper-lower phasing dependence
 
@@ -377,7 +602,10 @@ def dB_kink_phasing_dependence(q95_list_copy, lower_values_plasma, upper_values_
 
     '''
     #Work on the phasing as a function of q95
-    phasing_array = np.linspace(0,360,n_phases)
+    if phasing_array == None:
+        phasing_array = np.linspace(0,360,n_phases)
+    else:
+        phasing_array = np.array(phasing_array)
     q95_array = np.array(q95_list_copy)
 
     #create arrays to work with

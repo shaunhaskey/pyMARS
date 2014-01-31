@@ -9,6 +9,7 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan/shot_142614_
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_w_damp/shot_142614_rote_scan_w_damp_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_w_damp2/shot_142614_rote_scan_w_damp2_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_w_damp3/shot_142614_rote_scan_w_damp3_post_processing_PEST.pickle'
+file_name='/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30/shot_142614_rote_res_scan_30x30_post_processing_PEST.pickle'
 phasing = 0
 n = 3
 phase_machine_ntor = 0
@@ -16,7 +17,11 @@ s_surface = 0.92
 fixed_harmonic = 3
 reference_dB_kink = 'plas'
 reference_offset = [2,0]
+sort_name = 'rote_list'
 
+a = dBres_dBkink.test1(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+a.eta_rote_matrix(phasing = 0)
+1/0
 def do_everything(file_name, s_surface, phasing,phase_machine_ntor, fixed_harmonic = 5, reference_offset=[2,0], reference_dB_kink='plas',sort_name = 'q95_list'):
     project_dict = pickle.load(file(file_name,'r'))
     key_list = project_dict['sims'].keys()
@@ -104,79 +109,18 @@ def do_everything(file_name, s_surface, phasing,phase_machine_ntor, fixed_harmon
     output_dict = output_dict2
     return output_dict
 
-sort_name = 'rote_list'
 answers = do_everything(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name)
 a = dBres_dBkink.test1(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name)
 answers = a.output_dict
 xaxis = np.array(answers[sort_name+'_arranged'])
 dB_kink_fixed_vac = 1
 if dB_kink_fixed_vac:
-    #########################
-    #Plot for the paper
-    clim1 = [0,4.5]
-    clim2 = [0,0.55]
-    cm_to_inch=0.393701
-    fig, ax = pt.subplots(nrows = 2, sharex =True, sharey = True)
-    #if publication_images:
-    #    fig.set_figwidth(8.48*cm_to_inch)
-    #    fig.set_figheight(8.48*cm_to_inch)
-    #color_plot = ax[0].pcolor(np.array(answers['eta_list_arranged']), answers['phasing_array'], answers['plot_array_plasma'], cmap='hot', rasterized= 'True')
-    color_plot = ax[0].pcolor(xaxis, answers['phasing_array'], answers['plot_array_plasma'], cmap='hot', rasterized= 'True')
-    color_plot.set_clim(clim1)
-    #color_plot2 = ax[1].pcolor(np.array(answers['eta_list_arranged']), answers['phasing_array'], answers['plot_array_vac_fixed'], cmap='hot', rasterized = 'True')
-    color_plot2 = ax[1].pcolor(xaxis, answers['phasing_array'], answers['plot_array_vac_fixed'], cmap='hot', rasterized = 'True')
-    color_plot2.set_clim(clim2)
-    fig.canvas.draw();fig.show()
-    #ax[0].plot(answers['q95_array'], answers['phasing_array'][np.argmax(answers['plot_array_tot'],axis=0)],'kx')
-    #ax[0].plot(answers['q95_array'], answers['phasing_array'][np.argmin(answers['plot_array_tot'],axis=0)],'b.')
-
-    # suppressed_regions = [[3.81,-30,0.01],[3.48,15,0.1],[3.72,15,0.025],[3.75,0,0.025]]
-    # for i in range(0,len(suppressed_regions)):
-    #     curr_tmp = suppressed_regions[i]
-    #     tmp_angle = curr_tmp[1]*-2.
-    #     if tmp_angle<0:tmp_angle+=360
-    #     if tmp_angle>360:tmp_angle-=360
-
-    #     ax[0].errorbar(curr_tmp[0], tmp_angle, xerr=curr_tmp[2], yerr=0, ecolor='g')
-    #ax[1].plot(answers['q95_array'], answers['phasing_array'][np.argmin(answers['plot_array_vac'],axis=0)],'b.')
-    #color_plot.set_clim()
-    #ax[1].set_xlabel(r'$q_{95}$', fontsize=14)
-    ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)')#,fontsize = 20)
-    ax[1].set_ylabel(r'$\Delta \phi_{ul}$ (deg)')#,fontsize = 20)
-
-    #ax[0].set_xlim([2.5,6.0])
-    ax[0].set_ylim([np.min(answers['phasing_array']), np.max(answers['phasing_array'])])
-    #ax[0].plot(np.arange(1,10), np.arange(1,10)*(-55.)+180+180,'b-')
-    #ax[1].plot(np.arange(1,10), np.arange(1,10)*(-55.)+180+180,'b-')
-    ax[0].locator_params(nbins=4)
-    ax[1].locator_params(nbins=4)
-
-    cbar = pt.colorbar(color_plot, ax = ax[0])
-    ax[1].set_xlabel(r'$q_{95}$')#, fontsize = 20)
-    cbar.ax.set_ylabel(r'$\delta B_{kink}^{n=%d}$ G/kA'%(answers['n'],))#,fontsize=20)
-    cbar.ax.set_title('(a)')
-    
-    #cbar.set_ticks(np.round(np.linspace(clim1[0], clim1[1],5),decimals=2))
-
-    cbar = pt.colorbar(color_plot2, ax = ax[1])
-    cbar.ax.set_ylabel(r'$\delta B_{vac}^{m=nq+%d,n=%d}$ G/kA'%(fixed_harmonic,answers['n']))#,fontsize=20)
-    cbar.ax.set_title('(b)')
-    #cbar.set_ticks(np.round(np.linspace(clim2[0], clim2[1],5),decimals=2))
-    #cbar.locator.nbins=4
-    #cbar.set_ticks(cbar.ax.get_yticks()[::2])
-    fig.canvas.draw();
-    fig.savefig('tmp2.eps', bbox_inches='tight', pad_inches=0)
-    fig.savefig('tmp2.pdf', bbox_inches='tight', pad_inches=0)
-    fig.show()
-    #fig.savefig('tmp2.svg', bbox_inches='tight', pad_inches=0)
-
-    #fig.savefig('tmp3.eps', bbox='tight', pad_inches=0)
-    #fig.savefig('tmp3.pdf', bbox='tight', pad_inches=0)
-    #fig.savefig('tmp4.eps', bbox='tight', pad_inches=0)
-    #fig.savefig('tmp4.pdf', bbox='tight', pad_inches=0)
+    a.plot_dB_kink_fixed_vac(clim1=[0,0.6],clim2=[0,1.4],xaxis_type='log',xaxis_label='rote')
 
 dB_res_n2_dB_res_sum = 1
 if dB_res_n2_dB_res_sum:
+    a.dB_res_n2_dB_res_sum(clim1=None,clim2=None,xaxis_type='log',xaxis_label='rote')
+    1/0
     fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True); #ax = [ax]#nrows = 2, sharex = True, sharey = True)
     #color_plot = ax[0].pcolor(np.array(answers['eta_list']), answers['phasing_array'], answers['plot_array_vac_res'], cmap='hot', rasterized=True)
     #color_plot = ax[1].pcolor(np.array(answers['eta_list']), answers['phasing_array'], answers['plot_array_plas_res'], cmap='hot', rasterized=True)
