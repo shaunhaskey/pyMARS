@@ -133,88 +133,16 @@ class test1():
             yaxis[row, col] = +eta
             xaxis[row, col] = +rote
         if ax_matrix!=None:
-            color_ax = ax_matrix.pcolormesh(xaxis, yaxis, scipy_filt.median_filter(disp_matrix, med_filt_value), cmap='hot', rasterized= 'True')
+            color_ax = ax_matrix.pcolormesh(xaxis, yaxis, scipy_filt.median_filter(disp_matrix, med_filt_value), cmap='spectral', rasterized= 'True')
             print color_ax.get_clim()
             if clim!=None:
                 color_ax.set_clim(clim)
             ax_matrix.set_xscale('log')
             ax_matrix.set_yscale('log')
             ax_matrix.set_title(r'$\Delta \phi = {}^o$'.format(phasing))
-        return output_data
-            
+        return output_data, color_ax
 
-
-    def eta_rote_disp_matrix(self,):
-        '''
-        function for plotting resistivity vs rotation scans and
-        including different phasings SRH: 31Jan2014
-        '''
-        eta_vals = sorted(set(self.eta_list))
-        rote_vals = sorted(set(self.rote_list))
-        fig, ax_orig = pt.subplots(ncols = len(phasings)/2, nrows = 2, sharex = True, sharey = True); ax = ax_orig.flatten()
-        fig2, ax2_orig = pt.subplots(ncols = len(phasings)/2, nrows = 2, sharex = True, sharey = True); ax2 = ax2_orig.flatten()
-        cm_to_inch=0.393701
-        fig.set_figwidth(8.48*2*cm_to_inch)
-        fig.set_figheight(8.48*1.1*cm_to_inch)
-        fig2.set_figwidth(8.48*2*cm_to_inch)
-        fig2.set_figheight(8.48*1.1*cm_to_inch)
-        for i, phasing in enumerate(phasings):
-            disp_matrix = np.zeros((len(eta_vals),len(rote_vals)),dtype=float)
-            phasings = [0,45,90,135,180,225,270,315]
-            self.project_dict
-
-
-
-            tmp_vac_res, tmp_plas_res, tmp_tot_res, tmp_vac_ave, tmp_plas_ave,  tmp_tot_ave = self.dB_res_single_phasing(phasing,self.phase_machine_ntor, self.n,self.res_vac_list_upper, self.res_vac_list_lower, self.res_plas_list_upper, self.res_plas_list_lower, self.res_tot_list_upper, self.res_tot_list_lower)
-            
-            name_list = ['plot_array_plasma', 'plot_array_vac', 'plot_array_tot', 'plot_array_vac_fixed', 'q95_array', 'phasing_array', 'plot_array_plasma_fixed', 'plot_array_plasma_phase', 'plot_array_vac_phase', 'plot_array_vac_fixed_phase', 'plot_array_plasma_fixed_phase']
-            tmp_kink = dB_kink_phasing_dependence(self.q95_list_copy, self.lower_values_plasma, self.upper_values_plasma, self.lower_values_vac, self.upper_values_vac, self.lower_values_tot, self.upper_values_tot, self.lower_values_vac_fixed, self.upper_values_vac_fixed, self.phase_machine_ntor, self.upper_values_plas_fixed, self.lower_values_plas_fixed, self.n, n_phases = 360, phasing_array = [phasing])
-            tmp_dB_kink = tmp_kink[0].flatten()
-            print tmp_kink[0].shape
-            xaxis = dB_res_matrix_tot*0
-            yaxis = dB_res_matrix_tot*0
-            for eta, rote, list_index in zip(self.eta_list, self.rote_list, range(len(self.eta_list))):
-                row = eta_vals.index(eta)
-                col = rote_vals.index(rote)
-                #plot_array_vac_res[i,:], plot_array_plas_res[i,:], plot_array_tot_res[i,:], plot_array_vac_res_ave[i,:], plot_array_plas_res_ave[i,:], plot_array_tot_res_ave[i,:] 
-                dB_res_matrix_vac[row, col] = +tmp_vac_ave[list_index]
-                dB_res_matrix_plas[row, col] = +tmp_plas_ave[list_index]
-                dB_res_matrix_tot[row, col] = +tmp_tot_ave[list_index]
-                dB_kink_matrix[row, col] = +tmp_dB_kink[list_index]
-                yaxis[row, col] = +eta
-                xaxis[row, col] = +rote
-            color_ax = ax[i].pcolormesh(xaxis, yaxis, scipy_filt.median_filter(dB_res_matrix_tot,med_filt_value), cmap='spectral', rasterized= 'True')
-            color_ax2 = ax2[i].pcolormesh(xaxis, yaxis, scipy_filt.median_filter(dB_kink_matrix,med_filt_value), cmap='spectral', rasterized= 'True')
-            print color_ax.get_clim()
-            print color_ax2.get_clim()
-            color_ax.set_clim([0,2])
-            color_ax2.set_clim([0,1.5])
-            ax[i].set_xscale('log')
-            ax[i].set_yscale('log')
-            ax2[i].set_xscale('log')
-            ax2[i].set_yscale('log')
-            ax[i].set_title(r'$\Delta \phi = {}^o$'.format(phasing))
-            ax2[i].set_title(r'$\Delta \phi = {}^o$'.format(phasing))
-        ax[-1].set_xlim([1.e-4,1e-1])
-        ax2[-1].set_xlim([1.e-4,1e-1])
-        for i in ax_orig[:,0]:i.set_ylabel('eta')
-        for i in ax_orig[-1,:]:i.set_xlabel('rote')
-        for i in ax2_orig[:,0]:i.set_ylabel('eta')
-        for i in ax2_orig[-1,:]:i.set_xlabel('rote')
-        fig.tight_layout(pad=0.01)
-        fig2.tight_layout(pad=0.01)
-        cbar = pt.colorbar(color_ax, ax = ax.tolist())
-        cbar2 = pt.colorbar(color_ax2, ax = ax2.tolist())
-        #ax.imshow(new_matrix_tot)
-        cbar.set_label(r'$\delta B_{res}$ vac + plasma')
-        cbar2.set_label(r'$\delta B_{kink}$ plasma')
-        fig.savefig('res_rot_scan_dBres.pdf')
-        fig2.savefig('res_rot_scan_dBkink.pdf')
-        fig.canvas.draw(); fig.show()
-        fig2.canvas.draw(); fig2.show()
-
-
-    def eta_rote_matrix(self, phasing = 0, med_filt_value = 1):
+    def eta_rote_matrix(self, phasing = 0, med_filt_value = 1, plot_type = 'tot', clim_res = None, clim_kink = None, cmap_res = 'spectral', cmap_kink = 'spectral'):
         '''
         function for plotting resistivity vs rotation scans and
         including different phasings SRH: 31Jan2014
@@ -222,6 +150,8 @@ class test1():
         print len(self.eta_list), len(self.rote_list), len(self.res_vac_list_upper)
         print len(set(self.eta_list))
         print len(set(self.rote_list))
+        if clim_res == None: clim_res = [0,2]
+        if clim_kink == None: clim_kink = [0,1.5]
         eta_vals = sorted(set(self.eta_list))
         rote_vals = sorted(set(self.rote_list))
         dB_res_matrix_vac = np.zeros((len(eta_vals),len(rote_vals)),dtype=float)
@@ -254,12 +184,23 @@ class test1():
                 dB_kink_matrix[row, col] = +tmp_dB_kink[list_index]
                 yaxis[row, col] = +eta
                 xaxis[row, col] = +rote
-            color_ax = ax[i].pcolormesh(xaxis, yaxis, scipy_filt.median_filter(dB_res_matrix_tot,med_filt_value), cmap='spectral', rasterized= 'True')
-            color_ax2 = ax2[i].pcolormesh(xaxis, yaxis, scipy_filt.median_filter(dB_kink_matrix,med_filt_value), cmap='spectral', rasterized= 'True')
+            if plot_type == 'tot':
+                z_axis_res = dB_res_matrix_tot
+                cbar_label = r'$\delta B_{res}$ vac + plasma'
+            elif plot_type =='plas':
+                z_axis_res = dB_res_matrix_plas
+                cbar_label = r'$\delta B_{res}$ plasma'
+            elif plot_type =='vac':
+                z_axis_res = dB_res_matrix_vac
+                cbar_label = r'$\delta B_{res}$ vac'
+            else:
+                raise(ValueError)
+            color_ax = ax[i].pcolormesh(xaxis, yaxis, scipy_filt.median_filter(z_axis_res, med_filt_value), cmap=cmap_res, rasterized= 'True')
+            color_ax2 = ax2[i].pcolormesh(xaxis, yaxis, scipy_filt.median_filter(dB_kink_matrix,med_filt_value), cmap=cmap_kink, rasterized= 'True')
             print color_ax.get_clim()
             print color_ax2.get_clim()
-            color_ax.set_clim([0,2])
-            color_ax2.set_clim([0,1.5])
+            color_ax.set_clim(clim_res)
+            color_ax2.set_clim(clim_kink)
             ax[i].set_xscale('log')
             ax[i].set_yscale('log')
             ax2[i].set_xscale('log')
@@ -277,7 +218,7 @@ class test1():
         cbar = pt.colorbar(color_ax, ax = ax.tolist())
         cbar2 = pt.colorbar(color_ax2, ax = ax2.tolist())
         #ax.imshow(new_matrix_tot)
-        cbar.set_label(r'$\delta B_{res}$ vac + plasma')
+        cbar.set_label(cbar_label)
         cbar2.set_label(r'$\delta B_{kink}$ plasma')
         fig.savefig('res_rot_scan_dBres.pdf')
         fig2.savefig('res_rot_scan_dBkink.pdf')
