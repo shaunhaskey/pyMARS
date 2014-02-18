@@ -421,7 +421,7 @@ def mars_link_files(directory, special_dir = '', link_PROFTI = False, link_PROFT
 
 #--------- Mars Vacuum : setup -------------------
 #Link the PROFDEN, PROFROT, and chease outputs into the mars directory
-def mars_setup_files(master, special_dir = '', upper_and_lower = 0, link_PROFTI = False, link_PROFTE = False):
+def mars_setup_files(master, special_dir = '', upper_and_lower = 0, link_PROFTI = True, link_PROFTE = True):
     if upper_and_lower==1:
         master['dir_dict']['mars_dir'] = master['dir_dict']['exp_dir']+'/RES{:.4f}_ROTE{:.4f}/'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
         master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.p'
