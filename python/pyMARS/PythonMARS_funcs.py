@@ -403,11 +403,14 @@ def RMZM_post_matlab(master):
     return master
 
 
-def mars_link_files(directory, special_dir = ''):
+def mars_link_files(directory, special_dir = '', link_PROFTI = False, link_PROFTE = False):
     os.chdir(directory)
     #if special_dir == '':
     os.system('ln -sf ../../../../efit/' + special_dir + '/PROFDEN PROFDEN')
     os.system('ln -sf ../../../../efit/' + special_dir + '/PROFROT PROFROT')
+    if link_PROFTI: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTI PROFTI')
+    if link_PROFTE: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTE PROFTE')
+
     #else:
     #os.system('ln -sf ../../../efit/' + special_dir + '/PROFDEN PROFDEN')
     #os.system('ln -sf ../../../efit/' + special_dir + '/PROFROT PROFROT')
@@ -418,7 +421,7 @@ def mars_link_files(directory, special_dir = ''):
 
 #--------- Mars Vacuum : setup -------------------
 #Link the PROFDEN, PROFROT, and chease outputs into the mars directory
-def mars_setup_files(master, special_dir = '', upper_and_lower = 0):
+def mars_setup_files(master, special_dir = '', upper_and_lower = 0, link_PROFTI = False, link_PROFTE = False):
     if upper_and_lower==1:
         master['dir_dict']['mars_dir'] = master['dir_dict']['exp_dir']+'/RES{:.4f}_ROTE{:.4f}/'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
         master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.p'
@@ -429,15 +432,15 @@ def mars_setup_files(master, special_dir = '', upper_and_lower = 0):
         os.system('mkdir -p ' + master['dir_dict']['mars_lower_plasma_dir'])
         os.system('mkdir -p ' + master['dir_dict']['mars_lower_vacuum_dir'])
         os.system('mkdir -p ' + master['dir_dict']['mars_upper_vacuum_dir'])
-        mars_link_files(master['dir_dict']['mars_upper_plasma_dir'], special_dir = special_dir)
-        mars_link_files(master['dir_dict']['mars_lower_plasma_dir'], special_dir = special_dir)
-        mars_link_files(master['dir_dict']['mars_lower_vacuum_dir'], special_dir = special_dir)
-        mars_link_files(master['dir_dict']['mars_upper_vacuum_dir'], special_dir = special_dir)
+        mars_link_files(master['dir_dict']['mars_upper_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+        mars_link_files(master['dir_dict']['mars_lower_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+        mars_link_files(master['dir_dict']['mars_lower_vacuum_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+        mars_link_files(master['dir_dict']['mars_upper_vacuum_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
     else:
         master['dir_dict']['mars_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.4f}_ROTE{:.4f}.p'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
         master['dir_dict']['mars_vac_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.4f}_ROTE{:.4f}.vac'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
-        mars_link_files(master['dir_dict']['mars_plasma_dir'], special_dir = special_dir)
-        mars_link_files(master['dir_dict']['mars_vac_dir'], special_dir = special_dir)
+        mars_link_files(master['dir_dict']['mars_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+        mars_link_files(master['dir_dict']['mars_vac_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
 
 
 

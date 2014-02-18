@@ -281,6 +281,10 @@ if start_from_step == 1:
         time_list, gfile_list = cont_funcs.find_relevant_efit_files(project_dict['details']['efit_master'], project_dict['details']['profile_master'])
         print 'efit times :', time_list
         project_dict['details']['multiple_efit'] = []
+        density_prefix = 'dne'; density_post = ''
+        rotation_prefix = 'dtrot'; rotation_post = ''
+        te_prefix = 'dte'; te_post = ''
+        ti_prefix = 'dti'; ti_post = ''
         for i,time_tmp in enumerate(time_list):
             project_dict['details']['multiple_efit'].append(project_dict['details']['efit_dir'] + '/' + str(time_tmp) + '/')
             try:
@@ -293,10 +297,24 @@ if start_from_step == 1:
             #copy across the rotation files
             density_filename = 'dne'+gfile_list[i][1:]+'.dat'
             rotation_filename = 'dpr' + gfile_list[i].split('.')[0][1:] + '.' + str(time_tmp) + '_Er_RBpol.dat'
+            density_filename = density_prefix+gfile_list[i][1:]+'.dat' + density_post
+            rotation_filename = rotation_prefix+gfile_list[i][1:]+'.dat' + rotation_post
+            te_filename = te_prefix+gfile_list[i][1:]+'.dat' + te_post
+            ti_filename = ti_prefix+gfile_list[i][1:]+'.dat' + ti_post
+            
+            #rotation_filename = 'dpr' + gfile_list[i].split('.')[0][1:] + '.' + str(time_tmp) + '_Er_RBpol.dat'
+
+
             os.system('cp ' + project_dict['details']['profile_master'] + '/' + density_filename + ' ' + project_dict['details']['multiple_efit'][-1])
             os.system('cp ' + project_dict['details']['profile_master'] + '/' + rotation_filename + ' ' + project_dict['details']['multiple_efit'][-1])
+            os.system('cp ' + project_dict['details']['profile_master'] + '/' + ti_filename + ' ' + project_dict['details']['multiple_efit'][-1])
+            os.system('cp ' + project_dict['details']['profile_master'] + '/' + te_filename + ' ' + project_dict['details']['multiple_efit'][-1])
             os.system('cp ' + project_dict['details']['profile_master'] + '/' + density_filename + ' ' + project_dict['details']['multiple_efit'][-1] +'/PROFDEN')
             os.system('cp ' + project_dict['details']['profile_master'] + '/' + rotation_filename + ' ' + project_dict['details']['multiple_efit'][-1] + '/PROFROT')
+            inc_ti_te = True
+            if inc_ti_te:
+                os.system('cp ' + project_dict['details']['profile_master'] + '/' + ti_filename + ' ' + project_dict['details']['multiple_efit'][-1] + '/PROFTI')
+                os.system('cp ' + project_dict['details']['profile_master'] + '/' + te_filename + ' ' + project_dict['details']['multiple_efit'][-1] + '/PROFTE')
             shot_number = int(gfile_list[i][1:7])
 
         project_dict['details']['shot'] = shot_number
