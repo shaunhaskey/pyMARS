@@ -9,7 +9,7 @@ Updated to start using dBres_dBkink_funcs module
 
 '''
 
-import dBres_dBkink_funcs as dBres_dBkink
+import pyMARS.dBres_dBkink_funcs as dBres_dBkink
 import numpy as np
 import matplotlib.pyplot as pt
 from scipy.interpolate import griddata

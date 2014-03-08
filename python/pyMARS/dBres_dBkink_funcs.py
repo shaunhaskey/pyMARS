@@ -140,7 +140,45 @@ class test1():
             ax_matrix.set_xscale('log')
             ax_matrix.set_yscale('log')
             ax_matrix.set_title(r'$\Delta \phi = {}^o$'.format(phasing))
-        return output_data, color_ax
+            return output_data, color_ax
+        else:
+            return output_data, None
+
+    def plot_values_vs_time(self, phasing,ax = None):
+        disp_keys = ['disp_above_HFS', 'disp_above_LFS', 'disp_below_HFS', 'disp_below_LFS']
+        output_data = {}
+        cur_time_list = []; ROTE_list = []
+        for i in disp_keys: output_data[i] = []
+        for i in disp_keys: output_data[i.replace('disp','ang')] = []
+        for i in self.key_list:
+            upper_values = self.project_dict['sims'][i]['displacement_responses']['upper_values']
+            lower_values = self.project_dict['sims'][i]['displacement_responses']['lower_values']
+            cur_time_list.append(self.project_dict['sims'][i]['shot_time'])
+            ROTE_list.append(self.project_dict['sims'][i]['MARS_settings']['<<ROTE>>'])
+            for j in disp_keys:
+                output_data[j].append(self.project_dict['sims'][i]['displacement_responses'][phasing][j])
+                ang_key = j.replace('disp','ang')
+                output_data[ang_key].append(self.project_dict['sims'][i]['displacement_responses'][phasing][ang_key])
+        disp_x_point = self.disp_bounds(upper_values, lower_values, output_data, LFS = True, HFS = True, lower_bound = None, upper_bound = None)
+        print disp_x_point
+        tmp = zip(cur_time_list, disp_x_point, ROTE_list)
+        tmp.sort()
+        if ax == None:
+            fig, ax = pt.subplots(nrows = 2, sharex = True)
+        ax[0].plot([x for x, y, z in tmp], [y for x, y, z in tmp],marker='x')
+        ax[1].plot([x for x, y, z in tmp], [z for x, y, z in tmp], marker = 'x')
+        ax[1].set_ylabel('ROTE')
+        ax[0].set_ylabel('x-point displacement')
+        ax[0].set_title('Olivers shot, phasing : {}deg'.format(phasing))
+        ax[1].set_xlabel('Time (ms)')
+        if ax == None:
+            fig.canvas.draw(); fig.show()
+        #if ax_line_plots != None:
+        #    #for i in range(len(self.key_list)):
+        #    for j in ['disp_below_LFS']:
+        #        pass
+        print disp_x_point
+
 
     def eta_rote_matrix(self, phasing = 0, med_filt_value = 1, plot_type = 'tot', clim_res = None, clim_kink = None, cmap_res = 'spectral', cmap_kink = 'spectral'):
         '''
@@ -220,7 +258,7 @@ class test1():
         #ax.imshow(new_matrix_tot)
         cbar.set_label(cbar_label)
         cbar2.set_label(r'$\delta B_{kink}$ plasma')
-        fig.savefig('res_rot_scan_dBres.pdf')
+        fig.savefig('res_rot_scan_dBres_{}.pdf'.format(plot_type))
         fig2.savefig('res_rot_scan_dBkink.pdf')
         fig.canvas.draw(); fig.show()
         fig2.canvas.draw(); fig2.show()
@@ -366,6 +404,8 @@ class test1():
         for ii in range(0,len(res_vac_list_upper)):
             #divisor is for calculating the dBres_ave
             divisor = len(res_vac_list_upper[ii])
+            print divisor
+            print res_vac_list_upper[ii], res_vac_list_lower[ii]
             tmp_vac_list.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor)))
             tmp_plas_list.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor)))
             tmp_tot_list.append(np.sum(np.abs(res_tot_list_upper[ii] + res_tot_list_lower[ii]*phasor)))

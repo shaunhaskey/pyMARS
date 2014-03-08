@@ -7,7 +7,7 @@ from scipy.interpolate import griddata
 import pickle
 import matplotlib.cm as cm
 import time as time_module
-import dBres_dBkink_funcs as dBres_dBkink
+import pyMARS.dBres_dBkink_funcs as dBres_dBkink
 
 
 file_name = '/home/srh112/NAMP_datafiles/mars/detailed_q95_scan_n2_lower_BetaN/detailed_q95_scan_n2_lower_BetaN_post_processing_PEST.pickle'

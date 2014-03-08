@@ -5,6 +5,7 @@ from RZfuncs import I0EXP_calc
 import matplotlib.pyplot as pt
 import time
 import PythonMARS_funcs as pyMARS
+import generic_funcs as gen_func
 
 def extract_data(base_dir, I0EXP, ul=0, Nchi=513, get_VPLASMA=0, plas_vac = True):
     if ul==0:
@@ -43,7 +44,7 @@ ul = 1;
 plot_field = 'Vn'; field_type = 'plas'
 Nchi=513
 base_dir = '/home/srh112/NAMP_datafiles/mars/shot146398_ul_june2012/qmult1.000/exp1.000/marsrun/'
-
+base_dir = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/times/1935/RES2.0000_ROTE-100.0000/'
 run_data = extract_data(base_dir, I0EXP, ul=ul, Nchi=Nchi,get_VPLASMA=1)
 out = disp_calcs(run_data, n_zones = 100, phasing_vals = [0,45], ul= ul)
 
@@ -63,28 +64,49 @@ plas_r = grid_r[0:plot_quantity.shape[0],:]
 plas_z = grid_z[0:plot_quantity.shape[0],:]
 
 fig,ax = pt.subplots(ncols = 2, sharex = True, sharey = True)
-mesh = ax[0].pcolormesh(plas_r, plas_z, np.real(plot_quantity))
+# cm_to_inch=0.393701
+# import matplotlib as mpl
+# old_rc_Params = mpl.rcParams
+# mpl.rcParams['font.size']=8.0
+# mpl.rcParams['axes.titlesize']=8.0#'medium'
+# mpl.rcParams['xtick.labelsize']=8.0
+# mpl.rcParams['ytick.labelsize']=8.0
+# mpl.rcParams['lines.markersize']=5.0
+# mpl.rcParams['savefig.dpi']=300
+# fig.set_figwidth(8.48*cm_to_inch)
+# fig.set_figheight(8.48*0.7*cm_to_inch)
+gen_func.setup_publication_image(fig,)
+mesh = ax[0].pcolormesh(plas_r, plas_z, np.real(plot_quantity), rasterized = True)
 mesh.set_clim([-0.001,0.001])
 
 fig2, ax2 = pt.subplots()
 surfaces = range(0,plas_r.shape[0],30)
 surfaces = [-1]
 for i in surfaces: 
-    ax[1].plot(plas_r[i,:],plas_z[i,:],'.')
+    ax[1].plot(plas_r[i,:],plas_z[i,:],'-')
     norm_z = np.diff(plas_r[i,:])
     norm_r = -np.diff(plas_z[i,:])
     dl = np.sqrt(norm_r**2+norm_z**2)
     norm_r/=dl
     norm_z/=dl
-    disp_quant = np.abs(plot_quantity[i,:])
+    disp_quant = np.real(plot_quantity[i,:])
     ax[1].plot(plas_r[i,:-1]+10*norm_r*disp_quant[:-1],plas_z[i,:-1]+10*norm_z*disp_quant[:-1])
     angle = np.arctan2(plas_z[i,:], plas_r[i,:]-run_data[0].R0EXP)
     angle = np.rad2deg(angle)
     ax2.plot(angle, disp_quant)
-
+for i in ax: i.grid()
+for i in ax: i.set_xlabel('R (m)')
+ax[0].set_ylabel('Z (m)')
+ax[1].axhline(0.6*np.min(plas_z[-1,:]))
+ax[0].set_ylim([-1.25,1.25])
+for i in ax: i.set_xlim([1.0,2.5])
+ax[0].set_xticks(ax[0].get_xticks()[::2])
+fig.tight_layout(pad = 0.3)
+fig.savefig('/home/srh112/code/NAMP_analysis/python/reflectometer/edge_displacement.pdf')
 fig.canvas.draw();fig.show()
 fig2.canvas.draw();fig2.show()
 
+1/0
 fig, ax = pt.subplots()
 max_min_z = [np.max(plas_z[-1,:]), np.min(plas_z[-1,:])]
 upper_values = np.linspace(0,np.max(plas_z[-1,:]),50,endpoint = True)
