@@ -3,9 +3,15 @@ import numpy as np
 import cPickle as pickle
 import matplotlib.pyplot as pt
 import scipy.ndimage.filters as scipy_filt
+import pyMARS.generic_funcs as gen_funcs
 
 class test1():
-    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset=[2,0], reference_dB_kink='plas',sort_name = 'q95_list', try_many_phasings = True):
+    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset = None, reference_dB_kink='plas',sort_name = 'q95_list', try_many_phasings = True):
+        '''This object is a way to put all post processing calculations etc.. together
+
+        SRH : 8Mar2014
+        '''
+        #Assign the various things to object attributes
         self.project_dict = pickle.load(file(file_name,'r'))
         self.key_list = self.project_dict['sims'].keys()
         self.n = np.abs(self.project_dict['details']['MARS_settings']['<<RNTOR>>'])
@@ -13,20 +19,29 @@ class test1():
         self.phasing = phasing
         self.phase_machine_ntor = phase_machine_ntor
         self.fixed_harmonic = fixed_harmonic
-        self.reference_offset = reference_offset
+        if reference_offset == None:
+            self.reference_offset = [2,0]
+        else:
+            self.reference_offset = reference_offset
         self.reference_dB_kink = reference_dB_kink
         self.sort_name = sort_name
         
+        #Start extracting the important values
         self.extract_q95_Bn(bn_li = 1)
         self.extract_eta_rote()
-        self.extract_dB_res()
 
+        #extracts res_vac/tot/plas_upper/lower
+        self.extract_dB_res()
+        #extracts amps_plas/vac/tot_comp_upper/lower if upper_lower
+        #depends on self.s_surface, also gets mk_list, q_val_list, and resonant_close
         self.extract_dB_kink()
+
         #Create the fixed phasing cases (as set by phasing)
         self.amps_vac_comp = apply_phasing(self.amps_vac_comp_upper, self.amps_vac_comp_lower, self.phasing, self.n, phase_machine_ntor = self.phase_machine_ntor)
         self.amps_plas_comp = apply_phasing(self.amps_plas_comp_upper, self.amps_plas_comp_lower, self.phasing, self.n, phase_machine_ntor = self.phase_machine_ntor)
         self.amps_tot_comp = apply_phasing(self.amps_tot_comp_upper, self.amps_tot_comp_lower, self.phasing, self.n, phase_machine_ntor = self.phase_machine_ntor)
 
+        #Need to find the correct harmonic to use
         if self.reference_dB_kink=='plas':
             self.reference = get_reference(self.amps_plas_comp_upper, self.amps_plas_comp_lower, np.linspace(0,2.*np.pi,100), self.n, phase_machine_ntor = self.phase_machine_ntor)
         elif self.reference_dB_kink=='tot':
@@ -62,6 +77,7 @@ class test1():
 
         print self.eta_list
         list_of_item_names = ['eta_list', 'rote_list', 'q95_list', 'Bn_Li_list', 'plot_quantity_plas','plot_quantity_vac', 'plot_quantity_tot', 'plot_quantity_plas_phase', 'plot_quantity_vac_phase', 'plot_quantity_tot_phase', 'mode_list', 'time_list', 'key_list', 'resonant_close']
+        print 'first time!!', self.time_list
         list_of_items = zip(*[getattr(self,i) for i in list_of_item_names])
         sort_index = list_of_item_names.index(sort_name)
         print sort_index
@@ -80,7 +96,10 @@ class test1():
 
         name_list = ['q95_list_copy', 'max_loc_list', 'upper_values_vac_fixed', 'n', 'lower_values_plasma', 'lower_values_vac']
         for name in name_list: output_dict2[name]=getattr(self,name)
+        print 'second time!!!', self.time_list
         self.output_dict = output_dict2
+
+
 
 
     def disp_bounds(self, upper_values, lower_values, output_data, LFS = False, HFS = False, lower_bound = None, upper_bound = None):
@@ -144,6 +163,42 @@ class test1():
         else:
             return output_data, None
 
+    def plot_probe_values_vs_time(self, phasing, probe, field='plas', ax = None):
+        probe_ind = (self.project_dict['details']['pickup_coils']['probe']).index(probe)
+        print probe_ind
+        cur_time_list = []; vac_vals = []; plas_vals = []; tot_vals = []
+        for i in self.key_list:
+            upper_vac = self.project_dict['sims'][i]['vacuum_upper_response4'][probe_ind]
+            lower_vac = self.project_dict['sims'][i]['vacuum_lower_response4'][probe_ind]
+            upper_tot = self.project_dict['sims'][i]['plasma_upper_response4'][probe_ind]
+            lower_tot = self.project_dict['sims'][i]['plasma_lower_response4'][probe_ind]
+            upper_plas = upper_tot - upper_vac
+            lower_plas = lower_tot - lower_vac
+            plas_vals.append(apply_phasing(upper_plas, lower_plas, phasing, self.n, phase_machine_ntor = self.phase_machine_ntor))
+            vac_vals.append(apply_phasing(upper_vac, lower_vac, phasing, self.n, phase_machine_ntor = self.phase_machine_ntor))
+            tot_vals.append(apply_phasing(upper_tot, lower_tot, phasing, self.n, phase_machine_ntor = self.phase_machine_ntor))
+            cur_time_list.append(self.project_dict['sims'][i]['shot_time'])
+
+        print field
+        if field == 'plas':
+            vals = plas_vals
+        elif field == 'tot':
+            vals = tot_vals
+        elif field == 'vac':
+            vals = vac_vals
+        else:
+            raise ValueError('field type wrong')
+        tmp = zip(cur_time_list, vals)
+        tmp.sort()
+        if ax == None:
+            fig, ax = pt.subplots()
+        ax.plot([x for x, y in tmp], [np.abs(y) for x, y in tmp], marker='x')
+        ax.set_ylabel(probe)
+        if ax == None:
+            fig.canvas.draw(); fig.show()
+
+
+
     def plot_values_vs_time(self, phasing,ax = None):
         disp_keys = ['disp_above_HFS', 'disp_above_LFS', 'disp_below_HFS', 'disp_below_LFS']
         output_data = {}
@@ -170,7 +225,7 @@ class test1():
         ax[1].set_ylabel('ROTE')
         ax[0].set_ylabel('x-point displacement')
         ax[0].set_title('Olivers shot, phasing : {}deg'.format(phasing))
-        ax[1].set_xlabel('Time (ms)')
+        #ax[1].set_xlabel('Time (ms)')
         if ax == None:
             fig.canvas.draw(); fig.show()
         #if ax_line_plots != None:
@@ -198,11 +253,13 @@ class test1():
         phasings = [0,45,90,135,180,225,270,315]
         fig, ax_orig = pt.subplots(ncols = len(phasings)/2, nrows = 2, sharex = True, sharey = True); ax = ax_orig.flatten()
         fig2, ax2_orig = pt.subplots(ncols = len(phasings)/2, nrows = 2, sharex = True, sharey = True); ax2 = ax2_orig.flatten()
-        cm_to_inch=0.393701
-        fig.set_figwidth(8.48*2*cm_to_inch)
-        fig.set_figheight(8.48*1.1*cm_to_inch)
-        fig2.set_figwidth(8.48*2*cm_to_inch)
-        fig2.set_figheight(8.48*1.1*cm_to_inch)
+        gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
+        gen_funcs.setup_publication_image(fig2, height_prop = 1./1.618, single_col = False)
+        # cm_to_inch=0.393701
+        # fig.set_figwidth(8.48*2*cm_to_inch)
+        # fig.set_figheight(8.48*1.1*cm_to_inch)
+        # fig2.set_figwidth(8.48*2*cm_to_inch)
+        # fig2.set_figheight(8.48*1.1*cm_to_inch)
         for i, phasing in enumerate(phasings):
             tmp_vac_res, tmp_plas_res, tmp_tot_res, tmp_vac_ave, tmp_plas_ave,  tmp_tot_ave = self.dB_res_single_phasing(phasing,self.phase_machine_ntor, self.n,self.res_vac_list_upper, self.res_vac_list_lower, self.res_plas_list_upper, self.res_plas_list_lower, self.res_tot_list_upper, self.res_tot_list_lower)
             
@@ -251,8 +308,8 @@ class test1():
         for i in ax_orig[-1,:]:i.set_xlabel('rote')
         for i in ax2_orig[:,0]:i.set_ylabel('eta')
         for i in ax2_orig[-1,:]:i.set_xlabel('rote')
-        fig.tight_layout(pad=0.01)
-        fig2.tight_layout(pad=0.01)
+        fig.tight_layout(pad=0.1)
+        fig2.tight_layout(pad=0.1)
         cbar = pt.colorbar(color_ax, ax = ax.tolist())
         cbar2 = pt.colorbar(color_ax2, ax = ax2.tolist())
         #ax.imshow(new_matrix_tot)
@@ -301,6 +358,7 @@ class test1():
                 self.Bn_Li_list.append(self.project_dict['sims'][i]['BETAN']/self.project_dict['sims'][i]['LI'])
             else:
                 self.Bn_Li_list.append(self.project_dict['sims'][i]['BETAN'])
+
     def extract_eta_rote(self,):
         '''
         extract some various quantities from a standard pyMARS output dictionary
@@ -319,17 +377,17 @@ class test1():
         self.res_tot_list_upper = []; self.res_tot_list_lower = []
         self.res_plas_list_upper = []; self.res_plas_list_lower = []
         for i in self.project_dict['sims'].keys():
-            self.upper_tot_res = np.array(self.project_dict['sims'][i]['responses']['total_resonant_response_upper'])
-            self.lower_tot_res = np.array(self.project_dict['sims'][i]['responses']['total_resonant_response_lower'])
-            self.upper_vac_res = np.array(self.project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
-            self.lower_vac_res = np.array(self.project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
+            upper_tot_res = np.array(self.project_dict['sims'][i]['responses']['total_resonant_response_upper'])
+            lower_tot_res = np.array(self.project_dict['sims'][i]['responses']['total_resonant_response_lower'])
+            upper_vac_res = np.array(self.project_dict['sims'][i]['responses']['vacuum_resonant_response_upper'])
+            lower_vac_res = np.array(self.project_dict['sims'][i]['responses']['vacuum_resonant_response_lower'])
 
-            self.res_vac_list_upper.append(self.upper_vac_res)
-            self.res_vac_list_lower.append(self.lower_vac_res)
-            self.res_tot_list_upper.append(self.upper_tot_res)
-            self.res_tot_list_lower.append(self.lower_tot_res)
-            self.res_plas_list_upper.append(self.upper_tot_res - self.upper_vac_res)
-            self.res_plas_list_lower.append(self.lower_tot_res - self.lower_vac_res)
+            self.res_vac_list_upper.append(upper_vac_res)
+            self.res_vac_list_lower.append(lower_vac_res)
+            self.res_tot_list_upper.append(upper_tot_res)
+            self.res_tot_list_lower.append(lower_tot_res)
+            self.res_plas_list_upper.append(upper_tot_res - upper_vac_res)
+            self.res_plas_list_lower.append(lower_tot_res - lower_vac_res)
 
     def extract_dB_kink(self, upper_lower=True):
         '''
@@ -404,18 +462,81 @@ class test1():
         for ii in range(0,len(res_vac_list_upper)):
             #divisor is for calculating the dBres_ave
             divisor = len(res_vac_list_upper[ii])
-            print divisor
-            print res_vac_list_upper[ii], res_vac_list_lower[ii]
+            #print divisor
+            #print res_vac_list_upper[ii], res_vac_list_lower[ii]
             tmp_vac_list.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor)))
             tmp_plas_list.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor)))
             tmp_tot_list.append(np.sum(np.abs(res_tot_list_upper[ii] + res_tot_list_lower[ii]*phasor)))
-
+            print '!', tmp_vac_list[-1], tmp_plas_list[-1], tmp_tot_list[-1]
             tmp_vac_list2.append(tmp_vac_list[-1]/divisor)
             tmp_plas_list2.append(tmp_plas_list[-1]/divisor)
             tmp_tot_list2.append(tmp_tot_list[-1]/divisor)
             #tmp_vac_list2.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor))/divisor)
             #tmp_plas_list2.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor))/divisor)
         return tmp_vac_list, tmp_plas_list, tmp_tot_list, tmp_vac_list2, tmp_plas_list2,  tmp_tot_list2
+
+    def plot_dB_res_ind_harmonics(self, curr_phase):
+        print 'phase :', curr_phase
+        phasing = curr_phase/180.*np.pi
+        if self.phase_machine_ntor:
+            phasor = (np.cos(-phasing*self.n)+1j*np.sin(-phasing*self.n))
+        else:
+            phasor = (np.cos(phasing)+1j*np.sin(phasing))
+        #phasor = (np.cos(curr_phase/180.*np.pi)+1j*np.sin(curr_phase/180.*np.pi))
+        tmp_vac_list = []; tmp_plas_list = [];tmp_tot_list = []
+        tmp_vac_list2 = []; tmp_plas_list2 = []; tmp_tot_list2 = []
+
+        fig, ax = pt.subplots(nrows = 3, sharex = True, sharey = True)
+        fig2, ax2 = pt.subplots(nrows = 3, ncols = 2, sharex = True, )
+        
+        
+        print self.time_list
+        tmp = sorted(zip(self.time_list, range(len(self.res_vac_list_upper))), key = lambda sort_val:sort_val[0])
+        #tmp = np.sort([[t, res] for t, res in zip(self.time_list, range(len(self.res_vac_list_upper)))],axis = 0)
+        #print tmp
+        #for ii in range(0,len(self.res_vac_list_upper)):
+        jet = cm = pt.get_cmap('jet')
+        import matplotlib.colors as colors
+        import matplotlib.cm as cmx
+        cNorm  = colors.Normalize(vmin=np.min(self.time_list), vmax=np.max(self.time_list))
+        scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+        print scalarMap.get_clim()
+        x_axis = self.project_dict['sims'][1]['responses']['resonant_response_sq'].flatten()
+        for eq_time, ii in tmp:
+            #divisor is for calculating the dBres_ave
+            #divisor = len(res_vac_list_upper[ii])
+            #print divisor
+            #print res_vac_list_upper[ii], res_vac_list_lower[ii]
+            colorval = scalarMap.to_rgba(eq_time)
+            ax[0].plot(np.abs(self.res_vac_list_upper[ii] + self.res_vac_list_lower[ii]*phasor))
+            ax[1].plot(np.abs(self.res_plas_list_upper[ii] + self.res_plas_list_lower[ii]*phasor), color=colorval)
+            ax[2].plot(np.abs(self.res_tot_list_upper[ii] + self.res_tot_list_lower[ii]*phasor), color=colorval)
+            ax2[0,0].plot(x_axis, np.abs(self.res_vac_list_upper[ii] + self.res_vac_list_lower[ii]*phasor), color=colorval)
+            ax2[0,0].text(x_axis[-1], np.abs(self.res_vac_list_upper[ii] + self.res_vac_list_lower[ii]*phasor)[-1],np.sum(np.abs(self.res_vac_list_upper[ii] + self.res_vac_list_lower[ii]*phasor)[-1]))
+            ax2[1,0].plot(x_axis, np.abs(self.res_plas_list_upper[ii] + self.res_plas_list_lower[ii]*phasor), color=colorval)
+            ax2[1,0].text(x_axis[-1], np.abs(self.res_plas_list_upper[ii] + self.res_plas_list_lower[ii]*phasor)[-1],'{:.2f},{}'.format(np.sum(np.abs(self.res_plas_list_upper[ii] + self.res_plas_list_lower[ii]*phasor)[-1]),eq_time))
+
+            ax2[2,0].plot(x_axis, np.abs(self.res_tot_list_upper[ii] + self.res_tot_list_lower[ii]*phasor), color=colorval)
+
+            ax2[2,0].text(x_axis[-1], np.abs(self.res_tot_list_upper[ii] + self.res_tot_list_lower[ii]*phasor)[-1],'{:.2f},{}'.format(np.sum(np.abs(self.res_tot_list_upper[ii] + self.res_tot_list_lower[ii]*phasor)[-1]),eq_time))
+
+            ax2[0,1].plot(x_axis, np.angle(self.res_vac_list_upper[ii] + self.res_vac_list_lower[ii]*phasor), color=colorval)
+            ax2[1,1].plot(x_axis, np.angle(self.res_plas_list_upper[ii] + self.res_plas_list_lower[ii]*phasor), color=colorval)
+            ax2[2,1].plot(x_axis, np.angle(self.res_tot_list_upper[ii] + self.res_tot_list_lower[ii]*phasor), color=colorval)
+            #print '!', tmp_vac_list[-1], tmp_plas_list[-1], tmp_tot_list[-1]
+            #tmp_vac_list2.append(tmp_vac_list[-1]/divisor)
+            #tmp_plas_list2.append(tmp_plas_list[-1]/divisor)
+            #tmp_tot_list2.append(tmp_tot_list[-1]/divisor)
+            #tmp_vac_list2.append(np.sum(np.abs(res_vac_list_upper[ii] + res_vac_list_lower[ii]*phasor))/divisor)
+            #tmp_plas_list2.append(np.sum(np.abs(res_plas_list_upper[ii] + res_plas_list_lower[ii]*phasor))/divisor)
+        ax2[0,1].set_ylim([-np.pi,np.pi])
+        ax2[1,1].set_ylim([-np.pi,np.pi])
+        ax2[2,1].set_ylim([-np.pi,np.pi])
+        ax2[2,1].set_xlim([0,1.3])
+
+
+        fig.canvas.draw();fig.show()
+        fig2.canvas.draw();fig2.show()
 
     def plot_dB_kink_fixed_vac(self,sort_name = 'rote_list', clim1 = None, clim2 = None, xaxis_type = 'linear', xaxis_label = r'$q_{95}$'):
         xaxis = np.array(self.output_dict[sort_name+'_arranged'])
@@ -645,9 +766,12 @@ def apply_phasing(upper, lower, phasing, n, phase_machine_ntor = 1):
         phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
     else:
         phasor = (np.cos(phasing)+1j*np.sin(phasing))
-    for i in range(0,len(upper)):
-        answer.append(upper[i] + lower[i] * phasor)
-    return answer
+    if upper.__class__==np.ndarray or upper.__class__==list:
+        for i in range(0,len(upper)):
+            answer.append(upper[i] + lower[i] * phasor)
+        return answer
+    else:
+        return upper + lower * phasor
 
 def calculate_db_kink(mk_list, q_val_list, n, reference, to_be_calculated):
     '''

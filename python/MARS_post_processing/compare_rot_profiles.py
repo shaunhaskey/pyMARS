@@ -5,7 +5,7 @@ base_dir2 = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/times/'
 fig, ax_orig = pt.subplots(ncols = 2, nrows = 2); ax2 = ax_orig.flatten()
 fig2, ax_orig2 = pt.subplots(ncols = 2, nrows = 2); ax3 = ax_orig2.flatten()
 times = np.arange(1495,2015+40,40)
-times = [1615,1815,2015]
+times = [1615,1815,1935,2015]
 
 profeq_cols = ['s','q','jeq','peq','rho','rot','resist','gamarr', 'gmunu', 'tempi', 'tempe','dpsids', 't', 'omegasi','omegase']
 for ax, ax3, profeq_name, profile in zip(ax2,ax3,['rot','rho','resist','tempe'],['PROFROT','PROFDEN','PROFTI','PROFTE']):

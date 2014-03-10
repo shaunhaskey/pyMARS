@@ -2,6 +2,7 @@ import numpy as np
 import cPickle as pickle
 import matplotlib.pyplot as pt
 import pyMARS.dBres_dBkink_funcs as dBres_dBkink
+import pyMARS.generic_funcs as gen_funcs
 import copy
 
 file_name = '/home/srh112/NAMP_datafiles/mars/single_run_through_test_142614_V2/single_run_through_test_142614_V2_post_processing_PEST.pickle'
@@ -15,6 +16,9 @@ file_name='/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30/shot
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kpar1/shot_142614_rote_res_scan_30x30_kpar1_post_processing_PEST.pickle'
 
+file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
+
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
 
 phasing = 0
@@ -29,11 +33,15 @@ sort_name = 'rote_list'
 a = dBres_dBkink.test1(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
 fig, ax = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax = ax.flatten()
 fig2, ax2_orig = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax2 = ax2_orig.flatten()
+gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
+gen_funcs.setup_publication_image(fig2, height_prop = 1./1.618, single_col = False)
+
 phasings_disp = [0,45,90,135,180,225,270,315]
 for i in range(len(phasings_disp)):
     a.extract_organise_single_disp(phasings_disp[i], ax_line_plots = ax[i], ax_matrix = ax2[i], clim = [0, 0.015])
     tmp, color_ax = a.extract_organise_single_disp(phasings_disp[i], ax_line_plots = None, ax_matrix = ax2[i], clim = [0, 0.025])
     #tmp, color_ax = a.extract_organise_single_disp(phasings_disp[i], ax_line_plots = None, ax_matrix = None, clim = [0, 0.025])
+fig.tight_layout(pad = 0.5)
 fig.canvas.draw(); fig.show()
 
 
@@ -43,6 +51,7 @@ for i in ax2_orig[-1,:]:i.set_xlabel('rote')
 fig2.tight_layout(pad=0.01)
 cbar = pt.colorbar(color_ax, ax = ax2.tolist())
 cbar.set_label('Displacement around x-point')
+fig2.tight_layout(pad = 0.1)
 fig2.savefig('res_rot_scan_displacement.pdf')
 fig2.canvas.draw(); fig2.show()
 a.eta_rote_matrix(phasing = 0, plot_type = 'plas')
