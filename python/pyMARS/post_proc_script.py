@@ -1,9 +1,9 @@
 #!/usr/bin/env Python
-import results_class
+import pyMARS.results_class
 import pickle,sys
 import numpy as num
-import PythonMARS_funcs as pyMARS
-import RZfuncs as RZfuncs
+import pyMARS.PythonMARS_funcs as pyMARS_funcs
+import pyMARS.RZfuncs as RZfuncs
 
 project_name = sys.argv[1]
 upper_and_lower = int(sys.argv[2])
@@ -18,7 +18,7 @@ def perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,
     new_data_R = new_data.R*new_data.R0EXP
     new_data_Z = new_data.Z*new_data.R0EXP
     #print 'R and Z data obtained'
-    new_answer = num.array(pyMARS.coil_responses6(new_data_R,new_data_Z,new_data.Br,new_data.Bz,new_data.Bphi,probe, probe_type, Rprobe,Zprobe,tprobe,lprobe))
+    new_answer = num.array(pyMARS_funcs.coil_responses6(new_data_R,new_data_Z,new_data.Br,new_data.Bz,new_data.Bphi,probe, probe_type, Rprobe,Zprobe,tprobe,lprobe))
     #print 'finished calculation'
     return new_answer
 

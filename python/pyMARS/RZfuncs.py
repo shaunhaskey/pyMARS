@@ -4,7 +4,7 @@ import matplotlib.mlab as mlab
 from scipy.interpolate import *
 from scipy.interpolate import griddata as scipy_griddata
 import os,copy
-import magnetics_details as mag_details
+import pyMARS.magnetics_details as mag_details
 
 def I0EXP_calc(N,n,I):
     # Calculate I0EXP based on Chu's memo. This provides the conversion between MARS-F

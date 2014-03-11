@@ -29,9 +29,9 @@
 #Shaun Haskey Jan 18 2012 shaunhaskey@gmail.com
 
 
-import PythonMARS_funcs as pyMARS
-import control_funcs as cont_funcs
-import Batch_Launcher as batch_launch
+import pyMARS.PythonMARS_funcs as pyMARS_funcs
+import pyMARS.control_funcs as cont_funcs
+import pyMARS.Batch_Launcher as batch_launch
 import pickle, time, os
 import numpy as num
 
@@ -176,7 +176,7 @@ if start_from_step == 1:
     os.system('cp ' + project_dict['details']['efit_master'] + '* ' + project_dict['details']['efit_dir'])
 
     #Output data structure for the next step
-    pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_initial_setup.pickle')
+    pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_initial_setup.pickle')
 
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
     #corsica_base_dir = '/scratch/haskeysr/corsica_test9/'
@@ -193,13 +193,13 @@ if start_from_step == 1:
 if start_from_step <=2 and end_at_step>=2:
     overall_start = time.time()
     if start_from_step ==2:
-        project_dict = pyMARS.read_data(project_dir +project_name+'_initial_setup.pickle')
+        project_dict = pyMARS_funcs.read_data(project_dir +project_name+'_initial_setup.pickle')
 
     file_location = project_dict['details']['efit_dir']+'/stab_setup_results.dat'
     base_dir = project_dict['details']['base_dir']
 
     #Read the stab_results file and create the serial numbers in the data structure for each equilibria
-    project_dict['sims'] = pyMARS.read_stab_results(file_location)
+    project_dict['sims'] = pyMARS_funcs.read_stab_results(file_location)
 
     #Filter according to settings at top of file
     project_dict = cont_funcs.remove_certain_values(project_dict, q95_range, Bn_Div_Li_range, filter_WTOTN1, filter_WTOTN2, filter_WTOTN3, filter_WWTOTN1)
@@ -210,7 +210,7 @@ if start_from_step <=2 and end_at_step>=2:
 
     #Dump the data structure so it can be read by the next step if required
     print 'dumping data to pickle file'
-    pyMARS.dump_data(project_dict, project_dict['details']['base_dir']+ project_name + '_setup_directories.pickle')
+    pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir']+ project_name + '_setup_directories.pickle')
 
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 
@@ -221,7 +221,7 @@ if start_from_step <=2 and end_at_step>=2:
 if start_from_step <=3 and end_at_step>=3:
     overall_start = time.time()
     if start_from_step ==3:
-        project_dict = pyMARS.read_data(project_dict['details']['base_dir'] + project_name+'_setup_directories.pickle')
+        project_dict = pyMARS_funcs.read_data(project_dict['details']['base_dir'] + project_name+'_setup_directories.pickle')
 
     #setup and run the chease jobs, these are submitted to the venus cluster
     #set CHEASE_simultaneous_jobs to set how many jobs are run at the same time on the cluster
@@ -245,7 +245,7 @@ if start_from_step <=3 and end_at_step>=3:
         #DO I NEED TO RUN FourierX ON THE PEST JOB??? ask Matt or Yueqiang
 
     #Dump the data structure so it can be read by the next step if required
-    pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_chease.pickle')
+    pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_chease.pickle')
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 
 
@@ -259,12 +259,12 @@ if start_from_step <=3 and end_at_step>=3:
 if start_from_step <=4 and end_at_step>=4:
     overall_start = time.time()
     if start_from_step == 4:
-        project_dict = pyMARS.read_data(project_dir + project_name+'_post_chease.pickle')
+        project_dict = pyMARS_funcs.read_data(project_dir + project_name+'_post_chease.pickle')
     RMZM_name = 'RMZM_F'
 
     project_dict = cont_funcs.RMZM_func(project_dict, coilN, RMZM_name)
 
-    pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_RMZM.pickle')
+    pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_RMZM.pickle')
 
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 
@@ -274,12 +274,12 @@ if start_from_step <=4 and end_at_step>=4:
 if start_from_step <=5 and end_at_step>=5:
     overall_start = time.time()
     if start_from_step == 5:
-        project_dict = pyMARS.read_data(project_dir + project_name+'_post_RMZM.pickle')
+        project_dict = pyMARS_funcs.read_data(project_dir + project_name+'_post_RMZM.pickle')
 
     project_dict = cont_funcs.setup_mars_func(project_dict)
 
     #Save the data structure so that it can be read by the next step
-    pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_setup.pickle')
+    pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_setup.pickle')
 
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 
@@ -289,7 +289,7 @@ if start_from_step <=5 and end_at_step>=5:
 if start_from_step <=6 and end_at_step>=6:
     overall_start = time.time()
     if start_from_step == 6:
-        project_dict = pyMARS.read_data(project_dir + project_name + '_post_setup.pickle')
+        project_dict = pyMARS_funcs.read_data(project_dir + project_name + '_post_setup.pickle')
 
     job_num_filename = project_dict['details']['base_dir']+'MARS_simul_jobs.txt'
     job_num_file = open(job_num_filename,'w')
@@ -298,7 +298,7 @@ if start_from_step <=6 and end_at_step>=6:
 
     project_dict = cont_funcs.run_mars_function(project_dict, job_num_filename, rm_files = MARS_rm_files)
 
-    pyMARS.dump_data(project_dict, project_dict['details']['base_dir']+ project_name+'_post_mars_run.pickle')
+    pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir']+ project_name+'_post_mars_run.pickle')
 
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 
@@ -311,14 +311,14 @@ if start_from_step <=7 and end_at_step>=7:
     overall_start = time.time()
     if start_from_step == 7:
         print 'reading pickle_file'
-        project_dict = pyMARS.read_data(project_dir + project_name + '_post_mars_run.pickle')
+        project_dict = pyMARS_funcs.read_data(project_dir + project_name + '_post_mars_run.pickle')
 
     serial_list = project_dict['sims'].keys()
     project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script)
 
     #project_dict = cont_funcs.coil_outputs_B(project_dict,serial_list)
 
-    pyMARS.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_processing.pickle')
+    pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_post_processing.pickle')
 
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env Python
-import PythonMARS_funcs as pyMARS
+import pyMARS.PythonMARS_funcs as pyMARS_funcs
 import time, pickle, copy, os
-import Batch_Launcher as batch_launcher
-import RZfuncs as RZfuncs
-import results_class
+import pyMARS.Batch_Launcher as batch_launcher
+import pyMARS.RZfuncs as RZfuncs
+import pyMARS.results_class
 import multiprocessing
 import numpy as num
 
@@ -299,7 +299,7 @@ def generate_directories_func(project_dict, base_dir, multiple_efits = 0):
         project_dict['sims'][i]['MARS_settings'] = copy.deepcopy(project_dict['details']['MARS_settings'])
         project_dict['sims'][i]['corsica_settings'] = copy.deepcopy(project_dict['details']['corsica_settings'])
         project_dict['sims'][i]['I-coils'] = project_dict['details']['I-coils']
-        project_dict['sims'][i] = pyMARS.generate_directories(project_dict['sims'][i],base_dir, multiple_efits = multiple_efits)
+        project_dict['sims'][i] = pyMARS_funcs.generate_directories(project_dict['sims'][i],base_dir, multiple_efits = multiple_efits)
 
     return project_dict
 
@@ -319,7 +319,7 @@ def generate_directories_func_serial(project_dict, base_dir):
         project_dict['sims'][i]['MARS_settings'] = copy.deepcopy(project_dict['details']['MARS_settings'])
         project_dict['sims'][i]['corsica_settings'] = copy.deepcopy(project_dict['details']['corsica_settings'])
         project_dict['sims'][i]['I-coils'] = project_dict['details']['I-coils']
-        project_dict['sims'][i] = pyMARS.generate_directories(project_dict['sims'][i],base_dir)
+        project_dict['sims'][i] = pyMARS_funcs.generate_directories(project_dict['sims'][i],base_dir)
 
     return project_dict
 
@@ -330,19 +330,19 @@ def chease_setup_run(project_dict, job_num_filename, CHEASE_execution_script,CHE
     for i in project_dict['sims'].keys():
         print i
         #copy the Chease template
-        pyMARS.copy_chease_files(project_dict['sims'][i], PEST = PEST)
+        pyMARS_funcs.copy_chease_files(project_dict['sims'][i], PEST = PEST)
         #modify the datain so it is relevant for this project
-        project_dict['sims'][i] = pyMARS.modify_datain(project_dict['sims'][i],project_dict['details']['template_dir'], project_dict['sims'][i]['CHEASE_settings'], CHEASE_template = CHEASE_template, PEST = PEST)
+        project_dict['sims'][i] = pyMARS_funcs.modify_datain(project_dict['sims'][i],project_dict['details']['template_dir'], project_dict['sims'][i]['CHEASE_settings'], CHEASE_template = CHEASE_template, PEST = PEST)
         #modify_datain(project_dict['sims'][i],project_dict['details']['template_dir'], PEST = PEST)
         #generate a job file that can be submitted to the cluster
 
         tmp = project_dict['sims'][i]
         if PEST==0:
-            pyMARS.fxin_create(tmp['dir_dict']['chease_dir'], tmp['MARS_settings']['<<M1>>'],tmp['MARS_settings']['<<M2>>'],project_dict['sims'][i]['R0EXP'], project_dict['sims'][i]['B0EXP'])
+            pyMARS_funcs.fxin_create(tmp['dir_dict']['chease_dir'], tmp['MARS_settings']['<<M1>>'],tmp['MARS_settings']['<<M2>>'],project_dict['sims'][i]['R0EXP'], project_dict['sims'][i]['B0EXP'])
         else:
-            pyMARS.fxin_create(tmp['dir_dict']['chease_dir_PEST'], tmp['MARS_settings']['<<M1>>'],tmp['MARS_settings']['<<M2>>'],project_dict['sims'][i]['R0EXP'], project_dict['sims'][i]['B0EXP'])
+            pyMARS_funcs.fxin_create(tmp['dir_dict']['chease_dir_PEST'], tmp['MARS_settings']['<<M1>>'],tmp['MARS_settings']['<<M2>>'],project_dict['sims'][i]['R0EXP'], project_dict['sims'][i]['B0EXP'])
             
-        pyMARS.generate_chease_job_file(project_dict['sims'][i], CHEASE_execution_script, PEST = PEST, fxrun = fxrun, id_string = identifier_string,rm_files = rm_files)
+        pyMARS_funcs.generate_chease_job_file(project_dict['sims'][i], CHEASE_execution_script, PEST = PEST, fxrun = fxrun, id_string = identifier_string,rm_files = rm_files)
 
 
     #This is the step that launches the batch job
@@ -398,7 +398,7 @@ def RMZM_func_matlab(project_dict, matlab_RZplot_files, main_template):
         print i
 
         #copy a MacMain.m script to the chease dir and modify to perform the job we require
-        project_dict['sims'][i] = pyMARS.modify_RMZM_F2(project_dict['sims'][i], main_template)
+        project_dict['sims'][i] = pyMARS_funcs.modify_RMZM_F2(project_dict['sims'][i], main_template)
 
         mat_commands += 'close all;clear all;\n'
         #Go to correct dir
@@ -433,7 +433,7 @@ def RMZM_func_matlab(project_dict, matlab_RZplot_files, main_template):
     #Retrieve the results from the Matlab run
     for i in project_dict['sims'].keys():
         print i
-        project_dict['sims'][i] = pyMARS.RMZM_post_matlab(project_dict['sims'][i])
+        project_dict['sims'][i] = pyMARS_funcs.RMZM_post_matlab(project_dict['sims'][i])
 
     return project_dict
 
@@ -478,22 +478,22 @@ def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN
     for i in project_dict['sims'].keys():
         print i
         #Extract required values from CHEASE log file
-        project_dict['sims'][i] = pyMARS.extract_NW(project_dict['sims'][i])
+        project_dict['sims'][i] = pyMARS_funcs.extract_NW(project_dict['sims'][i])
 
         #Link required files
         if multiple_efits:
             special_dir = str(project_dict['sims'][i]['shot_time'])
         else:
             special_dir = ''
-        pyMARS.mars_setup_files(project_dict['sims'][i], upper_and_lower = upper_and_lower, special_dir = special_dir)
-        #pyMARS.mars_setup_files(project_dict['sims'][i], vac = 0, upper_and_lower = upper_and_lower)
+        pyMARS_funcs.mars_setup_files(project_dict['sims'][i], upper_and_lower = upper_and_lower, special_dir = special_dir)
+        #pyMARS_funcs.mars_setup_files(project_dict['sims'][i], vac = 0, upper_and_lower = upper_and_lower)
 
         #Calculate the values that need to be normalised to something to do with Alfven speed/frequency
-        project_dict['sims'][i] = pyMARS.mars_setup_alfven(project_dict['sims'][i], project_dict['sims'][i]['ICOIL_FREQ'], upper_and_lower = upper_and_lower)
+        project_dict['sims'][i] = pyMARS_funcs.mars_setup_alfven(project_dict['sims'][i], project_dict['sims'][i]['ICOIL_FREQ'], upper_and_lower = upper_and_lower)
 
         #Create the MARS RUN files
-        project_dict['sims'][i] = pyMARS.mars_setup_run_file_new(project_dict['sims'][i], project_dict['details']['template_dir'] + MARS_template_name, upper_and_lower = upper_and_lower)
-        #project_dict['sims'][i] = pyMARS.mars_setup_run_file_new(project_dict['sims'][i], project_dict['details']['template_dir'], vac = 0, upper_and_lower = upper_and_lower)
+        project_dict['sims'][i] = pyMARS_funcs.mars_setup_run_file_new(project_dict['sims'][i], project_dict['details']['template_dir'] + MARS_template_name, upper_and_lower = upper_and_lower)
+        #project_dict['sims'][i] = pyMARS_funcs.mars_setup_run_file_new(project_dict['sims'][i], project_dict['details']['template_dir'], vac = 0, upper_and_lower = upper_and_lower)
 
         #generate_job_file(project_dict['sims'][i],1) #create Venus cluster job file
         #mars_setup_run_file(project_dict['sims'][i], project_dict['details']['template_dir'], vac = 0)
@@ -508,10 +508,10 @@ def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN
 def run_mars_function(project_dict,job_num_filename, MARS_execution_script,rm_files = '', rm_files2 = '', cluster_job =1, upper_and_lower = 0):
     id_string = 'MAR' + str(int(num.random.rand(1)*100)) #to identify which jobs have been submitted to venus
     for i in project_dict['sims'].keys():
-        pyMARS.generate_job_file(project_dict['sims'][i], MARS_execution_script,id_string = id_string, rm_files = rm_files, rm_files2 = rm_files2, upper_and_lower=upper_and_lower)
+        pyMARS_funcs.generate_job_file(project_dict['sims'][i], MARS_execution_script,id_string = id_string, rm_files = rm_files, rm_files2 = rm_files2, upper_and_lower=upper_and_lower)
 
-        #pyMARS.generate_job_file(project_dict['sims'][i],1, id_string = id_string, rm_files = rm_files) #create Venus cluster job file
-        #pyMARS.generate_job_file(project_dict['sims'][i],0, id_string = id_string, rm_files = rm_files) #create Venus cluster job file
+        #pyMARS_funcs.generate_job_file(project_dict['sims'][i],1, id_string = id_string, rm_files = rm_files) #create Venus cluster job file
+        #pyMARS_funcs.generate_job_file(project_dict['sims'][i],0, id_string = id_string, rm_files = rm_files) #create Venus cluster job file
 
     if cluster_job == 0:
         project_dict['sims'] = batch_launcher.single_launch_mars(project_dict['sims'])
