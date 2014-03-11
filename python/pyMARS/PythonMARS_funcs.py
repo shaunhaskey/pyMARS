@@ -493,38 +493,38 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
         os.chdir(master['dir_dict']['mars_upper_vacuum_dir'])
 
 
-    PROFDEN_file = open('PROFDEN','r')
-    PROFDEN_data = PROFDEN_file.readlines()
-    PROFDEN_file.close()
-    #print PROFDEN_data[1]
+    # PROFDEN_file = open('PROFDEN','r')
+    # PROFDEN_data = PROFDEN_file.readlines()
+    # PROFDEN_file.close()
+    # #print PROFDEN_data[1]
 
-    pattern = ''
-    PROFDEN_data[1]
-    re.search(pattern, PROFDEN_data[1])
-    pattern = '\d+.\d+e*\+*\-*\d*'
-    string1 = re.search(pattern, PROFDEN_data[1])
-    string2 = re.search(pattern, PROFDEN_data[1][string1.end()+1:])
-    ne0_r = float(PROFDEN_data[1][string1.start():string1.end()])
-    ne0 = float(PROFDEN_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
-    ne0_new = np.loadtxt('PROFDEN',skiprows = 1)[0,1]
-    print 'new PROFDEN', ne0 == ne0_new
+    # pattern = ''
+    # PROFDEN_data[1]
+    # re.search(pattern, PROFDEN_data[1])
+    # pattern = '\d+.\d+e*\+*\-*\d*'
+    # string1 = re.search(pattern, PROFDEN_data[1])
+    # string2 = re.search(pattern, PROFDEN_data[1][string1.end()+1:])
+    # ne0_r = float(PROFDEN_data[1][string1.start():string1.end()])
+    # ne0 = float(PROFDEN_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
+    ne0 = np.loadtxt('PROFDEN',skiprows = 1)[0,1]
+    #print 'new PROFDEN', ne0 == ne0_new
 
-    #rotation data
-    #print 'Rotation section ------------' 
-    PROFROT_file = open('PROFROT','r')
-    PROFROT_data = PROFROT_file.readlines()
-    PROFROT_file.close()
-    #print PROFROT_data[1]
+    # #rotation data
+    # #print 'Rotation section ------------' 
+    # PROFROT_file = open('PROFROT','r')
+    # PROFROT_data = PROFROT_file.readlines()
+    # PROFROT_file.close()
+    # #print PROFROT_data[1]
 
-    pattern = ''
-    re.search(pattern, PROFROT_data[1])
-    pattern = '\d+.\d+e*\+*\-*\d*'
-    string1 = re.search(pattern, PROFROT_data[1])
-    string2 = re.search(pattern, PROFROT_data[1][string1.end()+1:])
-    vtor0_r = float(PROFROT_data[1][string1.start():string1.end()])
-    vtor0 = float(PROFROT_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
-    vtor0_new = np.loadtxt('PROFROT',skiprows = 1)[0,1]
-    print 'new PROFROT', vtor0 == vtor0_new
+    # pattern = ''
+    # re.search(pattern, PROFROT_data[1])
+    # pattern = '\d+.\d+e*\+*\-*\d*'
+    # string1 = re.search(pattern, PROFROT_data[1])
+    # string2 = re.search(pattern, PROFROT_data[1][string1.end()+1:])
+    # vtor0_r = float(PROFROT_data[1][string1.start():string1.end()])
+    # vtor0 = float(PROFROT_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
+    vtor0 = np.loadtxt('PROFROT',skiprows = 1)[0,1]
+    #print 'new PROFROT', vtor0 == vtor0_new
     #print 'vtor0_r', vtor0_r, 'vtor0', vtor0
     
     B0EXP = master['B0EXP']
@@ -541,7 +541,10 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     ichz = num.array([1,2,5,10,20,40,60,100,120,160,200,500,1000,5000,10000.],dtype=float)
     ichz = num.array([input_frequency],dtype = float)
 
-    vtorn=vtor0/v0a
+    #OLD....
+    #vtorn=vtor0/v0a
+
+    vtorn=vtor0*taua
 
     #Resistivity data
     try:
@@ -567,16 +570,16 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     output_string.append('=======================================')
     output_string.append('B0EXP (T)                  : %.4f'%(B0EXP))
     output_string.append('R0EXP (m)                  : %.4f'%(R0EXP))
-    output_string.append('Central density (m^-3)    : %.4f'%(ne0))
-    output_string.append('Tau wall physics (s)      : %.4f'%(tauwp))
+    output_string.append('Central density (m^-3)    : %.4e'%(ne0))
+    output_string.append('Tau wall physics (s)      : %.4e'%(tauwp))
     output_string.append('=======================================')
     output_string.append('Normalized values')
     output_string.append('=======================================')
-    output_string.append('Central Alfven speed (m/s)    : %.4f'%(v0a))
-    output_string.append('Central Alfven time (s)       :%.4f'%(taua))
-    output_string.append('Central Alfven Frequency (1/s): %.4f'%(1.0/taua))
-    output_string.append('TAUW              : %.4f'%(tauwm))
-    output_string.append('ROTE              : %.4f'%(vtorn))
+    output_string.append('Central Alfven speed (m/s)    : %.4e'%(v0a))
+    output_string.append('Central Alfven time (s)       :%.4e'%(taua))
+    output_string.append('Central Alfven Frequency (1/s): %.4e'%(1.0/taua))
+    output_string.append('TAUW              : %.4e'%(tauwm))
+    output_string.append('ROTE              : %.4e'%(vtorn))
     output_string.append('Thermal OMEGACIO : %.4f'%(fcio))
 #    IF nprofda GT 0 THEN  print 'Fast OMEGACIO    : ',fcio_fast
     output_string.append('=======================================')
@@ -587,10 +590,10 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     output_string.append('=======================================')
     output_string.append('B0EXP: %.8f'%(B0EXP))
     output_string.append('R0EXP: %.8f'%(R0EXP))
-    output_string.append('tauwp: %.8f'%(tauwp))
-    output_string.append('tauwm: %.8f'%(tauwm))
-    output_string.append('f_v0a: %.8f'%(f_v0a))
-    output_string.append('fcio: %.8f'%(fcio))
+    output_string.append('tauwp: %.8e'%(tauwp))
+    output_string.append('tauwm: %.8e'%(tauwm))
+    output_string.append('f_v0a: %.8e'%(f_v0a))
+    output_string.append('fcio: %.8e'%(fcio))
     if te_success:
         output_string.append('============== Resistivity =================')
         output_string.append('Spitzer_resist : {:.4e} Ohm m'.format(spitz_resist))
@@ -599,10 +602,10 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     
     for i in range(0,len(output_string)):
         output_string[i]+='\n'
-    alf_calc_file = open(master['dir_dict']['mars_dir']+'Alf_calcs.txt','w')
-        
-    alf_calc_file.writelines(output_string)
-    alf_calc_file.close()
+
+    with file(master['dir_dict']['mars_dir']+'Alf_calcs.txt','w') as alf_calc_file:
+        alf_calc_file.writelines(output_string)
+    #alf_calc_file.close()
     
     master['ROTE'] = vtorn
     if te_success: master['ETA'] = eta
