@@ -2,7 +2,7 @@ import numpy as np
 import cPickle as pickle
 import matplotlib.pyplot as pt
 import pyMARS.dBres_dBkink_funcs as dBres_dBkink
-import generic_funcs as gen_func
+import pyMARS.generic_funcs as gen_func
 import copy
 
 file_name = '/home/srh112/NAMP_datafiles/mars/single_run_through_test_142614_V2/single_run_through_test_142614_V2_post_processing_PEST.pickle'
@@ -32,7 +32,10 @@ reference_dB_kink = 'plas'
 reference_offset = [2,0]
 sort_name = 'time_list'
 
-a = dBres_dBkink.test1(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+reference_dB_kink = 'plasma'
+a = dBres_dBkink.test1_new(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+1/0
+
 #fig, ax = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax = ax.flatten()
 #fig2, ax2_orig = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax2 = ax2_orig.flatten()
 phasings_disp = [0,45,90,135,180,225,270,315]
