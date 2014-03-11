@@ -506,7 +506,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     string2 = re.search(pattern, PROFDEN_data[1][string1.end()+1:])
     ne0_r = float(PROFDEN_data[1][string1.start():string1.end()])
     ne0 = float(PROFDEN_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
-    ne0_new = np.loadtxt('PROFDEN',skiplines = 1)[0,1]
+    ne0_new = np.loadtxt('PROFDEN',skiprows = 1)[0,1]
     print 'new PROFDEN', ne0 == ne0_new
 
     #rotation data
@@ -523,7 +523,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     string2 = re.search(pattern, PROFROT_data[1][string1.end()+1:])
     vtor0_r = float(PROFROT_data[1][string1.start():string1.end()])
     vtor0 = float(PROFROT_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
-    vtor0_new = np.loadtxt('PROFROT',skiplines = 1)[0,1]
+    vtor0_new = np.loadtxt('PROFROT',skiprows = 1)[0,1]
     print 'new PROFROT', vtor0 == vtor0_new
     #print 'vtor0_r', vtor0_r, 'vtor0', vtor0
     
@@ -545,7 +545,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 
     #Resistivity data
     try:
-        Te0 = np.loadtxt('PROFTE',skiplines = 1)[0,1]
+        Te0 = np.loadtxt('PROFTE',skiprows = 1)[0,1]
         #Make sure it is in eV
         if Te0<200: Te0*=1000
         te_success = 1
