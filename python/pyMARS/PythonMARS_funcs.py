@@ -494,6 +494,9 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 
     ne0 = np.loadtxt('PROFDEN',skiprows = 1)[0,1]
     vtor0 = np.loadtxt('PROFROT',skiprows = 1)[0,1]
+
+    #Make sure we are in rad/s
+    if vtor0<200: vtor0*=1000
     
     B0EXP = master['B0EXP']
     R0EXP = master['R0EXP']
