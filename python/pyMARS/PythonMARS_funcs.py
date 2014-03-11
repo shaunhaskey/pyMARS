@@ -447,6 +447,41 @@ def mars_setup_files(master, special_dir = '', upper_and_lower = 0, link_PROFTI 
 #--------- Calculate Alvfen velociy  -------------------
 # and related alfven velocity scaled values :
 # for mars input file : ROTE, OMEGA_NORM, TAUWM, v0a
+
+def spitz_eta_func(Te, Z = 1, e = -1.602176565*10**(-19), m = 9.10938291*10**(-31), coul_log = 15, e_0 = 8.85418782*10**(-12), K = 1.38*10**(-23), chen_H_approx = False):
+    '''Te is in eV
+    SRH : 11March2014
+    '''
+    if chen_H_approx:
+        return 5.2*10**(-5) * Z * coul_log/(Te)**1.5
+    else:
+        return np.pi * Z * e**2 * np.sqrt(m) * coul_log/((4.*np.pi*e_0)**2*(K * Te*11600)**1.5)
+
+def lundquist(eta, L = 1.6, va=4.e6):
+    '''
+    Gives the lundquist number which is a dimensionless quantity
+    The ratio between the Alfven wave crossing timescale to the resistive diffusion timescale
+
+    eta in [Ohm m ] = [V m A-1]
+    SRH : 11Mar2014
+    '''
+
+    mu_0 = 4.*np.pi*10**(-7) #[v s A-1 m-1]
+    return mu_0 * L * va / eta
+
+def eta_from_lundquist(lundquist, L = 1.6):
+    '''
+    Gives the lundquist number which is a dimensionless quantity
+    The ratio between the Alfven wave crossing timescale to the resistive diffusion timescale
+
+    eta in [Ohm m ] = [V m A-1]
+    SRH : 11Mar2014
+    '''
+
+    mu_0 = 4.*np.pi*10**(-7) #[v s A-1 m-1]
+    va = 4.e6 #[m s-1]
+    return mu_0 * L * va / lundquist
+
 def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     mu0 = 4e-7 * num.pi
     mi = 1.6726e-27 + 1.6749e-27 #rest mass of deuterium kg
@@ -460,6 +495,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 
     PROFDEN_file = open('PROFDEN','r')
     PROFDEN_data = PROFDEN_file.readlines()
+    PROFDEN_file.close()
     #print PROFDEN_data[1]
 
     pattern = ''
@@ -470,12 +506,14 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     string2 = re.search(pattern, PROFDEN_data[1][string1.end()+1:])
     ne0_r = float(PROFDEN_data[1][string1.start():string1.end()])
     ne0 = float(PROFDEN_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
-
+    ne0_new = np.loadtxt('PROFDEN',skiplines = 1)[0,1]
+    print 'new PROFDEN', ne0 == ne0_new
 
     #rotation data
     #print 'Rotation section ------------' 
     PROFROT_file = open('PROFROT','r')
     PROFROT_data = PROFROT_file.readlines()
+    PROFROT_file.close()
     #print PROFROT_data[1]
 
     pattern = ''
@@ -485,6 +523,8 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     string2 = re.search(pattern, PROFROT_data[1][string1.end()+1:])
     vtor0_r = float(PROFROT_data[1][string1.start():string1.end()])
     vtor0 = float(PROFROT_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
+    vtor0_new = np.loadtxt('PROFROT',skiplines = 1)[0,1]
+    print 'new PROFROT', vtor0 == vtor0_new
     #print 'vtor0_r', vtor0_r, 'vtor0', vtor0
     
     B0EXP = master['B0EXP']
@@ -503,6 +543,18 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 
     vtorn=vtor0/v0a
 
+    #Resistivity data
+    try:
+        Te0 = np.loadtxt('PROFTE',skiplines = 1)[0,1]
+        #Make sure it is in eV
+        if Te0<200: Te0*=1000
+        te_success = 1
+    except IOError:
+        print 'Error getting PROFTE data'
+    if te_success:
+        spitz_resist = spitz_eta_func(Te0, Z = 1, coul_log = 15, chen_H_approx = False)
+        lundquist = lundquist(spitz_resist, L = R0EXP, va=v0a)
+        eta = 1./lundquist
 #    nichz = N_ELEMENTS(ichz)
 
     #omega = ichz/f_v0a
@@ -533,14 +585,18 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     output_string.append('I-coil (Hz)      OMEGA')
     for k in range(0, len(ichz)): output_string.append('%.4e       %.4e'%(ichz[k], omega[k]))
     output_string.append('=======================================')
-                                                                                                   
     output_string.append('B0EXP: %.8f'%(B0EXP))
     output_string.append('R0EXP: %.8f'%(R0EXP))
     output_string.append('tauwp: %.8f'%(tauwp))
     output_string.append('tauwm: %.8f'%(tauwm))
     output_string.append('f_v0a: %.8f'%(f_v0a))
     output_string.append('fcio: %.8f'%(fcio))
-
+    if te_success:
+        output_string.append('============== Resistivity =================')
+        output_string.append('Spitzer_resist : {:.4e} Ohm m'.format(spitz_resist))
+        output_string.append('Lundquist number : {:.4e}'.format(lundquist))
+        output_string.append('ETA : {:.4e}'.format(eta))
+    
     for i in range(0,len(output_string)):
         output_string[i]+='\n'
     alf_calc_file = open(master['dir_dict']['mars_dir']+'Alf_calcs.txt','w')
@@ -549,6 +605,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     alf_calc_file.close()
     
     master['ROTE'] = vtorn
+    if te_success: master['ETA'] = eta
     master['OMEGA_NORM'] = omega[0]
     master['TAUWM'] = tauwm
     master['v0a'] = v0a
@@ -577,6 +634,7 @@ def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
     master[dict_key]['<<TAUW>>'] = master['TAUWM']
 
     if master[dict_key]['<<ROTE>>'] == -1:master[dict_key]['<<ROTE>>']=master['ROTE']
+    if master[dict_key]['<<ETA>>'] == -1:master[dict_key]['<<ETA>>']=master['ETA']
 #master[dict_key]['<<FEEDI>>'] = master['FEEDI']
     master[dict_key]['<<AL0>>'] = '( 0, ' + str(master['OMEGA_NORM']) + ')'
 
