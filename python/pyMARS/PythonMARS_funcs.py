@@ -492,40 +492,8 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     else:
         os.chdir(master['dir_dict']['mars_upper_vacuum_dir'])
 
-
-    # PROFDEN_file = open('PROFDEN','r')
-    # PROFDEN_data = PROFDEN_file.readlines()
-    # PROFDEN_file.close()
-    # #print PROFDEN_data[1]
-
-    # pattern = ''
-    # PROFDEN_data[1]
-    # re.search(pattern, PROFDEN_data[1])
-    # pattern = '\d+.\d+e*\+*\-*\d*'
-    # string1 = re.search(pattern, PROFDEN_data[1])
-    # string2 = re.search(pattern, PROFDEN_data[1][string1.end()+1:])
-    # ne0_r = float(PROFDEN_data[1][string1.start():string1.end()])
-    # ne0 = float(PROFDEN_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
     ne0 = np.loadtxt('PROFDEN',skiprows = 1)[0,1]
-    #print 'new PROFDEN', ne0 == ne0_new
-
-    # #rotation data
-    # #print 'Rotation section ------------' 
-    # PROFROT_file = open('PROFROT','r')
-    # PROFROT_data = PROFROT_file.readlines()
-    # PROFROT_file.close()
-    # #print PROFROT_data[1]
-
-    # pattern = ''
-    # re.search(pattern, PROFROT_data[1])
-    # pattern = '\d+.\d+e*\+*\-*\d*'
-    # string1 = re.search(pattern, PROFROT_data[1])
-    # string2 = re.search(pattern, PROFROT_data[1][string1.end()+1:])
-    # vtor0_r = float(PROFROT_data[1][string1.start():string1.end()])
-    # vtor0 = float(PROFROT_data[1][string2.start()+string1.end()+1:string2.end()+string1.end()+1])
     vtor0 = np.loadtxt('PROFROT',skiprows = 1)[0,1]
-    #print 'new PROFROT', vtor0 == vtor0_new
-    #print 'vtor0_r', vtor0_r, 'vtor0', vtor0
     
     B0EXP = master['B0EXP']
     R0EXP = master['R0EXP']
@@ -612,7 +580,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     master['OMEGA_NORM'] = omega[0]
     master['TAUWM'] = tauwm
     master['v0a'] = v0a
-    print 'ROTE:', vtorn, ' OMEGA_NORM:', omega[0],' TAUWM:', tauwm, ' v0a:', v0a
+    print 'ROTE: {:.3e}, OMEGA_NORM:{:.3e}, TAUWM:{:.3e}, v0a:{:.3e}'.format(vtorn, omega[0], tauwm, v0a)
     return master
 
 def mars_edit_run_file(directory, settings, template_file):
