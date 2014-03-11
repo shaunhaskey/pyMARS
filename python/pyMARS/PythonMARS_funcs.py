@@ -634,7 +634,9 @@ def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
     master[dict_key]['<<TAUW>>'] = master['TAUWM']
 
     if master[dict_key]['<<ROTE>>'] == -1:master[dict_key]['<<ROTE>>']=master['ROTE']
+    print master[dict_key]['<<ETA>>'], master['ETA']
     if master[dict_key]['<<ETA>>'] == -1:master[dict_key]['<<ETA>>']=master['ETA']
+    print master[dict_key]['<<ETA>>'], master['ETA']
 #master[dict_key]['<<FEEDI>>'] = master['FEEDI']
     master[dict_key]['<<AL0>>'] = '( 0, ' + str(master['OMEGA_NORM']) + ')'
 
