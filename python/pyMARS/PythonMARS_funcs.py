@@ -457,7 +457,7 @@ def spitz_eta_func(Te, Z = 1, e = -1.602176565*10**(-19), m = 9.10938291*10**(-3
     else:
         return np.pi * Z * e**2 * np.sqrt(m) * coul_log/((4.*np.pi*e_0)**2*(K * Te*11600)**1.5)
 
-def lundquist(eta, L = 1.6, va=4.e6):
+def lundquist_calc(eta, L = 1.6, va=4.e6):
     '''
     Gives the lundquist number which is a dimensionless quantity
     The ratio between the Alfven wave crossing timescale to the resistive diffusion timescale
@@ -553,7 +553,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
         print 'Error getting PROFTE data'
     if te_success:
         spitz_resist = spitz_eta_func(Te0, Z = 1, coul_log = 15, chen_H_approx = False)
-        lundquist = lundquist(spitz_resist, L = R0EXP, va=v0a)
+        lundquist = lundquist_calc(spitz_resist, L = R0EXP, va=v0a)
         eta = 1./lundquist
 #    nichz = N_ELEMENTS(ichz)
 
