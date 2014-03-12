@@ -3,7 +3,7 @@
 import pyMARS.PythonMARS_funcs as pyMARS_funcs
 import pyMARS.control_funcs as cont_funcs
 import pyMARS.Batch_Launcher as batch_launch
-import pyMARS.__version__ as version
+import pyMARS as pyMARS_mod
 import pickle, time, os,sys, copy
 import numpy as num
 import ConfigParser
@@ -15,7 +15,7 @@ parser = ConfigParser.SafeConfigParser()
 parser.optionxform=str
 parser.read(config_filename)
 
-print version
+print pyMARS_mod.__version__
 #process control
 start_from_step = int(parser.get('process_control', 'start_from_step'))
 end_at_step = int(parser.get('process_control', 'end_at_step'))
