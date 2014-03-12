@@ -308,8 +308,8 @@ if start_from_step == 1:
             #rotation_filename = 'dpr' + gfile_list[i].split('.')[0][1:] + '.' + str(time_tmp) + '_Er_RBpol.dat'
 
             for tmp_file, mars_name in zip([density_filename, rotation_filename, ti_filename, te_filename],['PROFDEN', 'PROFROT', 'PROFTI', 'PROFTE']):
-                shutils.copy('{}/{}'.format(project_dict['details']['profile_master'], tmp_file), project_dict['details']['multiple_efit'][-1])
-                shutils.copy('{}/{}'.format(project_dict['details']['profile_master'], tmp_file), '{}/{}'.format(project_dict['details']['multiple_efit'][-1], mars_name))
+                shutil.copy('{}/{}'.format(project_dict['details']['profile_master'], tmp_file), project_dict['details']['multiple_efit'][-1])
+                shutil.copy('{}/{}'.format(project_dict['details']['profile_master'], tmp_file), '{}/{}'.format(project_dict['details']['multiple_efit'][-1], mars_name))
             #os.system('cp ' + project_dict['details']['profile_master'] + '/' + density_filename + ' ' + project_dict['details']['multiple_efit'][-1])
             #os.system('cp ' + project_dict['details']['profile_master'] + '/' + rotation_filename + ' ' + project_dict['details']['multiple_efit'][-1])
             #os.system('cp ' + project_dict['details']['profile_master'] + '/' + ti_filename + ' ' + project_dict['details']['multiple_efit'][-1])
