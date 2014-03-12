@@ -27,10 +27,44 @@ phase_machine_ntor = 0
 s_surface = 0.92
 fixed_harmonic = 3
 reference_dB_kink = 'plas'
+reference_dB_kink = 'plasma'
 reference_offset = [2,0]
 sort_name = 'rote_list'
 
+
+a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+
+dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'mean')
+dBkink = dBres_dBkink.dBkink_calculations(a)
+probe = dBres_dBkink.magnetic_probe(a,' 66M')
+
+
+phasings_disp = [0,45,90,135,180,225,270,315]
+
+for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,2],[0,2],[0,2]], ['dBres plasma', 'dBkink plasma', 'Probe plasma']):
+    fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
+    gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
+    for i, cur_ax in zip(phasings_disp, ax.flatten()):
+        calc_type.plot_2D(i,'ROTE','ETA',cmap_res = 'spectral', field = 'plasma', clim = cur_clim, ax = cur_ax)
+    fig.suptitle(title)
+    fig.tight_layout(pad = 0.5)
+    fig.canvas.draw(); fig.show()
+
+fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
+gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
+for i, cur_ax in zip(phasings_disp, ax.flatten()):
+    xpoint = dBres_dBkink.x_point_displacement_calcs(a, i)
+    xpoint.plot_2D(i,'ROTE','ETA',cmap_res = 'spectral', field = 'plasma', clim = [0,0.025], ax = cur_ax)
+fig.tight_layout(pad = 0.5)
+fig.canvas.draw(); fig.show()
+
+1/0
+
+
 a = dBres_dBkink.test1(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+
+
+
 fig, ax = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax = ax.flatten()
 fig2, ax2_orig = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax2 = ax2_orig.flatten()
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)

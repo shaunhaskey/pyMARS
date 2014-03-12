@@ -21,7 +21,7 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq/shot_142614_expt_scan_const_eq_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eqV2/shot_142614_expt_scan_const_eqV2_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq_eta_10-10/shot_142614_expt_scan_const_eq_eta_10-10_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq_eta_10-5/shot_142614_expt_scan_const_eq_eta_10-5_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq_eta_10-5/shot_142614_expt_scan_const_eq_eta_10-5_post_processing_PEST.pickle'
 
 phasing = 0
 n = 3
@@ -33,7 +33,44 @@ reference_offset = [2,0]
 sort_name = 'time_list'
 
 reference_dB_kink = 'plasma'
-a = dBres_dBkink.test1_new(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+
+
+dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'sum')
+dBkink = dBres_dBkink.dBkink_calculations(a)
+probe = dBres_dBkink.magnetic_probe(a,' 66M')
+xpoint = dBres_dBkink.x_point_displacement_calcs(a, 0)
+
+fig, ax = pt.subplots(nrows = 7, sharex = True)
+gen_func.setup_publication_image(fig, height_prop = 1./1.618*4, single_col = True)
+
+xpoint.plot_single_phasing(0, 'shot_time', field = 'plasma',  ax = ax[0], plot_kwargs = {'marker':'x'})
+a.plot_parameters('shot_time', 'ROTE', ax = ax[1], plot_kwargs = {'marker':'x'})
+ax[1].set_ylabel('ROTE')
+dBres.plot_single_phasing(0, 'shot_time', field = 'plasma', plot_kwargs = {'marker':'x'}, amplitude = True, ax = ax[2])
+ax[2].set_ylabel('dBres plasma')
+dBres.plot_single_phasing(0, 'shot_time', field = 'total', plot_kwargs = {'marker':'x'}, amplitude = True, ax = ax[3])
+ax[3].set_ylabel('dBres total')
+probe.plot_single_phasing(0, 'shot_time', field = 'total', plot_kwargs = {'marker':'x'}, amplitude = True, ax = ax[4])
+ax[4].set_ylabel('66M plasma')
+dBkink.plot_single_phasing(0, 'shot_time', field = 'plasma', plot_kwargs = {'marker':'x'}, amplitude = True, ax = ax[5])
+ax[5].set_ylabel('dBkink plasma')
+a.plot_parameters('shot_time', 'Q95', ax = ax[6], plot_kwargs = {'marker':'x'})
+ax[6].set_ylabel('q95')
+ax[0].set_xlim([np.min(a.raw_data['shot_time']),np.max(a.raw_data['shot_time'])])
+
+for i in ax: 
+    vline_times = [1600,1717,2134,1830]
+    vline_labels = ['I-coil on', 'CIII image 2', 'CIII image 3', 'plas resp decay']
+    for t_tmp, j in zip(vline_times, vline_labels):
+        i.axvline(t_tmp)
+        i.text(t_tmp,np.mean(i.get_ylim()),j,rotation = 90, verticalalignment='center')
+    i.grid(True)
+
+fig.tight_layout(pad = 0.01)
+fig.savefig('comparison_oliver_data.pdf')
+fig.canvas.draw(); fig.show()
+
 1/0
 
 #fig, ax = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax = ax.flatten()
