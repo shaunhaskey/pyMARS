@@ -24,7 +24,7 @@ def running_jobs(id_string):
     number_of_jobs = output.count(id_string)
     #number_of_jobs = output.count(count_string) - 2
     #if number_of_jobs<0:number_of_jobs = 0
-    print 'Running Jobs : ' + str(number_of_jobs)
+    #print 'Running Jobs : ' + str(number_of_jobs)
     return number_of_jobs
 
 def batch_launch_chease(master_dict, job_num_filename, PEST=0, id_string = 'Chease_'):

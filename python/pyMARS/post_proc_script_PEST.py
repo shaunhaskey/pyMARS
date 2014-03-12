@@ -4,10 +4,10 @@ This does the post processing of the MARS-F runs to get dBkink and dBres informa
 SH: 26Feb2013
 '''
 
-import pyMARS.results_class
+import results_class
 import pickle,sys,copy
 import numpy as np
-import pyMARS.RZfuncs as RZfuncs
+import RZfuncs as RZfuncs
 
 project_name = sys.argv[1]
 upper_and_lower = int(sys.argv[2])

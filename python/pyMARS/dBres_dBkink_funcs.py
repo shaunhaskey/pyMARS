@@ -63,6 +63,22 @@ class dBkink_calculations():
 
 
 
+class x_point_displacement_calcs():
+    def __init__(self, project_dict, s_surface, n, phase_machine_ntor, reference_offset, ref = 'plasma'):
+        self.n = n
+        self.phase_machine_ntor = phase_machine_ntor
+        self.project_dict = project_dict
+        self.raw_data = {}
+        self.reference_offset = reference_offset
+        self.s_surface = s_surface
+        for field in ['total', 'vacuum']:
+            for coil in ['upper','lower']:
+                self.raw_data['{}_kink_{}'.format(field, coil)] = data_from_dict('responses/{}/{}_kink_response_{}'.format(str(self.s_surface), field,coil), self.project_dict)
+        for j in ['mk', 'q_val']: self.raw_data[j] = data_from_dict('responses/{}/{}'.format(str(self.s_surface), j), self.project_dict)
+        self.raw_data['sq'] = data_from_dict('responses/resonant_response_sq', self.project_dict)
+
+
+
 def data_from_dict(path, project_dict):
     output_data = []
     parts = path.split('/')
@@ -72,6 +88,7 @@ def data_from_dict(path, project_dict):
             tmp = tmp[j]
         output_data.append(tmp)
     return output_data
+
 
 class test1_new():
     def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset = None, reference_dB_kink='plas',sort_name = 'q95_list', try_many_phasings = True):

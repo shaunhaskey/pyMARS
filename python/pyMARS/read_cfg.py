@@ -15,7 +15,7 @@ parser = ConfigParser.SafeConfigParser()
 parser.optionxform=str
 parser.read(config_filename)
 
-print pyMARS_mod.__version__
+print 'pyMARS module version {}'.format(pyMARS_mod.__version__)
 #process control
 start_from_step = int(parser.get('process_control', 'start_from_step'))
 end_at_step = int(parser.get('process_control', 'end_at_step'))

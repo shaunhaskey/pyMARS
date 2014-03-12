@@ -1,9 +1,9 @@
 #!/usr/bin/env Python
-import pyMARS.results_class
+import results_class
 import pickle,sys
 import numpy as num
-import pyMARS.PythonMARS_funcs as pyMARS_funcs
-import pyMARS.RZfuncs as RZfuncs
+import PythonMARS_funcs as pyMARS_funcs
+import RZfuncs as RZfuncs
 
 project_name = sys.argv[1]
 upper_and_lower = int(sys.argv[2])
