@@ -1,5 +1,5 @@
 #!/usr/bin/env Python
-import pyMARS.results_class
+import pyMARS.results_class as results_class
 import pickle,sys
 import numpy as num
 import pyMARS.PythonMARS_funcs as pyMARS_funcs

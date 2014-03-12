@@ -4,7 +4,7 @@ This does the post processing of the MARS-F runs to get dBkink and dBres informa
 SH: 26Feb2013
 '''
 
-import pyMARS.results_class
+import pyMARS.results_class as results_class
 import pickle,sys,copy
 import numpy as np
 import pyMARS.RZfuncs as RZfuncs
