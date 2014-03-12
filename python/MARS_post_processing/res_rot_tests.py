@@ -16,7 +16,7 @@ file_name='/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30/shot
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kpar1/shot_142614_rote_res_scan_30x30_kpar1_post_processing_PEST.pickle'
 
-file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
@@ -40,23 +40,39 @@ probe = dBres_dBkink.magnetic_probe(a,' 66M')
 
 
 phasings_disp = [0,45,90,135,180,225,270,315]
-
-for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,2],[0,2],[0,2]], ['dBres plasma', 'dBkink plasma', 'Probe plasma']):
+x_axis = 'ROTE'
+y_axis = 'ETA'
+for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,2],[0,2],[0,2]], ['dBres-plasma', 'dBkink-plasma', 'Probe-plasma']):
     fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
     gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
     for i, cur_ax in zip(phasings_disp, ax.flatten()):
-        calc_type.plot_2D(i,'ROTE','ETA',cmap_res = 'spectral', field = 'plasma', clim = cur_clim, ax = cur_ax)
-    fig.suptitle(title)
+        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = 'plasma', clim = cur_clim, ax = cur_ax)
+    for i in ax[:,0]: i.set_ylabel(y_axis)
+    for i in ax[-1,:]: i.set_xlabel(x_axis)
     fig.tight_layout(pad = 0.5)
+    cbar = pt.colorbar(cax, ax = ax.flatten().tolist())
+    cbar.set_label(title)
+    fig.savefig(title+'.pdf')
+    fig.savefig(title+'.eps')
     fig.canvas.draw(); fig.show()
 
 fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
+x_axis = 'ROTE'
+y_axis = 'ETA'
+title = 'xpoint'
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
 for i, cur_ax in zip(phasings_disp, ax.flatten()):
     xpoint = dBres_dBkink.x_point_displacement_calcs(a, i)
-    xpoint.plot_2D(i,'ROTE','ETA',cmap_res = 'spectral', field = 'plasma', clim = [0,0.025], ax = cur_ax)
+    cax = xpoint.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = 'plasma', clim = [0,0.025], ax = cur_ax)
+for i in ax[:,0]: i.set_ylabel(y_axis)
+for i in ax[-1,:]: i.set_xlabel(x_axis)
 fig.tight_layout(pad = 0.5)
+cbar = pt.colorbar(cax, ax = ax.flatten().tolist())
+cbar.set_label(title)
+fig.savefig(title+'.pdf')
+fig.savefig(title+'.eps')
 fig.canvas.draw(); fig.show()
+
 
 1/0
 

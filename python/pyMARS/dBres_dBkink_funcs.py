@@ -73,7 +73,7 @@ class generic_calculation():
         if xaxis_log: ax.set_xscale('log')
         if yaxis_log: ax.set_yscale('log')
         if no_ax: fig.canvas.draw();fig.show()
-
+        return color_ax
 
 class dBres_calculations(generic_calculation):
     def __init__(self, parent, mean_sum = 'sum'):
