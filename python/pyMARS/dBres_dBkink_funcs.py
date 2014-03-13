@@ -21,6 +21,7 @@ class generic_calculation():
         '''Perform a phasing scan for the  dBkink calculations
         phasing_array is the list of phasings to use - in degrees
         '''
+        a = 5
         pass
 
     def phasing_scan(self, n_phases = 360, phasing_array = None, field = 'total'):
