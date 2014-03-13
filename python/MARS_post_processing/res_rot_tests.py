@@ -37,7 +37,9 @@ a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_ma
 dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'mean')
 dBkink = dBres_dBkink.dBkink_calculations(a)
 probe = dBres_dBkink.magnetic_probe(a,' 66M')
-probe_r = dBres_dBkink.magnetic_probe(a,' ISL')
+probe = dBres_dBkink.magnetic_probe(a,'Inner_pol')
+probe_r = dBres_dBkink.magnetic_probe(a,'UISL')
+probe_r = dBres_dBkink.magnetic_probe(a,'Inner_rad')
 
 
 phasings_disp = [0,45,90,135,180,225,270,315]
@@ -76,19 +78,17 @@ fig.canvas.draw(); fig.show()
 
 fig,ax = pt.subplots(nrows = 5, sharex = True)
 x_log = False
+x_interp = np.linspace(1.e-4,0.1,100)
 for eta in [1.e-6, 1.e-7, 1.e-8]:
-    dBres.plot_slice_through_2D_data(0, x_axis, y_axis, eta, np.linspace(1.e-4,0.01,100), field = 'plasma',  ax = ax[0], plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = False, xaxis_log = x_log)
-    ax[0].set_ylabel('dBres plasma')
-    dBkink.plot_slice_through_2D_data(0, x_axis, y_axis, eta, np.linspace(1.e-4,0.01,100), field = 'plasma',  ax = ax[1], plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = False, xaxis_log = x_log)
-    ax[1].set_ylabel('dBkink plasma')
-    probe.plot_slice_through_2D_data(0, x_axis, y_axis, eta, np.linspace(1.e-4,0.01,100), field = 'plasma',  ax = ax[2], plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = False, xaxis_log = x_log)
-    ax[2].set_ylabel('probe plasma')
-    probe_r.plot_slice_through_2D_data(0, x_axis, y_axis, eta, np.linspace(1.e-4,0.01,100), field = 'plasma',  ax = ax[4], plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = False, xaxis_log = x_log)
+    for cur_ax, func, title in zip(ax, [dBres, dBkink, probe, probe_r], ['dBres plasma', 'dBkink plasma', 'probe p plasma', 'probe r plasma']):
+        func.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = cur_ax, plot_kwargs = None, amplitude = True, yaxis_log = False, xaxis_log = x_log)
+        cur_ax.set_ylabel(title)
     xpoint = dBres_dBkink.x_point_displacement_calcs(a, 0)
-    xpoint.plot_slice_through_2D_data(0, x_axis, y_axis, eta, np.linspace(1.e-4,0.01,100), field = 'plasma',  ax = ax[3], plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = False, xaxis_log = x_log)
-    ax[3].set_ylabel('disp x-point')
-    fig.canvas.draw(); fig.show()
-
+    xpoint.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = ax[4], plot_kwargs = None, amplitude = True, yaxis_log = False, xaxis_log = x_log)
+    ax[4].set_ylabel('disp x-point')
+for i in ax: i.grid()
+ax[0].set_xlim([np.min(x_interp), np.max(x_interp)])
+fig.canvas.draw(); fig.show()
 1/0
 
 
