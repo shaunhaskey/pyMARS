@@ -3,6 +3,7 @@ import numpy as np
 import cPickle as pickle
 import matplotlib.pyplot as pt
 import scipy.ndimage.filters as scipy_filt
+import scipy.interpolate as interp
 import pyMARS.generic_funcs as gen_funcs
 
 class generic_calculation():
@@ -45,12 +46,34 @@ class generic_calculation():
         ax.plot([self.parent.raw_data[xaxis][i] for i in indices], [comp_func(calc_val[i]) for i in indices], **plot_kwargs)
         if no_ax: fig.canvas.draw();fig.show()
 
-    def plot_2D_slice(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True):
-        '''Plot  a calculation versus a particular attribute
+    def plot_slice_through_2D_data(self, phasing, xaxis, yaxis, y_const, slice_vals_x, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True):
+        '''plot a 1D slice through 2D data
 
         SRH : 12Mar2014
         '''
         no_ax = True if ax==None else False 
+        if no_ax: fig,ax = pt.subplots()
+        if plot_kwargs == None: plot_kwargs = {}
+        comp_func = np.abs if amplitude else np.angle
+        xvals = self.parent.raw_data[xaxis]
+        yvals = self.parent.raw_data[yaxis]
+        input_coords = np.zeros((len(xvals), 2), dtype = float)
+        output_coords = np.zeros((len(slice_vals_x), 2), dtype = float)
+        input_coords[:,0] = xvals
+        input_coords[:,1] = yvals
+        
+        output_coords[:,0] = slice_vals_x
+        output_coords[:,1] = y_const
+        #output_coords = slice_values
+
+        xvals_set = sorted(set(xvals))
+        yvals_set = sorted(set(yvals))
+        current_data = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
+        interp_data = interp.griddata(input_coords, np.abs(current_data), output_coords, method = 'linear')
+        ax.plot(slice_vals_x, interp_data, '-o')
+        no_ax = True if ax==None else False 
+        if xaxis_log: ax.set_xscale('log')
+        if yaxis_log: ax.set_yscale('log')
         if no_ax: fig,ax = pt.subplots()
 
 
