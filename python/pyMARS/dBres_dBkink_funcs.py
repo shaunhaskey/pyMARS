@@ -5,6 +5,8 @@ import matplotlib.pyplot as pt
 import scipy.ndimage.filters as scipy_filt
 import pyMARS.generic_funcs as gen_funcs
 
+
+
 class generic_calculation():
     def single_phasing(self, phasing, field = 'total'):
         '''Apply a phasing to the upper-lower dBkink calculations
@@ -14,6 +16,12 @@ class generic_calculation():
         SRH : 12Mar2014
         '''
         return apply_phasing(self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)], np.deg2rad(phasing), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
+
+    def new_function(self, n_phases = 360, phasing_array = None, field = 'total'):
+        '''Perform a phasing scan for the  dBkink calculations
+        phasing_array is the list of phasings to use - in degrees
+        '''
+        pass
 
     def phasing_scan(self, n_phases = 360, phasing_array = None, field = 'total'):
         '''Perform a phasing scan for the  dBkink calculations
