@@ -45,6 +45,14 @@ class generic_calculation():
         ax.plot([self.parent.raw_data[xaxis][i] for i in indices], [comp_func(calc_val[i]) for i in indices], **plot_kwargs)
         if no_ax: fig.canvas.draw();fig.show()
 
+    def plot_2D_slice(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True):
+        '''Plot  a calculation versus a particular attribute
+
+        SRH : 12Mar2014
+        '''
+        no_ax = True if ax==None else False 
+        if no_ax: fig,ax = pt.subplots()
+
 
     def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True):
         '''Plot  a calculation versus a particular attribute
