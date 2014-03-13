@@ -15,14 +15,6 @@ class generic_calculation():
         '''
         return apply_phasing(self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)], np.deg2rad(phasing), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
 
-    def new_function(self, n_phases = 360, phasing_array = None, field = 'total'):
-        '''Perform a phasing scan for the  dBkink calculations
-        phasing_array is the list of phasings to use - in degrees
-        '''
-        a = 5
-        print 'couple more changes'
-        print 'couple more changes2'
-        pass
 
     def phasing_scan(self, n_phases = 360, phasing_array = None, field = 'total'):
         '''Perform a phasing scan for the  dBkink calculations
