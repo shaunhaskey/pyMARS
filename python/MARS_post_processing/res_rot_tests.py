@@ -16,6 +16,9 @@ file_name='/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30/shot
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kpar1/shot_142614_rote_res_scan_30x30_kpar1_post_processing_PEST.pickle'
 
+file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
+
+
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
@@ -37,15 +40,15 @@ a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_ma
 dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'mean')
 dBkink = dBres_dBkink.dBkink_calculations(a)
 probe = dBres_dBkink.magnetic_probe(a,' 66M')
-probe = dBres_dBkink.magnetic_probe(a,'Inner_pol')
+#probe = dBres_dBkink.magnetic_probe(a,'Inner_pol')
 probe_r = dBres_dBkink.magnetic_probe(a,'UISL')
-probe_r = dBres_dBkink.magnetic_probe(a,'Inner_rad')
+#probe_r = dBres_dBkink.magnetic_probe(a,'Inner_rad')
 
 
 phasings_disp = [0,45,90,135,180,225,270,315]
 x_axis = 'ROTE'
 y_axis = 'ETA'
-for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,2],[0,2],[0,2]], ['dBres-plasma', 'dBkink-plasma', 'Probe-plasma']):
+for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,3],[0,3],[0,3]], ['dBres-plasma', 'dBkink-plasma', 'Probe-plasma']):
     fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
     gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
     for i, cur_ax in zip(phasings_disp, ax.flatten()):
@@ -77,9 +80,12 @@ fig.savefig(title+'.eps')
 fig.canvas.draw(); fig.show()
 
 fig,ax = pt.subplots(nrows = 5, sharex = True)
-x_log = False
-x_interp = np.linspace(1.e-4,0.1,100)
-for eta in [1.e-6, 1.e-7, 1.e-8]:
+x_log = True
+x_interp = np.linspace(-6,-2,100)
+x_interp = 10**x_interp
+#x_interp = np.linspace(1.e-6,0.01,100)
+eta_list = [1.e-6, 1.e-7, 1.e-8]
+for eta in eta_list:
     for cur_ax, func, title in zip(ax, [dBres, dBkink, probe, probe_r], ['dBres plasma', 'dBkink plasma', 'probe p plasma', 'probe r plasma']):
         func.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = cur_ax, plot_kwargs = None, amplitude = True, yaxis_log = False, xaxis_log = x_log)
         cur_ax.set_ylabel(title)
@@ -87,8 +93,10 @@ for eta in [1.e-6, 1.e-7, 1.e-8]:
     xpoint.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = ax[4], plot_kwargs = None, amplitude = True, yaxis_log = False, xaxis_log = x_log)
     ax[4].set_ylabel('disp x-point')
 for i in ax: i.grid()
+title ='blue, green, red : eta={}'.format(' '.join(['{:.1e}'.format(i) for i in eta_list]))
 ax[0].set_xlim([np.min(x_interp), np.max(x_interp)])
 fig.canvas.draw(); fig.show()
+
 1/0
 
 
