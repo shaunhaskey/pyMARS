@@ -14,7 +14,7 @@ import cPickle as pickle
 import PythonMARS_funcs as pyMARS
 import multiprocessing
 import itertools, os
-import tmp_test
+import scan_pics_func
 N = 6; n = 3
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I = np.array([1.,-1.,1.,-1,-1.,-1.])
@@ -99,8 +99,8 @@ print im_name_list
 
 input_data = zip(valid_sim_list, im_name_list, itertools.repeat(I0EXP), itertools.repeat(facn), itertools.repeat(subplot_plot), itertools.repeat(n), itertools.repeat(inc_contours), itertools.repeat(clim), title_list)
 
-#map(tmp_test.plot_scan, input_data)
+#map(scan_pics_func.plot_scan, input_data)
 
 #pool = multiprocessing.Pool(10, maxtasksperchild = 1)
-#pool.map(tmp_test.plot_scan, input_data)
-#pool.map(tmp_test, input_data)
+#pool.map(scan_pics_func.plot_scan, input_data)
+
