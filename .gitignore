@@ -8,5 +8,7 @@
 *.eps
 *.pdf
 *.svg
+*.job
+*.log
 '*#'
 \#*\#
