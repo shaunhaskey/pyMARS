@@ -66,10 +66,11 @@ fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
 x_axis = 'ROTE'
 y_axis = 'ETA'
 title = 'xpoint'
+field = 'total'
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
 for i, cur_ax in zip(phasings_disp, ax.flatten()):
     xpoint = dBres_dBkink.x_point_displacement_calcs(a, i)
-    cax = xpoint.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = 'plasma', clim = [0,0.025], ax = cur_ax)
+    cax = xpoint.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = 'field', clim = [0,0.025], ax = cur_ax)
 for i in ax[:,0]: i.set_ylabel(y_axis)
 for i in ax[-1,:]: i.set_xlabel(x_axis)
 fig.tight_layout(pad = 0.5)
@@ -86,11 +87,11 @@ x_interp = 10**x_interp
 #x_interp = np.linspace(1.e-6,0.01,100)
 eta_list = [1.e-6, 1.e-7, 1.e-8]
 for eta in eta_list:
-    for cur_ax, func, title in zip(ax, [dBres, dBkink, probe, probe_r], ['dBres plasma', 'dBkink plasma', 'probe p plasma', 'probe r plasma']):
-        func.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = cur_ax, plot_kwargs = None, amplitude = True, yaxis_log = False, xaxis_log = x_log)
-        cur_ax.set_ylabel(title)
+    for cur_ax, func, title in zip(ax, [dBres, dBkink, probe, probe_r], ['dBres', 'dBkink', 'probe p', 'probe r']):
+        func.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = field,  ax = cur_ax, plot_kwargs = None, amplitude = True, yaxis_log = False, xaxis_log = x_log)
+        cur_ax.set_ylabel(title+' '+field)
     xpoint = dBres_dBkink.x_point_displacement_calcs(a, 0)
-    xpoint.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = ax[4], plot_kwargs = None, amplitude = True, yaxis_log = False, xaxis_log = x_log)
+    xpoint.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = field,  ax = ax[4], plot_kwargs = None, amplitude = True, yaxis_log = False, xaxis_log = x_log)
     ax[4].set_ylabel('disp x-point')
 for i in ax: i.grid()
 title ='blue, green, red : eta={}'.format(' '.join(['{:.1e}'.format(i) for i in eta_list]))

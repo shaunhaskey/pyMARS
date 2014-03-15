@@ -199,7 +199,7 @@ class dBkink_calculations(generic_calculation):
         #Find the actual harmonic value
         for field in ['total', 'vacuum', 'plasma']:
             for coil in ['upper','lower']:
-                self.raw_data['{}_kink_harm_{}'.format(field, coil)], mode_list, max_mode_list = calculate_db_kink2(self.raw_data['mk'], self.raw_data['q_val'], self.parent.n, self.raw_data['reference'], self.raw_data['{}_kink_{}'.format(field,coil)], reference_offset = self.parent.reference_offset)
+                self.raw_data['{}_kink_harm_{}'.format(field, coil)], self.raw_data['{}_mode_list_{}'.format(field, coil)], self.raw_data['{}_max_mode_list_{}'.format(field, coil)] = calculate_db_kink2(self.raw_data['mk'], self.raw_data['q_val'], self.parent.n, self.raw_data['reference'], self.raw_data['{}_kink_{}'.format(field,coil)], reference_offset = self.parent.reference_offset)
                 #self.raw_data['{}_kink_harm_{}'.format(field, coil)] = calculate_db_kink2(self.raw_data['mk'], self.raw_data['q_val'], self.n, self.raw_data['reference'], self.raw_data['{}_kink_{}'.format(field,coil)], reference_offset = self.reference_offset)
 
 class x_point_displacement_calcs(generic_calculation):
