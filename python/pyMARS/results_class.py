@@ -164,31 +164,33 @@ def extract_plotk_results():
 
 
 class data():
-    def __init__(self, directory,Nchi=513,link_RMZM=1, I0EXP=1.0e+3 * 3./np.pi, spline_B23=2):
+    def __init__(self, directory,Nchi=513,link_RMZM=1, I0EXP=1.0e+3 * 3./np.pi, spline_B23=2, getpest = False):
         self.directory = copy.deepcopy(directory)
         self.Nchi = copy.deepcopy(Nchi)
         #self.link_RMZM = copy.deepcopy(link_RMZM)
         self.I0EXP = copy.deepcopy(I0EXP)
         self.spline_B23 = spline_B23
         self.extract_single()
+        if getpest: self.get_PEST(facn =1 )
+        print '-----',  os.getcwd(), os.getpid(), np.sum(np.abs((self.Bn))), np.sum(np.abs((self.BnPEST)))
 
     def extract_single(self):
-        os.chdir(self.directory) 
+        #os.chdir(self.directory) 
         self.chi = np.linspace(np.pi*-1,np.pi,self.Nchi)
         self.chi.resize(1,len(self.chi))
         self.phi = np.linspace(0,2.*np.pi,self.Nchi)
         self.phi.resize(len(self.phi),1)
 
-        file_name = '../../cheaserun/RMZM_F'
+        file_name = self.directory + '/../../cheaserun/RMZM_F'
         self.RM, self.ZM, self.Ns, self.Ns1, self.Ns2, self.Nm0, self.R0EXP, self.B0EXP, self.s = readRMZM(file_name)
         print self.Ns, self.Ns1, self.Ns2
         #print 'R0EXP', self.R0EXP
         self.Nm2 = self.Nm0
         self.R, self.Z =  GetRZ(self.RM,self.ZM,self.Nm0,self.Nm2,self.chi,self.phi)
-        self.FEEDI = get_FEEDI('FEEDI')
+        self.FEEDI = get_FEEDI(self.directory + '/FEEDI')
         self.BNORM = calc_BNORM(self.FEEDI, self.R0EXP, I0EXP = self.I0EXP)
         print self.directory, self.BNORM, self.FEEDI, self.R0EXP, self.I0EXP
-        file_name = 'BPLASMA'
+        file_name = self.directory + '/BPLASMA'
         #Extract geometry related stuff
         self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian = GetUnitVec(self.R, self.Z, self.s, self.chi)
 
@@ -197,12 +199,12 @@ class data():
         self.B1,self.B2,self.B3,self.Bn,self.BMn = GetB123(self.BM1, self.BM2, self.BM3, self.R, self.Mm, self.chi, self.dRdchi, self.dZdchi)
         self.Br,self.Bz,self.Bphi = MacGetBphysC(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3)
         self.Brho,self.Bchi,self.Bphi2 = MacGetBphysT(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3,self.B0EXP)
-        self.NW = int(round(float(pyMARS_funcs.extract_value('../../cheaserun/log_chease','NW',' '))))
+        self.NW = int(round(float(pyMARS_funcs.extract_value(self.directory + '/../../cheaserun/log_chease','NW',' '))))
 
     def get_VPLASMA(self, VNORM=1.0):
-        os.chdir(self.directory)
+        #os.chdir(self.directory)
         self.VNORM = calc_VNORM(self.FEEDI, self.B0EXP, I0EXP = self.I0EXP)
-        self.VM1, self.VM2, self.VM3, self.DPSIDS, self.T = ReadVPLASMA('VPLASMA',self.Ns, self.Ns1, self.s, VNORM=self.VNORM)
+        self.VM1, self.VM2, self.VM3, self.DPSIDS, self.T = ReadVPLASMA(self.directory + '/VPLASMA',self.Ns, self.Ns1, self.s, VNORM=self.VNORM)
         self.V1,self.V2,self.V3,self.Vn, self.V1m = GetV123(self.VM1,self.VM2,self.VM3,self.R, self.chi, self.dRds, self.dZds, self.dRdchi, self.dZdchi, self.jacobian, self.Mm, self.Nchi, self.s, self.Ns1, self.DPSIDS, self.T)
         self.Vr, self.Vz, self.Vphi = MacGetVphys(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.V1,self.V2,self.V3, self.Ns1)
 
@@ -267,13 +269,14 @@ class data():
         return color_plot
 
     def get_PEST(self, facn = 3.1416/2):
-        os.chdir(self.directory) 
+        #os.chdir(self.directory) 
         #os.system('ln -f -s ../../cheaserun_PEST/RMZM_F RMZM_F_PEST')
         II=np.arange(1,self.Ns1+21,dtype=int)-1
         BnEQAC = copy.deepcopy(self.Bn[II,:])
         R_EQAC = copy.deepcopy(self.R[II,:])
         Z_EQAC = copy.deepcopy(self.Z[II,:])
         
+        print '--- in pest calc eqac orig',  os.getcwd(), np.sum(np.abs((BnEQAC)))
         Rs = copy.deepcopy(R_EQAC[-1,:])
         Zs = copy.deepcopy(Z_EQAC[-1,:])
         Rc = (np.min(Rs)+np.max(Rs))/2.
@@ -281,7 +284,7 @@ class data():
         Tg = np.arctan2(Zs-Zc,Rs-Rc)
         BnEDGE = copy.deepcopy(BnEQAC[-1,:])
 
-        file_name = '../../cheaserun_PEST/RMZM_F'
+        file_name = self.directory +'/../../cheaserun_PEST/RMZM_F'
         #file_name = 'RMZM_F_PEST'
         RM, ZM, Ns, Ns1, Ns2, Nm0, R0EXP, B0EXP, s = readRMZM(file_name)
         Nm2 = copy.deepcopy(Nm0)
@@ -305,10 +308,20 @@ class data():
         R_Z_PEST[:,0] = R_PEST.flatten()
         R_Z_PEST[:,1] = Z_PEST.flatten()
         #this section is to make it work inthe griddata function
+        print '--- in pest calc eqac',  os.getpid(), os.getcwd(), np.sum(np.abs((BnEQAC)))
+        import scipy.interpolate as interp
+        BnPEST  = interp.griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
+        print '--- in pest calc nan', os.getpid(), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(R_Z_PEST))
+        print '--- in pest calc eqac*',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST))), np.sum(np.isnan((BnPEST))), np.sum(np.isnan((BnPEST))) >0
 
-        BnPEST  = griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
+        #if_pass = 'fail' if np.sum(np.isnan((BnPEST))) > 0 else 'pass'
+        #np.savetxt('{}_RZPEST_{}'.format(os.getpid(), if_pass), R_Z_PEST)
+        #np.savetxt('{}_BnPEST_{}'.format(os.getpid(), if_pass), BnPEST)
+        #np.savetxt('{}_RZEQAC_{}'.format(os.getpid(), if_pass), R_Z_EQAC)
         BnPEST.resize(BnEQAC.shape)
         BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST
+        print '--- in pest calc eqac**',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST)))
+
 
         mk = np.arange(-29,29+1,dtype=int)
         mk.resize(1,len(mk))
@@ -331,6 +344,7 @@ class data():
         BnPEST[0,:] = BnPEST[1,:]
         BnPEST[-1,:] = BnPEST[-2,:]
         self.BnPEST = BnPEST
+        print '--- in pest calc',  os.getcwd(), os.getcwd(), np.sum(np.abs((self.Bn))), np.sum(np.abs((self.BnPEST)))
 
         new_area = []
         for i in range(0, self.R.shape[0]):
@@ -354,9 +368,9 @@ class data():
         Finds the integral of the resonant line
         SH : 26Feb2013
         '''
-        os.chdir(self.directory) 
+        #os.chdir(self.directory) 
 
-        self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
+        self.extract_q_profile_information(n=n, file_name=self.directory + '/PROFEQ.OUT')
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         #qn_grid, s_grid = np.meshgrid(self.q_profile*n, self.s.flatten())
         if SURFMN_coords:
@@ -386,7 +400,7 @@ class data():
         q value on the s grid, q_profile, and q_profile_s (sgrid locations)
         SH : 26Feb2013
         '''
-        os.chdir(self.directory) 
+        #os.chdir(self.directory) 
         qn, sq, q, s, mq = return_q_profile(self.mk, file_name=file_name, n=n)
         self.qn = qn
         self.sq = sq
@@ -407,7 +421,7 @@ class data():
         '''
 
         #Get q profile information, and find the surface we are interested in
-        self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
+        self.extract_q_profile_information(n=n, file_name=self.directory + '/PROFEQ.OUT')
         s_loc = np.argmin(np.abs(self.ss-s_surface))
 
         #q value at the relevant surface
@@ -823,7 +837,7 @@ class data():
         fig_tmp100.canvas.draw(); fig_tmp100.show()
 
     def load_SURFMN_data(self, surfmn_file, n, horizontal_comparison=0, PEST_comparison=0, single_radial_mode_plots=0, all_radial_mode_plots=0):
-        self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
+        self.extract_q_profile_information(n=n, file_name=self.directory + 'PROFEQ.OUT')
         self.get_SURFMN_data(surfmn_file, n)
 
         #This is if we want to plot SURFMN data in MARS-F coords
@@ -861,8 +875,8 @@ class data():
 
 
     def plot1(self, suptitle='', title='', fig_name = '', fig_show = 1,clim_value=[0,1],inc_phase=1, phase_correction=None, cmap = 'gist_rainbow_r', ss_squared = 0, surfmn_file = None, n=2, increase_grid_BnPEST = 0, single_mode_plots = range(1,3**2+1), single_mode_plots2 = [1,5,9]):
-        os.chdir(self.directory) 
-        self.extract_q_profile_information(n=n, file_name='PROFEQ.OUT')
+        #os.chdir(self.directory) 
+        self.extract_q_profile_information(n=n, file_name=self.directory + '/PROFEQ.OUT')
 
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         #qn_grid, s_grid = np.meshgrid(self.q_profile*n, self.s.flatten())
@@ -937,7 +951,7 @@ class data():
 
         self.plot_BnPEST_phase(inc_phase, BnPEST, mk, ss, tmp_cmap, phase_correction, clim_value, title, temp_qn, mk_grid, ss_grid, ss_squared, n, suptitle, fig_show, fig_name)
 
-    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100, gauss_filter = [0,0.5]):
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100, gauss_filter = [0,0.5], cmap = 'hot'):
         ss_plas_edge = np.argmin(np.abs(self.ss-max_ss))
         if phase==1:
             tmp_plot_quantity = np.angle(self.BnPEST[:ss_plas_edge,:], deg = True)
@@ -952,11 +966,11 @@ class data():
             tmp_plot_ss = self.ss[:ss_plas_edge].flatten()
 
 
-        #color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap='hot', rasterized=True)
+        #color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap=cmap, rasterized=True)
         if increase_grid_BnPEST:
-            color_ax = ax.imshow(tmp_plot_quantity, cmap='hot', aspect='auto', interpolation='bicubic', rasterized=True, extent = [np.min(tmp_plot_mk), np.max(tmp_plot_mk), np.min(tmp_plot_ss), np.max(tmp_plot_ss)], origin='lower')
+            color_ax = ax.imshow(tmp_plot_quantity, cmap=cmap, aspect='auto', interpolation='bicubic', rasterized=True, extent = [np.min(tmp_plot_mk), np.max(tmp_plot_mk), np.min(tmp_plot_ss), np.max(tmp_plot_ss)], origin='lower')
         else:
-            color_ax = ax.pcolor(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap='hot', rasterized=True)
+            color_ax = ax.pcolor(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap=cmap, rasterized=True)
         self.tmp_plot_quantity = tmp_plot_quantity
         if inc_contours:
             if contour_levels==None:
@@ -965,8 +979,8 @@ class data():
                 ax.contour(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, contour_levels, colors='white')
                 #ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, contour_levels, colors='white')
 
-        #color_ax = ax.pcolor(self.mk,self.ss,np.abs(self.BnPEST),cmap='hot')
-        file_name = 'PROFEQ.OUT'
+        #color_ax = ax.pcolor(self.mk,self.ss,np.abs(self.BnPEST),cmap=cmap)
+        file_name = self.directory + '/PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         ax.plot(mq,sq,'wo')
         ax.plot(q*n,s,'w--') 

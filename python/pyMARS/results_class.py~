@@ -3,10 +3,10 @@ import scipy.ndimage as ndimage
 import scipy.interpolate as interp
 import matplotlib.mlab as mlab
 from scipy.interpolate import *
-import PythonMARS_funcs as pyMARS
+import pyMARS.PythonMARS_funcs as pyMARS_funcs
 import os, copy,time
-from RZfuncs import *
-import RZfuncs
+from pyMARS.RZfuncs import *
+import pyMARS.RZfuncs
 import matplotlib
 
 
@@ -75,8 +75,7 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
     r_vals_red = r_vals[:-1]
 
     for theta_deg in phasing_vals:
-        output_dict[theta_deg] = {}
-        cur_dict = output_dict[theta_deg]
+        cur_dict = {}
         for side in ['HFS','LFS']:
             for ab in ['above','below']:
                 cur_dict['disp_{}_{}'.format(ab,side)] = []
@@ -104,6 +103,8 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
             cur_dict['disp_below_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
             cur_dict['ang_below_LFS'].append(np.mean(angle[truth]))
             #ax.plot(r_vals_red[truth2], z_vals_red[truth],'-')
+        output_dict[theta_deg]=copy.deepcopy(cur_dict)
+    print output_dict[0]['disp_below_HFS'], output_dict[45]['disp_below_HFS']
     return output_dict
 
 
@@ -196,7 +197,7 @@ class data():
         self.B1,self.B2,self.B3,self.Bn,self.BMn = GetB123(self.BM1, self.BM2, self.BM3, self.R, self.Mm, self.chi, self.dRdchi, self.dZdchi)
         self.Br,self.Bz,self.Bphi = MacGetBphysC(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3)
         self.Brho,self.Bchi,self.Bphi2 = MacGetBphysT(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3,self.B0EXP)
-        self.NW = int(round(float(pyMARS.extract_value('../../cheaserun/log_chease','NW',' '))))
+        self.NW = int(round(float(pyMARS_funcs.extract_value('../../cheaserun/log_chease','NW',' '))))
 
     def get_VPLASMA(self, VNORM=1.0):
         os.chdir(self.directory)
@@ -559,7 +560,7 @@ class data():
             if include_surfmn_tmp:
                 tmp_styles = ['--k','--r']
                 for tmp_i, tmp_n in enumerate([2,4]):
-                    tmp, xdat_tmp, ydat_tmp, zdat_tmp  = pyMARS.extract_surfmn_data(surfmn_file, tmp_n)
+                    tmp, xdat_tmp, ydat_tmp, zdat_tmp  = pyMARS_funcs.extract_surfmn_data(surfmn_file, tmp_n)
                     tmp_surfmn_m = xdat_tmp[:,0]
                     tmp_surfmn_s = ydat_tmp[0,:].flatten()
                     tmp_surfmn_loc = np.argmin(np.abs(tmp_surfmn_m-tmp_m))
@@ -599,7 +600,7 @@ class data():
             zdat = stored_data[0][0]; xdat = stored_data[0][1]; ydat = stored_data[0][2]
         else:
             print 'getting surfmn natively, n = ', n
-            tmp, xdat, ydat, zdat  = pyMARS.extract_surfmn_data(surfmn_file, n)
+            tmp, xdat, ydat, zdat  = pyMARS_funcs.extract_surfmn_data(surfmn_file, n)
         #min_loc = np.argmin(np.abs(xdat[:,0]-(-30.)))
         #max_loc = np.argmin(np.abs(xdat[:,0]-(30.)))
         print 'ss, mk values :', min(self.ss), max(self.ss), min(self.mk), max(self.mk)
