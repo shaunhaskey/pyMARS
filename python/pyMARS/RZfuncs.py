@@ -179,7 +179,7 @@ def MacGetBphysT(R,Z,dRds,dZds,dRdchi,dZdchi,jacobian,B1,B2,B3,B0EXP):
 
 def readRMZM(file_name):
     #read RMZM from Chease run
-    RMZM = np.loadtxt(open(file_name))
+    RMZM = np.loadtxt(file_name)
     Nm0 = np.round(RMZM[0,0])
     Ns1 = np.round(RMZM[0,1])
     Ns2 = np.round(RMZM[0,2])
