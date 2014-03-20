@@ -957,7 +957,7 @@ class data():
             tmp_plot_quantity = np.angle(self.BnPEST[:ss_plas_edge,:], deg = True)
             tmp_plot_quantity[tmp_plot_quantity<min_phase] += 360
         else:
-            tmp_plot_quantity = (np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose()
+            tmp_plot_quantity = np.abs((np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose())
         if increase_grid_BnPEST:
             tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], tmp_plot_quantity, increase_y = 1, increase_x = 0, new_y_lims = [0,0.99],number=interp_points)
             tmp_plot_quantity =  ndimage.gaussian_filter(tmp_plot_quantity,gauss_filter)
