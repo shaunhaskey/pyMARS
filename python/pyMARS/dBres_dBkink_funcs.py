@@ -77,10 +77,8 @@ class generic_calculation():
         current_data = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
         interp_data = interp.griddata(input_coords, comp_func(current_data), output_coords, method = 'linear')
         ax.plot(slice_vals_x, interp_data, '-o', **plot_kwargs)
-        no_ax = True if ax==None else False 
         if xaxis_log: ax.set_xscale('log')
         if yaxis_log: ax.set_yscale('log')
-        if no_ax: fig,ax = pt.subplots()
 
 
     def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True):

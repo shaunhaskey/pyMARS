@@ -51,7 +51,8 @@ y_axis = 'ETA'
 field = 'plasma'
 for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,3],[0,3],[0,3]], ['dBres', 'dBkink', 'Probe']):
     fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
-    gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
+    #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
+    gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False)
     for i, cur_ax in zip(phasings_disp, ax.flatten()):
         cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = field, clim = cur_clim, ax = cur_ax)
         cur_ax.set_title('$\Delta \phi = {}^o$'.format(i))
@@ -60,16 +61,17 @@ for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,3],[0,3],[0,3]
     fig.tight_layout(pad = 0.1)
     cbar = pt.colorbar(cax, ax = ax.flatten().tolist())
     cbar.set_label('{}-{}'.format(title, field))
-    fig.savefig(title+'.pdf')
-    fig.savefig(title+'.eps')
+    fig.savefig(title+'-'+field+'.pdf')
+    fig.savefig(title+'-'+field+'.eps')
     fig.canvas.draw(); fig.show()
 
 fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
 x_axis = 'ROTE'
 y_axis = 'ETA'
 title = 'xpoint'
-field = 'total'
-gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
+field = 'plasma'
+#gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
+gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False)
 for i, cur_ax in zip(phasings_disp, ax.flatten()):
     xpoint = dBres_dBkink.x_point_displacement_calcs(a, i)
     cax = xpoint.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = 'plasma', clim = [0,0.035], ax = cur_ax)
@@ -91,17 +93,20 @@ x_interp = 10**x_interp
 #x_interp = np.linspace(1.e-6,0.01,100)
 eta_list = [5.e-7, 5.5e-8, 1.e-8]
 field = 'plasma'
+phasing = 270
 for eta, clr in zip(eta_list, ['b','g','r']):
     #for cur_ax, func, title in zip(ax, [dBres, dBkink, probe, probe_r], ['dBres', 'dBkink', 'probe p', 'probe r']):
     for cur_ax, func, title in zip(ax, [dBres, dBkink, probe,], ['dBres', 'dBkink', 'poloidal probe']):
         plot_kwargs = {'marker':'o', 'color':clr}
-        func.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = cur_ax, plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
+        func.plot_slice_through_2D_data(phasing, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = cur_ax, plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
         plot_kwargs = {'marker':'x', 'color':clr}
-        func.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'total',  ax = cur_ax, plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
+        func.plot_slice_through_2D_data(phasing, x_axis, y_axis, eta, x_interp, field = 'total',  ax = cur_ax, plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
+        plot_kwargs = {'marker':'+', 'color':clr}
+        func.plot_slice_through_2D_data(phasing, x_axis, y_axis, eta, x_interp, field = 'vacuum',  ax = cur_ax, plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
         cur_ax.set_ylabel(title)
-    xpoint = dBres_dBkink.x_point_displacement_calcs(a, 0)
+    xpoint = dBres_dBkink.x_point_displacement_calcs(a, phasing)
     plot_kwargs = {'marker':'o', 'color':clr}
-    xpoint.plot_slice_through_2D_data(0, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = ax[-1], plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
+    xpoint.plot_slice_through_2D_data(phasing, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = ax[-1], plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
     ax[-1].set_ylabel('disp x-point')
 for i in ax: i.grid()
 title ='blue, green, red : eta={}\n dots: plasma, crosses:plasma+vacuum'.format(' '.join(['{:.1e}'.format(i) for i in eta_list]))
@@ -109,7 +114,7 @@ ax[0].set_title(title)
 ax[0].set_xlim([np.min(x_interp), np.max(x_interp)])
 ax[-1].set_xlabel('ROTE')
 fig.tight_layout(pad = 0.05)
-fig.savefig('simulated_scan_{}.pdf'.format(field))
+fig.savefig('simulated_scan_{}_{}.pdf'.format(phasing, field))
 fig.canvas.draw(); fig.show()
 
 1/0
