@@ -28,6 +28,7 @@ I_coil_freq = 10.
 shot = 146392; start_time = 2990; end_time = 4700
 #shot = 146397; start_time = 3030; end_time = 4800
 shot = 146398; start_time = 3200; end_time = 3620
+shot = 146121; start_time = 1350; end_time = 1895; I_coil_freq = 25
 
 #shot = 146398; start_time = 3050; end_time = 3950
 
@@ -42,7 +43,6 @@ shot = 146398; start_time = 3200; end_time = 3620
 #shot = 146392; start_time = 3010; end_time = 3950
 #shot = 146392; start_time = 3010; end_time = 3650
 #shot = 146397; start_time = 3030; end_time = 3950
-
 reg_grid_pts = 100
 rad_thresh = 208
 include_MARS = 1
@@ -53,7 +53,7 @@ skip_am = 1
 #period = 5.
 
 load_pickle = 0
-load_hdf5 = 1
+load_hdf5 = 0
 save_pickle = 0
 include_n = 0
 only_save = 0
@@ -356,15 +356,15 @@ if grid_plot == 1:
     lim1 = [0,6.4e19]
     clr_fig, clr_ax = pt.subplots(nrows=3, sharex=True)
     clr_ax[0].set_title('griddata and raw data')
-    clr_plot = clr_ax[0].pcolor(time_base[::10], plot_densities, const_dens[:,::10], cmap = 'spectral')
+    clr_plot = clr_ax[0].pcolormesh(time_base[::10], plot_densities, const_dens[:,::10], cmap = 'spectral')
     pt.colorbar(clr_plot, ax=clr_ax[0])
     #clr_plot.set_clim(lim1)
-    clr_plot = clr_ax[1].pcolor(time_base[::10], plot_radius, const_rad[:,::10], cmap = 'jet')
+    clr_plot = clr_ax[1].pcolormesh(time_base[::10], plot_radius, const_rad[:,::10], cmap = 'jet')
     pt.colorbar(clr_plot, ax=clr_ax[1])
     clr_ax[1].set_xlim([start_time,end_time])
     clr_ax[1].set_ylim([2.2,2.35])
     clr_plot.set_clim([0,3.2e19])
-    clr_plot = clr_ax[2].pcolor(n_time[start_loc:end_loc:10], n_r[:,start_loc:end_loc:10], n_data[:,start_loc:end_loc:10], cmap = 'spectral')
+    clr_plot = clr_ax[2].pcolormesh(n_time[start_loc:end_loc:10], n_r[:,start_loc:end_loc:10], n_data[:,start_loc:end_loc:10], cmap = 'spectral')
     pt.colorbar(clr_plot, ax=clr_ax[2])
     clr_fig.canvas.draw(); clr_fig.show()
     #clr_plot.set_clim(lim1)
@@ -706,13 +706,13 @@ if single_clr_plot == 1:
     new_vals_phase = np.interp(new_vals_tmp, plot_radius,phase_list)
 
     for i in range(0,len(new_vals_amp)):
-        tmp_data = new_vals_amp[i] * np.cos(10.*np.pi*2*time_base[::10]/1000.+phase_list[i]/180.*np.pi)*4. + new_vals_tmp[i]
+        tmp_data = new_vals_amp[i] * np.cos(I_coil_freq*np.pi*2*time_base[::10]/1000.+phase_list[i]/180.*np.pi)*4. + new_vals_tmp[i]
         tmp_ax[0].plot(time_base[::10],tmp_data,'k-')
     cbar = pt.colorbar(clr_plot1, ax=tmp_ax[0])
     cbar.set_label(r'Density   $(m^{-3})$', fontsize = 15)
     #cbar = pt.colorbar(clr_plot2, ax=tmp_ax[1])
     tmp_fig.canvas.draw(); tmp_fig.show()
-    tmp_fig.savefig('/home/srh112/Desktop/testing.pdf')
+    #tmp_fig.savefig('/home/srh112/Desktop/testing.pdf')
     #clr_ax[2].plot(I_coil_x, I_coil_y,'k')
 
 
