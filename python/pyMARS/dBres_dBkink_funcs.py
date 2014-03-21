@@ -14,7 +14,11 @@ class generic_calculation():
         returns a 1D complex array of the values - 
         SRH : 12Mar2014
         '''
-        return apply_phasing(self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)], np.deg2rad(phasing), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
+        if self.calc_ul:
+            return apply_phasing(self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)], np.deg2rad(phasing), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
+        else:
+            return self.raw_data['{}_{}_{}'.format(field, self.calc_type, '')]
+
 
 
     def phasing_scan(self, n_phases = 360, phasing_array = None, field = 'total'):
@@ -112,19 +116,20 @@ class generic_calculation():
         return color_ax
 
 class dBres_calculations(generic_calculation):
-    def __init__(self, parent, mean_sum = 'sum'):
+    def __init__(self, parent, mean_sum = 'sum',):
         '''This class does all the dBres calculations
         SRH : 12Mar2014
         '''
         self.parent = parent
         self.raw_data = {}
         self.calc_type = 'res'
-        self.calc_ul = True
+        self.calc_ul = self.parent.calc_ul
         self.mean_sum = mean_sum
+        locs = ['upper', 'lower'] if self.calc_ul else ['']
         for field in ['total', 'vacuum']:
-            for coil in ['upper','lower']:
+            for coil in locs:
                 self.raw_data['{}_res_{}'.format(field, coil)] = data_from_dict('responses/{}_resonant_response_{}'.format(field,coil), self.parent.project_dict)
-        for coil in ['upper','lower']:
+        for coil in locs:
             self.raw_data['plasma_res_{}'.format(coil)] = []
             for tot, vac in zip(self.raw_data['total_res_{}'.format(coil)], self.raw_data['vacuum_res_{}'.format(coil)]):
                 self.raw_data['plasma_res_{}'.format(coil)].append(tot - vac)
@@ -139,15 +144,20 @@ class dBres_calculations(generic_calculation):
         #print 'dB res applying single phasing phase :', curr_phase
         output_data = []
         for ii in range(0,len(self.raw_data['{}_res_upper'.format(field)])):
-            tmp = np.sum(np.abs(apply_phasing(self.raw_data['{}_res_upper'.format(field)][ii], self.raw_data['{}_res_lower'.format(field)][ii], np.deg2rad(curr_phase), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)))
+            if self.calc_ul:
+                tmp = np.sum(np.abs(apply_phasing(self.raw_data['{}_res_upper'.format(field)][ii], self.raw_data['{}_res_lower'.format(field)][ii], np.deg2rad(curr_phase), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)))
+                n_harms = len(self.raw_data['{}_res_upper'.format(field)][ii])
+            else:
+                tmp = np.sum(np.abs(self.raw_data['{}_res_{}'.format(field, '')][ii]))
+                n_harms = len(self.raw_data['{}_res_{}'.format(field, '')][ii])
             if self.mean_sum=='sum':
                 output_data.append(tmp)
             elif self.mean_sum == 'mean':
-                output_data.append(tmp/len(self.raw_data['{}_res_upper'.format(field)][ii]))
+                output_data.append(tmp/n_harms)
         return output_data
 
 class magnetic_probe(generic_calculation):
-    def __init__(self, parent, probe):
+    def __init__(self, parent, probe,):
         '''This class does all the probe calculations
 
         SRH : 12Mar2014
@@ -156,47 +166,54 @@ class magnetic_probe(generic_calculation):
         self.probe = probe
         self.raw_data = {}
         self.calc_type = 'probe'
-        self.calc_ul = True
+        self.calc_ul = self.parent.calc_ul
+        locs = ['upper', 'lower'] if self.calc_ul else ['']
         self.probe_ind = (self.parent.project_dict['details']['pickup_coils']['probe']).index(probe)
-        for coil in ['upper','lower']:
+        for coil in locs:
             tmp = data_from_dict('vacuum_{}_response4'.format(coil), self.parent.project_dict)
             self.raw_data['vacuum_{}_{}'.format(self.calc_type, coil)] = [i[self.probe_ind] for i in tmp]
             tmp = data_from_dict('plasma_{}_response4'.format(coil), self.parent.project_dict)
             self.raw_data['total_{}_{}'.format(self.calc_type, coil)] = [i[self.probe_ind] for i in tmp]
-        for coil in ['upper','lower']:
+        for coil in locs:
             self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)] = []
             for tot, vac in zip(self.raw_data['total_{}_{}'.format(self.calc_type, coil)], self.raw_data['vacuum_probe_{}'.format(coil)]):
                 self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)].append(tot - vac)
 
 
 class dBkink_calculations(generic_calculation):
-    def __init__(self, parent):
+    def __init__(self, parent,):
         '''This class does all the dBkink calculations
         SRH : 12Mar2014
         '''
         self.parent = parent
         self.raw_data = {}
         self.calc_type = 'kink_harm'
-        self.calc_ul = True
+        self.calc_ul = self.parent.calc_ul
+        locs = ['upper', 'lower'] if self.calc_ul else ['']
         #Get the useful data out of the dictionary
         for field in ['total', 'vacuum']:
-            for coil in ['upper','lower']:
+            for coil in locs:
                 self.raw_data['{}_kink_{}'.format(field, coil)] = data_from_dict('responses/{}/{}_kink_response_{}'.format(str(self.parent.s_surface), field,coil), self.parent.project_dict)
         for j in ['mk', 'q_val']: self.raw_data[j] = data_from_dict('responses/{}/{}'.format(str(self.parent.s_surface), j), self.parent.project_dict)
         self.raw_data['sq'] = data_from_dict('responses/resonant_response_sq', self.parent.project_dict)
 
         #calculate the plasma only values
-        for coil in ['upper','lower']:
+        for coil in locs:
             self.raw_data['plasma_kink_{}'.format(coil)] = []
             for tot, vac in zip(self.raw_data['total_kink_{}'.format(coil)], self.raw_data['vacuum_kink_{}'.format(coil)]):
                 self.raw_data['plasma_kink_{}'.format(coil)].append(tot - vac)
 
         #get data for the reference harmonics
-        self.raw_data['reference'] = get_reference(self.raw_data['{}_kink_upper'.format(self.parent.reference_dB_kink)], self.raw_data['{}_kink_lower'.format(self.parent.reference_dB_kink)], np.linspace(0,2.*np.pi,100), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
+        if self.calc_ul:
+            self.raw_data['reference'] = get_reference(self.raw_data['{}_kink_upper'.format(self.parent.reference_dB_kink)], self.raw_data['{}_kink_lower'.format(self.parent.reference_dB_kink)], np.linspace(0,2.*np.pi,100), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
+            print '!!!!!!!!!!!!!!!', len(self.raw_data['reference']), self.raw_data['reference'][0].shape
+        else:
+            self.raw_data['reference'] = get_reference(self.raw_data['{}_kink_'.format(self.parent.reference_dB_kink, '')], None, np.linspace(0,2.*np.pi,100), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor, ul = False)
+            print '!!!!!!!!!!!!!!!', len(self.raw_data['reference']), self.raw_data['reference'][0].shape
 
         #Find the actual harmonic value
         for field in ['total', 'vacuum', 'plasma']:
-            for coil in ['upper','lower']:
+            for coil in locs:
                 self.raw_data['{}_kink_harm_{}'.format(field, coil)], self.raw_data['{}_mode_list_{}'.format(field, coil)], self.raw_data['{}_max_mode_list_{}'.format(field, coil)] = calculate_db_kink2(self.raw_data['mk'], self.raw_data['q_val'], self.parent.n, self.raw_data['reference'], self.raw_data['{}_kink_{}'.format(field,coil)], reference_offset = self.parent.reference_offset)
                 #self.raw_data['{}_kink_harm_{}'.format(field, coil)] = calculate_db_kink2(self.raw_data['mk'], self.raw_data['q_val'], self.n, self.raw_data['reference'], self.raw_data['{}_kink_{}'.format(field,coil)], reference_offset = self.reference_offset)
 
@@ -255,7 +272,7 @@ def return_sort_indices(input_data):
     return sorted(range(len(input_data)), key=lambda k: input_data[k])
     
 class post_processing_results():
-    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset = None, reference_dB_kink='plas',sort_name = 'q95_list', try_many_phasings = True):
+    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset = None, reference_dB_kink='plas',sort_name = 'q95_list', try_many_phasings = True, ul = True):
         '''This object is a way to put all post processing calculations etc.. together
 
         SRH : 8Mar2014
@@ -265,6 +282,7 @@ class post_processing_results():
         self.s_surface = s_surface
         self.phase_machine_ntor = phase_machine_ntor
         self.n = np.abs(self.project_dict['details']['MARS_settings']['<<RNTOR>>'])
+        self.calc_ul = ul
         self.reference_dB_kink = reference_dB_kink
         self.reference_offset = [2,0] if reference_offset == None else reference_offset
         plasma_params = ['Q95','shot_time','BETAN', 'LI']
@@ -1395,7 +1413,7 @@ def dB_res_phasing_dependence(phasing_array, q95_array, res_vac_list_upper, res_
         plot_array_vac_res[i,:], plot_array_plas_res[i,:], plot_array_vac_res_ave[i,:], plot_array_plas_res_ave[i,:] = dB_res_single_phasing(curr_phase,phase_machine_ntor, n,res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower)
     return plot_array_vac_res, plot_array_plas_res, plot_array_vac_res_ave, plot_array_plas_res_ave
 
-def get_reference(upper, lower, phasing_list, n, phase_machine_ntor = 1):
+def get_reference(upper, lower, phasing_list, n, phase_machine_ntor = 1, ul = True):
     '''
     Appy a phasing between an upper and lower array quantity
     '''
@@ -1407,7 +1425,10 @@ def get_reference(upper, lower, phasing_list, n, phase_machine_ntor = 1):
                 phasor = (np.cos(-phasing*n)+1j*np.sin(-phasing*n))
             else:
                 phasor = (np.cos(phasing)+1j*np.sin(phasing))
-            tmp.append(upper[i] + lower[i] * phasor)
+            if ul:
+                tmp.append(upper[i] + lower[i] * phasor)
+            else:
+                tmp.append(upper[i])
         answer.append(np.array(tmp))
     return answer
 
