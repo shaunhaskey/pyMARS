@@ -208,6 +208,38 @@ class data():
         self.V1,self.V2,self.V3,self.Vn, self.V1m = GetV123(self.VM1,self.VM2,self.VM3,self.R, self.chi, self.dRds, self.dZds, self.dRdchi, self.dZdchi, self.jacobian, self.Mm, self.Nchi, self.s, self.Ns1, self.DPSIDS, self.T)
         self.Vr, self.Vz, self.Vphi = MacGetVphys(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.V1,self.V2,self.V3, self.Ns1)
 
+
+    def plot_Bn_surface(self,ax = None, surfaces = None, multiplier = 0.0074):
+        self.plot_Vn_surface(ax = ax, surfaces = surfaces, multiplier = multiplier, plot_attribute = 'Bn')
+        print 'Bn'
+
+    def plot_Vn_surface(self,ax = None, surfaces = None, multiplier = 10, plot_attribute = 'Vn'):
+        if surfaces == None: surfaces = [-1]
+        grid_r = self.R*self.R0EXP
+        grid_z = self.Z*self.R0EXP
+        plas_r = grid_r[0:self.Vn.shape[0],:]
+        plas_z = grid_z[0:self.Vn.shape[0],:]
+        no_ax = True if (ax == None) else False
+        if no_ax: fig,ax = pt.subplots(ncols = 2, sharex = True, sharey = True)
+        for i in surfaces: 
+            ax.plot(plas_r[i,:],plas_z[i,:],'-')
+            norm_z = np.diff(plas_r[i,:])
+            norm_r = -np.diff(plas_z[i,:])
+            dl = np.sqrt(norm_r**2+norm_z**2)
+            norm_r/=dl
+            norm_z/=dl
+            disp_quant = (getattr(self, plot_attribute))[0:self.Vn.shape[0],:]
+            disp_quant = disp_quant[i,:]
+            print 'mean abs {:.4e}'.format(np.mean(np.abs(disp_quant)))
+            ax.plot(plas_r[i,:-1]+multiplier*norm_r*np.real(disp_quant[:-1]),plas_z[i,:-1]+multiplier*norm_z*np.real(disp_quant[:-1]))
+            ax.plot(plas_r[i,:-1]+multiplier*norm_r*np.imag(disp_quant[:-1]),plas_z[i,:-1]+multiplier*norm_z*np.imag(disp_quant[:-1]))
+
+            #angle = np.arctan2(plas_z[i,:], plas_r[i,:]-run_data[0].R0EXP)
+            #angle = np.rad2deg(angle)
+            #ax2.plot(angle, disp_quant)
+        if no_ax: fig.canvas.draw(); fig.show()
+
+    
     def plot_Bn(self, plot_quantity, axis, start_surface = 0, end_surface = 300, skip = 1,cmap='spectral', wall_grid = 23, plot_coils_switch=0, plot_boundaries = 0):
         #print self.R.shape, self.Z.shape, self.Bn.shape
         import matplotlib.pyplot as pt

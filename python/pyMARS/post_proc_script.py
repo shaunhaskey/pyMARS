@@ -35,24 +35,29 @@ def coil_outputs_B(project_dict, upper_and_lower=0):
         project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
         Nchi = project_dict['sims'][i]['CHEASE_settings']['<<NCHI>>']
         print 'working on serial : ', i
-        if upper_and_lower == 1:
-            #print 'hello1'
-            directory = project_dict['sims'][i]['dir_dict']['mars_upper_vacuum_dir']
-            #print directory, Nchi, link_RMZM
-            #print 'starting vacuum_upper_response'
-            project_dict['sims'][i]['vacuum_upper_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
-            directory = project_dict['sims'][i]['dir_dict']['mars_lower_vacuum_dir']
-            project_dict['sims'][i]['vacuum_lower_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
-            directory = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
-            project_dict['sims'][i]['plasma_upper_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
-            directory = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
-            project_dict['sims'][i]['plasma_lower_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
-        else:
-            #print 'hello2'
-            directory = project_dict['sims'][i]['dir_dict']['mars_vac_dir']
-            project_dict['sims'][i]['vacuum_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
-            directory = project_dict['sims'][i]['dir_dict']['mars_plasma_dir']
-            project_dict['sims'][i]['plasma_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
+        locs = ['upper','lower'] if upper_and_lower else ['']
+        for loc in locs:
+            for type in ['plasma', 'vacuum']:
+                directory = project_dict['sims'][i]['dir_dict']['mars_{}_{}_dir'.format(loc,type)]
+                project_dict['sims'][i]['{}_{}_response4'.format(type, loc)] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
+#         if upper_and_lower == 1:
+#             #print 'hello1'
+#             directory = project_dict['sims'][i]['dir_dict']['mars_upper_vacuum_dir']
+#             #print directory, Nchi, link_RMZM
+#             #print 'starting vacuum_upper_response'
+#             project_dict['sims'][i]['vacuum_upper_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
+#             directory = project_dict['sims'][i]['dir_dict']['mars_lower_vacuum_dir']
+#             project_dict['sims'][i]['vacuum_lower_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
+#             directory = project_dict['sims'][i]['dir_dict']['mars_upper_plasma_dir']
+#             project_dict['sims'][i]['plasma_upper_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
+#             directory = project_dict['sims'][i]['dir_dict']['mars_lower_plasma_dir']
+#             project_dict['sims'][i]['plasma_lower_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
+#         else:
+#             #print 'hello2'
+#             directory = project_dict['sims'][i]['dir_dict']['mars_vac_dir']
+#             project_dict['sims'][i]['vacuum_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
+#             directory = project_dict['sims'][i]['dir_dict']['mars_plasma_dir']
+#             project_dict['sims'][i]['plasma_response4'] = perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP=project_dict['sims'][i]['I0EXP'])
             
     return project_dict
 

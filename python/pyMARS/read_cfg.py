@@ -518,9 +518,7 @@ if start_from_step <=6 and end_at_step>=6:
         project_dict = pyMARS_funcs.read_data(project_dir + project_name + '_post_setup.pickle')
 
     job_num_filename = project_dict['details']['base_dir']+'MARS_simul_jobs.txt'
-    job_num_file = open(job_num_filename,'w')
-    job_num_file.write('%d\n'%(MARS_simultaneous_jobs))
-    job_num_file.close()
+    with file(job_num_filename,'w') as file_handle: file_handle.write('%d\n'%(MARS_simultaneous_jobs))
 
     project_dict = cont_funcs.run_mars_function(project_dict, job_num_filename, MARS_execution_script,rm_files = MARS_rm_files, rm_files2 = MARS_rm_files2, cluster_job = cluster_job, upper_and_lower = upper_and_lower)
 

@@ -445,6 +445,7 @@ def RMZM_func_matlab(project_dict, matlab_RZplot_files, main_template):
 ###################################################################
 #step 5
 def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN_template', multiple_efits = 0, rot_scan_list = None, res_scan_list = None):
+    print '!!!!!!', os.getcwd()
     if res_scan_list!=None or rot_scan_list!=None:
         project_dict_new = copy.deepcopy(project_dict)
         project_dict_new['sims'] = {}
@@ -482,8 +483,10 @@ def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN
 
     for i in project_dict['sims'].keys():
         print i
+        print '!!! before NW', os.getcwd()
         #Extract required values from CHEASE log file
         project_dict['sims'][i] = pyMARS_funcs.extract_NW(project_dict['sims'][i])
+        print '!!! after NW', os.getcwd()
 
         #Link required files
         if multiple_efits:
@@ -491,10 +494,12 @@ def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN
         else:
             special_dir = ''
         pyMARS_funcs.mars_setup_files(project_dict['sims'][i], upper_and_lower = upper_and_lower, special_dir = special_dir)
+        print '!!! mars_setup_files', os.getcwd()
         #pyMARS_funcs.mars_setup_files(project_dict['sims'][i], vac = 0, upper_and_lower = upper_and_lower)
 
         #Calculate the values that need to be normalised to something to do with Alfven speed/frequency
         project_dict['sims'][i] = pyMARS_funcs.mars_setup_alfven(project_dict['sims'][i], project_dict['sims'][i]['ICOIL_FREQ'], upper_and_lower = upper_and_lower)
+        print '!!! after mars_setup_alfven', os.getcwd()
 
         #Create the MARS RUN files
         project_dict['sims'][i] = pyMARS_funcs.mars_setup_run_file_new(project_dict['sims'][i], project_dict['details']['template_dir'] + MARS_template_name, upper_and_lower = upper_and_lower)

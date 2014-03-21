@@ -340,8 +340,8 @@ def modify_datain(master,template_dir, replace_values,CHEASE_template = 'datain_
     
 #---------Chease : Extract NW from log_chease--------------
 def extract_NW(master):
-    os.chdir(master['dir_dict']['chease_dir'])
-    master['NW'] = int(round(float(extract_value('log_chease','NW',' '))))
+    #os.chdir(master['dir_dict']['chease_dir'])
+    master['NW'] = int(round(float(extract_value(master['dir_dict']['chease_dir'] + '/log_chease','NW',' '))))
     #print 'NW : ' + str(master['NW'])
     return master
 
@@ -404,6 +404,7 @@ def RMZM_post_matlab(master):
 
 
 def mars_link_files(directory, special_dir = '', link_PROFTI = False, link_PROFTE = False):
+    start_directory = os.getcwd()
     os.chdir(directory)
     #if special_dir == '':
     os.system('ln -sf ../../../../efit/' + special_dir + '/PROFDEN PROFDEN')
@@ -418,29 +419,44 @@ def mars_link_files(directory, special_dir = '', link_PROFTI = False, link_PROFT
     os.system('ln -sf ../../cheaserun/OUTVMAR OUTVMAR')
     os.system('ln -sf ../../cheaserun/RMZM_F RMZM_F')
     os.system('ln -sf ../../cheaserun/log_chease log_chease')
+    os.chdir(start_directory)
 
 #--------- Mars Vacuum : setup -------------------
 #Link the PROFDEN, PROFROT, and chease outputs into the mars directory
 def mars_setup_files(master, special_dir = '', upper_and_lower = 0, link_PROFTI = True, link_PROFTE = True):
-    if upper_and_lower==1:
-        master['dir_dict']['mars_dir'] = master['dir_dict']['exp_dir']+'/RES{:.4f}_ROTE{:.4f}/'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
-        master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.p'
-        master['dir_dict']['mars_lower_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.p'
-        master['dir_dict']['mars_upper_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.vac'
-        master['dir_dict']['mars_lower_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.vac'
-        os.system('mkdir -p ' + master['dir_dict']['mars_upper_plasma_dir'])
-        os.system('mkdir -p ' + master['dir_dict']['mars_lower_plasma_dir'])
-        os.system('mkdir -p ' + master['dir_dict']['mars_lower_vacuum_dir'])
-        os.system('mkdir -p ' + master['dir_dict']['mars_upper_vacuum_dir'])
-        mars_link_files(master['dir_dict']['mars_upper_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-        mars_link_files(master['dir_dict']['mars_lower_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-        mars_link_files(master['dir_dict']['mars_lower_vacuum_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-        mars_link_files(master['dir_dict']['mars_upper_vacuum_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-    else:
-        master['dir_dict']['mars_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.4f}_ROTE{:.4f}.p'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
-        master['dir_dict']['mars_vac_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.4f}_ROTE{:.4f}.vac'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
-        mars_link_files(master['dir_dict']['mars_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-        mars_link_files(master['dir_dict']['mars_vac_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+    print 'in mars setup files'
+    master['dir_dict']['mars_dir'] = master['dir_dict']['exp_dir']+'/RES{:.4f}_ROTE{:.4f}/'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
+    print master['dir_dict']['mars_dir']
+    #if upper_and_lower==1:
+    for loc in ['upper','lower']:
+        if not upper_and_lower: loc = ''
+        for type, folder in zip(['plasma','vacuum'],['p','vac']):
+            master['dir_dict']['mars_{}_{}_dir'.format(loc, type)]=master['dir_dict']['mars_dir']+'RUN_rfa_{}.{}'.format(loc,folder)
+            os.system('mkdir -p ' + master['dir_dict']['mars_{}_{}_dir'.format(loc, type)])
+            mars_link_files(master['dir_dict']['mars_{}_{}_dir'.format(loc, type)], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+
+        #master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.p'
+        #master['dir_dict']['mars_lower_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.p'
+        ##master['dir_dict']['mars_upper_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.vac'
+        #master['dir_dict']['mars_lower_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.vac'
+#         os.system('mkdir -p ' + master['dir_dict']['mars_upper_plasma_dir'])
+#         os.system('mkdir -p ' + master['dir_dict']['mars_lower_plasma_dir'])
+#         os.system('mkdir -p ' + master['dir_dict']['mars_lower_vacuum_dir'])
+#         os.system('mkdir -p ' + master['dir_dict']['mars_upper_vacuum_dir'])
+#         mars_link_files(master['dir_dict']['mars_upper_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+#         mars_link_files(master['dir_dict']['mars_lower_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+#         mars_link_files(master['dir_dict']['mars_lower_vacuum_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+#         mars_link_files(master['dir_dict']['mars_upper_vacuum_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+#     else:
+#         for type, folder in zip(['plasma','vacuum'],['p','vac']):
+#             master['dir_dict']['mars_{}_{}_dir'.format(loc, type)]=master['dir_dict']['mars_dir']+'RUN_rfa_{}.{}'.format(loc,folder)
+#             os.system('mkdir -p ' + master['dir_dict']['mars_{}_{}_dir'.format(type, loc)])
+#             mars_link_files(master['dir_dict']['mars_{}_{}_dir'.format(type, loc)], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+
+#         master['dir_dict']['mars_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.4f}_ROTE{:.4f}.p'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
+#         master['dir_dict']['mars_vac_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.4f}_ROTE{:.4f}.vac'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
+#         mars_link_files(master['dir_dict']['mars_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
+#         mars_link_files(master['dir_dict']['mars_vac_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
 
 
 
@@ -486,14 +502,15 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     mu0 = 4e-7 * num.pi
     mi = 1.6726e-27 + 1.6749e-27 #rest mass of deuterium kg
     e = 1.60217e-19 #coulombs
+    ul_loc = 'upper' if upper_and_lower else ''
+    file_loc_dir = master['dir_dict']['mars_{}_{}_dir'.format(ul_loc,'vacuum')]
+#     if upper_and_lower==0:
+#         os.chdir(master['dir_dict']['mars_vac_dir'])
+#     else:
+#         os.chdir(master['dir_dict']['mars_upper_vacuum_dir'])
 
-    if upper_and_lower==0:
-        os.chdir(master['dir_dict']['mars_vac_dir'])
-    else:
-        os.chdir(master['dir_dict']['mars_upper_vacuum_dir'])
-
-    ne0 = np.loadtxt('PROFDEN',skiprows = 1)[0,1]
-    vtor0 = np.loadtxt('PROFROT',skiprows = 1)[0,1]
+    ne0 = np.loadtxt(file_loc_dir + '/PROFDEN',skiprows = 1)[0,1]
+    vtor0 = np.loadtxt(file_loc_dir + '/PROFROT',skiprows = 1)[0,1]
 
     #Make sure we are in rad/s
     if vtor0<200: vtor0*=1000
@@ -519,7 +536,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 
     #Resistivity data
     try:
-        Te0 = np.loadtxt('PROFTE',skiprows = 1)[0,1]
+        Te0 = np.loadtxt(file_loc_dir + '/PROFTE',skiprows = 1)[0,1]
         #Make sure it is in eV
         if Te0<200: Te0*=1000
         te_success = 1
@@ -584,19 +601,19 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     master['TAUWM'] = tauwm
     master['v0a'] = v0a
     print 'ROTE: {:.3e}, OMEGA_NORM:{:.3e}, TAUWM:{:.3e}, v0a:{:.3e}'.format(vtorn, omega[0], tauwm, v0a)
+    print os.getcwd()
     return master
 
 def mars_edit_run_file(directory, settings, template_file):
-    os.chdir(directory)
+    #os.chdir(directory)
     RUN_file = open(template_file,'r')
     RUN_text = RUN_file.read()
     RUN_file.close()
     for current in settings.keys():
         #print current, master[dict_key][current]
         RUN_text = RUN_text.replace(current,str(settings[current]))
-    RUN_file = open('RUN','w')
-    RUN_file.write(RUN_text)
-    RUN_file.close()
+    with file(directory + '/RUN','w') as file_handle: file_handle.write(RUN_text)
+
     
 def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
     #print 'Modify Mars run file'
@@ -636,10 +653,11 @@ def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
         master[dict_key]['<<INCFEED>>'] = 4
         mars_edit_run_file(master['dir_dict']['mars_lower_vacuum_dir'], master[dict_key], template_file)
     else:
-        master[dict_key]['<<INCFEED>>'] = 4
-        mars_edit_run_file(master['dir_dict']['mars_vac_dir'], master[dict_key], template_file)
-        master[dict_key]['<<INCFEED>>'] = 8
-        mars_edit_run_file(master['dir_dict']['mars_plasma_dir'], master[dict_key], template_file)
+        for incfeed, type in zip([4,8],['vacuum','plasma']):
+            master[dict_key]['<<INCFEED>>'] = incfeed
+            mars_edit_run_file(master['dir_dict']['mars_{}_{}_dir'.format('',type)], master[dict_key], template_file)
+        #master[dict_key]['<<INCFEED>>'] = 8
+        #mars_edit_run_file(master['dir_dict']['mars_{}_{}_dir'], master[dict_key], template_file)
 
     return master
 
@@ -648,35 +666,41 @@ def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
 
 #----------- Generate Job file for MARS batch run -----------
 def generate_job_file(master,MARS_execution_script, id_string = 'MARS', rm_files = 'OUTDATA  JPLASMA VPLASMA PPLASMA JACOBIAN', rm_files2 = '', upper_and_lower=0):
-    os.chdir(master['dir_dict']['mars_dir'])
+    #os.chdir(master['dir_dict']['mars_dir'])
 
-    if upper_and_lower == 1:
-        execution_txt = 'cd '+ master['dir_dict']['mars_upper_vacuum_dir'] + '\n'
-        execution_txt += MARS_execution_script + ' > log_runmars\n'
-        execution_txt += 'rm ' + rm_files +'\n'
-        execution_txt += 'cd '+ master['dir_dict']['mars_lower_vacuum_dir'] + '\n'
-        execution_txt += MARS_execution_script + ' > log_runmars\n'
-        execution_txt += 'rm ' + rm_files +'\n'
+    locs = ['upper','lower'] if upper_and_lower else ['']
+    execution_txt = ''
+    for loc in locs:
+        for type in ['plasma','vacuum']:
+            execution_txt += 'cd '+ master['dir_dict']['mars_{}_{}_dir'.format(loc, type)] + '\n'
+            execution_txt += MARS_execution_script + ' > log_runmars\n'
+            execution_txt += 'rm ' + rm_files +'\n'
+            
+#     if upper_and_lower == 1:
+#         execution_txt = 'cd '+ master['dir_dict']['mars_upper_vacuum_dir'] + '\n'
+#         execution_txt += MARS_execution_script + ' > log_runmars\n'
+#         execution_txt += 'rm ' + rm_files +'\n'
+#         execution_txt += 'cd '+ master['dir_dict']['mars_lower_vacuum_dir'] + '\n'
+#         execution_txt += MARS_execution_script + ' > log_runmars\n'
+#         execution_txt += 'rm ' + rm_files +'\n'
 
-        execution_txt += 'cd '+ master['dir_dict']['mars_upper_plasma_dir'] + '\n'
-        execution_txt += MARS_execution_script + ' > log_runmars\n'
-        execution_txt += 'rm ' + rm_files +'\n'
-        execution_txt += 'cd '+ master['dir_dict']['mars_lower_plasma_dir'] + '\n'
-        execution_txt += MARS_execution_script+ ' > log_runmars\n'
-        execution_txt += 'rm ' + rm_files +'\n'
+#         execution_txt += 'cd '+ master['dir_dict']['mars_upper_plasma_dir'] + '\n'
+#         execution_txt += MARS_execution_script + ' > log_runmars\n'
+#         execution_txt += 'rm ' + rm_files +'\n'
+#         execution_txt += 'cd '+ master['dir_dict']['mars_lower_plasma_dir'] + '\n'
+#         execution_txt += MARS_execution_script+ ' > log_runmars\n'
+#         execution_txt += 'rm ' + rm_files +'\n'
+#     else:
+#         execution_txt = 'cd '+ master['dir_dict']['mars_vac_dir'] + '\n'
+#         execution_txt += MARS_execution_script +' > log_runmars\n'
+#         execution_txt += 'rm ' + rm_files +'\n'
 
+#         execution_txt += 'cd '+ master['dir_dict']['mars_plasma_dir'] + '\n'
+#         execution_txt += MARS_execution_script + ' > log_runmars\n'
+#         execution_txt += 'rm ' + rm_files +'\n'
 
-    else:
-        execution_txt = 'cd '+ master['dir_dict']['mars_vac_dir'] + '\n'
-        execution_txt += MARS_execution_script +' > log_runmars\n'
-        execution_txt += 'rm ' + rm_files +'\n'
-
-        execution_txt += 'cd '+ master['dir_dict']['mars_plasma_dir'] + '\n'
-        execution_txt += MARS_execution_script + ' > log_runmars\n'
-        execution_txt += 'rm ' + rm_files +'\n'
-
-    execution_txt += 'cd '+ master['dir_dict']['chease_dir'] + '\n'
-    execution_txt += 'rm ' + rm_files2 +'\n'
+#     execution_txt += 'cd '+ master['dir_dict']['chease_dir'] + '\n'
+#     execution_txt += 'rm ' + rm_files2 +'\n'
 
     job_string = '#!/bin/bash\n'
     job_string = job_string + '#$ -N ' + id_string + '_p%d_q%d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
@@ -688,9 +712,7 @@ def generate_job_file(master,MARS_execution_script, id_string = 'MARS', rm_files
     job_string += execution_txt
     #job_string = job_string + 'runmarsf > log_runmars\n'
     #job_string = job_string + 'rm ' + rm_files +'\n'
-    file = open('mars_venus.job','w')
-    file.write(job_string)
-    file.close()
+    with file(master['dir_dict']['mars_dir'] + '/mars_venus.job','w') as file_handle: file_handle.write(job_string)
 
 
 #------------ Generate job file for Chease batch run ----------
