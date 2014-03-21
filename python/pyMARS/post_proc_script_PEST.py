@@ -29,26 +29,29 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, s_surfac
         locs = ['upper', 'lower'] if upper_and_lower else ['']
         project_dict['sims'][i]['responses']={}
         results_classes = {}
+        for s_surface in s_surface_list:
+            current_label = str(s_surface)
+            project_dict['sims'][i]['responses'][current_label]={}
+
         for loc in locs:
-            for type in ['plasma', 'vacuum']:
-                directory = project_dict['sims'][i]['dir_dict']['mars_{}_{}_dir'.format(loc, type)]
+            for type1, type2 in zip(['plasma', 'vacuum'], ['total','vacuum']):
+                directory = project_dict['sims'][i]['dir_dict']['mars_{}_{}_dir'.format(loc, type1)]
                 curr_data = results_class.data(directory, I0EXP=I0EXP)
                 curr_data.get_PEST(facn = facn)
                 res_integral, res_discrete = curr_data.resonant_strength(n = n, SURFMN_coords=SURFMN_coords)
-                project_dict['sims'][i]['responses']['{}_resonant_response_{}'.format(type, loc)] = copy.deepcopy(res_discrete)
-                project_dict['sims'][i]['responses']['{}_resonant_response_{}_integral'.format(type, loc)] = copy.deepcopy(res_integral)
+                project_dict['sims'][i]['responses']['{}_resonant_response_{}'.format(type2, loc)] = copy.deepcopy(res_discrete)
+                project_dict['sims'][i]['responses']['{}_resonant_response_{}_integral'.format(type2, loc)] = copy.deepcopy(res_integral)
                 for tmp_type in ['mq','qn','sq']:  project_dict['sims'][i]['responses']['resonant_response_{}'.format(tmp_type)] = copy.deepcopy(getattr(curr_data, tmp_type))
                 for s_surface in s_surface_list:
                     current_label = str(s_surface)
-                    project_dict['sims'][i]['responses'][current_label]={}
                     print 'getting kink data'
                     mk, ss, relevant_values, q_val = curr_data.kink_amp(s_surface, q_range, n = n, SURFMN_coords=SURFMN_coords)
-                    project_dict['sims'][i]['responses'][current_label]['{}_kink_response_{}'.format(type, loc)] = copy.deepcopy(relevant_values)
+                    project_dict['sims'][i]['responses'][current_label]['{}_kink_response_{}'.format(type2, loc)] = copy.deepcopy(relevant_values)
                     project_dict['sims'][i]['responses'][current_label]['mk'] = copy.deepcopy(mk)
                     project_dict['sims'][i]['responses'][current_label]['ss'] = copy.deepcopy(ss)
                     project_dict['sims'][i]['responses'][current_label]['q_val'] = copy.deepcopy(q_val)
 
-                results_classes['{}_{}'.format(loc, type)] = copy.deepcopy(curr_data)
+                results_classes['{}_{}'.format(loc, type1)] = copy.deepcopy(curr_data)
 
         if disp_calcs:
             #disp_run_list = [lower_data_tot, lower_data_vac, upper_data_tot, upper_data_vac]
