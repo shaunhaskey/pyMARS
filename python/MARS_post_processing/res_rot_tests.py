@@ -18,10 +18,13 @@ file_name='/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30/shot
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kpar1/shot_142614_rote_res_scan_30x30_kpar1_post_processing_PEST.pickle'
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
+file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
 
 
 
-file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_post_processing_PEST.pickle'; ul = False
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_post_processing_PEST.pickle'; ul = False
+file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_post_processing_PEST.pickle'; ul = False
+file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_ul/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_ul_post_processing_PEST.pickle'; ul = True
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
@@ -49,6 +52,7 @@ probe_r = dBres_dBkink.magnetic_probe(a,'UISL')
 
 
 phasings_disp = [0,45,90,135,180,225,270,315]
+if not ul: phasings_disp = [0]
 x_axis = 'ROTE'
 y_axis = 'ETA'
 field = 'plasma'
@@ -96,7 +100,7 @@ x_interp = 10**x_interp
 #x_interp = np.linspace(1.e-6,0.01,100)
 eta_list = [5.e-7, 5.5e-8, 1.e-8]
 field = 'plasma'
-phasing = 270
+phasing = 0
 for eta, clr in zip(eta_list, ['b','g','r']):
     #for cur_ax, func, title in zip(ax, [dBres, dBkink, probe, probe_r], ['dBres', 'dBkink', 'probe p', 'probe r']):
     for cur_ax, func, title in zip(ax, [dBres, dBkink, probe,], ['dBres', 'dBkink', 'poloidal probe']):

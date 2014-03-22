@@ -43,7 +43,8 @@ class generic_calculation():
         '''
         if plot_kwargs == None: plot_kwargs = {}
         comp_func = np.abs if amplitude else np.angle
-        calc_val = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
+        #calc_val = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
+        calc_val = self.single_phasing(phasing, field = field)
         indices = return_sort_indices(self.parent.raw_data[xaxis])
         no_ax = True if ax==None else False 
         if no_ax: fig,ax = pt.subplots()
@@ -78,7 +79,8 @@ class generic_calculation():
 
         xvals_set = sorted(set(xvals))
         yvals_set = sorted(set(yvals))
-        current_data = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
+        #current_data = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
+        current_data = self.single_phasing(phasing, field = field)
         interp_data = interp.griddata(input_coords, comp_func(current_data), output_coords, method = 'linear')
         ax.plot(slice_vals_x, interp_data, '-o', **plot_kwargs)
         if xaxis_log: ax.set_xscale('log')
@@ -98,7 +100,8 @@ class generic_calculation():
         yvals = self.parent.raw_data[yaxis]
         xvals_set = sorted(set(xvals))
         yvals_set = sorted(set(yvals))
-        current_data = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
+        #current_data = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
+        current_data = self.single_phasing(phasing, field = field)
         #current_data = self.single_phasing(phasing, field = field)
         output_matrix = np.zeros((len(yvals_set), len(xvals_set)),dtype=complex)
         for x, y, list_index in zip(xvals, yvals, range(len(xvals))):
@@ -143,7 +146,11 @@ class dBres_calculations(generic_calculation):
         '''
         #print 'dB res applying single phasing phase :', curr_phase
         output_data = []
-        for ii in range(0,len(self.raw_data['{}_res_upper'.format(field)])):
+        if self.calc_ul:
+            n_items = len(self.raw_data['{}_res_upper'.format(field)])
+        else:
+            n_items = len(self.raw_data['{}_res_'.format(field)])
+        for ii in range(0,n_items):
             if self.calc_ul:
                 tmp = np.sum(np.abs(apply_phasing(self.raw_data['{}_res_upper'.format(field)][ii], self.raw_data['{}_res_lower'.format(field)][ii], np.deg2rad(curr_phase), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)))
                 n_harms = len(self.raw_data['{}_res_upper'.format(field)][ii])
