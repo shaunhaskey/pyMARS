@@ -21,7 +21,7 @@ class generic_calculation():
 
 
 
-    def phasing_scan(self, n_phases = 360, phasing_array = None, field = 'total'):
+    def phasing_scan(self, n_phases = 360, phasing_array = None, field = 'total', filter_key = None):
         '''Perform a phasing scan for the  dBkink calculations
         phasing_array is the list of phasings to use - in degrees
         if phasing_array is None, then n_phases is the number of phases used between 0 and 360
@@ -31,10 +31,50 @@ class generic_calculation():
         SRH : 12Mar2014
         '''
         if phasing_array == None: phasing_array = np.linspace(0, 360, n_phases)
-        output_array = np.zeros((len(phasing_array), len(self.raw_data['plasma_{}_upper'.format(self.calc_type)])), dtype=complex)
+        #output_array = np.zeros((len(phasing_array), len(self.raw_data['plasma_{}_upper'.format(self.calc_type)])), dtype=complex)
+        n_sims = self.parent.n_sims  if filter_key == None  else np.sum(filter_key)
+        output_array = np.zeros((len(phasing_array), n_sims), dtype=complex)
+        if filter_key == None: filter_key = np.ones(n_sims, dtype = bool)
         for i, curr_phase in enumerate(phasing_array):
-            output_array[i,:] = self.single_phasing(curr_phase, field = field)
+            output_array[i,:] = np.array(self.single_phasing(curr_phase, field = field))[filter_key]
         return phasing_array, output_array
+
+
+    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None plot_kwargs = None):
+        '''
+        Need to select an 'axis' to perform the phase scan along
+
+        Need a filter if there other things need to be kept constant
+        SRH : 22Mar2014
+        '''
+        #filter out the values that are not wanted....
+        if plot_kwargs == None: plot_kwargs = {}
+        no_ax = True if ax==None else False 
+        if no_ax: fig,ax = pt.subplots()
+
+        if filter_names == None: filter_names = []; filter_values = []
+        first_time = True
+        for name, value in zip(filter_names, filter_values):
+            tmp_vals = np.array(self.parent.raw_data[name])
+            new_value = tmp_vals[np.argmin(np.abs(tmp_vals - value))]
+            print value, new_value
+            if first_time:
+                filter_key = (np.array(self.parent.raw_data[name]) == new_value)
+            else:
+                filter_key *= (np.array(self.parent.raw_data[name]) == new_value)
+        relevant_axis_values = np.array(self.parent.raw_data[axis_name])[filter_key]
+        sort_indices = np.argsort(relevant_axis_values, axis=0)
+        print sort_indices
+        print relevant_axis_values
+        phasing_array, output_array = self.phasing_scan(n_phases = n_phases, phasing_array = phasing_array, field = 'total', filter_key = filter_key)
+        rel_axis_grid, phase_grid = np.meshgrid(relevant_axis_values, phasing_array)
+        color_ax = ax.pcolormesh(rel_axis_grid, phase_grid, np.abs(output_array), cmap='spectral', rasterized= 'True')
+        if xaxis_log: ax.set_xscale('log')
+        if yaxis_log: ax.set_yscale('log')
+        if no_ax: fig.canvas.draw();fig.show()
+
+        print output_array.shape
+
 
     def plot_single_phasing(self, phasing, xaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True):
         '''Plot  a calculation versus a particular attribute
@@ -236,6 +276,7 @@ class x_point_displacement_calcs(generic_calculation):
         self.output_data = {}
         for i in disp_keys: self.output_data[i] = []
         for i in disp_keys: self.output_data[i.replace('disp','ang')] = []
+        self.n_sims = len(self.parent.project_dict['sims'].keys())
         for i in self.parent.project_dict['sims'].keys():
             upper_values = self.parent.project_dict['sims'][i]['displacement_responses']['upper_values']
             lower_values = self.parent.project_dict['sims'][i]['displacement_responses']['lower_values']
