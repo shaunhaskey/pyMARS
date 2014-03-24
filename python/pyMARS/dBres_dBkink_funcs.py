@@ -40,7 +40,7 @@ class generic_calculation():
         return phasing_array, output_array
 
 
-    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None plot_kwargs = None):
+    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None, plot_kwargs = None, n_contours = 0, contour_kwargs = None):
         '''
         Need to select an 'axis' to perform the phase scan along
 
@@ -49,6 +49,7 @@ class generic_calculation():
         '''
         #filter out the values that are not wanted....
         if plot_kwargs == None: plot_kwargs = {}
+        if contour_kwargs == None: contour_kwargs = {}
         no_ax = True if ax==None else False 
         if no_ax: fig,ax = pt.subplots()
 
@@ -57,24 +58,27 @@ class generic_calculation():
         for name, value in zip(filter_names, filter_values):
             tmp_vals = np.array(self.parent.raw_data[name])
             new_value = tmp_vals[np.argmin(np.abs(tmp_vals - value))]
-            print value, new_value
+
             if first_time:
                 filter_key = (np.array(self.parent.raw_data[name]) == new_value)
             else:
                 filter_key *= (np.array(self.parent.raw_data[name]) == new_value)
         relevant_axis_values = np.array(self.parent.raw_data[axis_name])[filter_key]
         sort_indices = np.argsort(relevant_axis_values, axis=0)
-        print sort_indices
-        print relevant_axis_values
-        phasing_array, output_array = self.phasing_scan(n_phases = n_phases, phasing_array = phasing_array, field = 'total', filter_key = filter_key)
+
+        phasing_array, output_array = self.phasing_scan(n_phases = n_phases, phasing_array = phasing_array, field = field, filter_key = filter_key)
         rel_axis_grid, phase_grid = np.meshgrid(relevant_axis_values, phasing_array)
-        color_ax = ax.pcolormesh(rel_axis_grid, phase_grid, np.abs(output_array), cmap='spectral', rasterized= 'True')
+        color_ax = ax.pcolormesh(rel_axis_grid, phase_grid, np.abs(output_array), cmap='hot', rasterized= 'True', shading = 'gouraud')
+
+        if n_contours != 0: color_ax2 = ax.contour(rel_axis_grid, phase_grid, np.abs(output_array), n_contours, **contour_kwargs)
         if xaxis_log: ax.set_xscale('log')
         if yaxis_log: ax.set_yscale('log')
+        ax.set_ylim([np.min(phasing_array), np.max(phasing_array)])
+        ax.set_xlim([np.min(rel_axis_grid), np.max(rel_axis_grid)])
         if no_ax: fig.canvas.draw();fig.show()
 
-        print output_array.shape
 
+        return color_ax
 
     def plot_single_phasing(self, phasing, xaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True):
         '''Plot  a calculation versus a particular attribute
