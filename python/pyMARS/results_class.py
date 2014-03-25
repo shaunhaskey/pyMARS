@@ -212,11 +212,11 @@ class data():
         self.Vr, self.Vz, self.Vphi = MacGetVphys(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.V1,self.V2,self.V3, self.Ns1)
 
 
-    def plot_Bn_surface(self,ax = None, surfaces = None, multiplier = 0.0074):
-        self.plot_Vn_surface(ax = ax, surfaces = surfaces, multiplier = multiplier, plot_attribute = 'Bn')
+    def plot_Bn_surface(self,ax = None, surfaces = None, multiplier = 0.0074, plot_im = False):
+        self.plot_Vn_surface(ax = ax, surfaces = surfaces, multiplier = multiplier, plot_attribute = 'Bn', plot_im = plot_im)
         print 'Bn'
 
-    def plot_Vn_surface(self,ax = None, surfaces = None, multiplier = 10, plot_attribute = 'Vn'):
+    def plot_Vn_surface(self,ax = None, surfaces = None, multiplier = 10, plot_attribute = 'Vn', plot_im = False):
         if surfaces == None: surfaces = [-1]
         grid_r = self.R*self.R0EXP
         grid_z = self.Z*self.R0EXP
@@ -235,7 +235,7 @@ class data():
             disp_quant = disp_quant[i,:]
             print 'mean abs {:.4e}'.format(np.mean(np.abs(disp_quant)))
             ax.plot(plas_r[i,:-1]+multiplier*norm_r*np.real(disp_quant[:-1]),plas_z[i,:-1]+multiplier*norm_z*np.real(disp_quant[:-1]))
-            ax.plot(plas_r[i,:-1]+multiplier*norm_r*np.imag(disp_quant[:-1]),plas_z[i,:-1]+multiplier*norm_z*np.imag(disp_quant[:-1]))
+            if plot_im: ax.plot(plas_r[i,:-1]+multiplier*norm_r*np.imag(disp_quant[:-1]),plas_z[i,:-1]+multiplier*norm_z*np.imag(disp_quant[:-1]))
 
             #angle = np.arctan2(plas_z[i,:], plas_r[i,:]-run_data[0].R0EXP)
             #angle = np.rad2deg(angle)
@@ -986,7 +986,7 @@ class data():
 
         self.plot_BnPEST_phase(inc_phase, BnPEST, mk, ss, tmp_cmap, phase_correction, clim_value, title, temp_qn, mk_grid, ss_grid, ss_squared, n, suptitle, fig_show, fig_name)
 
-    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100, gauss_filter = [0,0.5], cmap = 'hot'):
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100, gauss_filter = [0,0.5], cmap = 'hot', n_contours = 5):
         ss_plas_edge = np.argmin(np.abs(self.ss-max_ss))
         if phase==1:
             tmp_plot_quantity = np.angle(self.BnPEST[:ss_plas_edge,:], deg = True)
@@ -1005,11 +1005,13 @@ class data():
         if increase_grid_BnPEST:
             color_ax = ax.imshow(tmp_plot_quantity, cmap=cmap, aspect='auto', interpolation='bicubic', rasterized=True, extent = [np.min(tmp_plot_mk), np.max(tmp_plot_mk), np.min(tmp_plot_ss), np.max(tmp_plot_ss)], origin='lower')
         else:
-            color_ax = ax.pcolor(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap=cmap, rasterized=True)
+            #color_ax = ax.pcolor(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap=cmap, rasterized=True)
+            print 'hello world'
+            color_ax = ax.pcolormesh(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap=cmap, rasterized=True, shading='gouraud')
         self.tmp_plot_quantity = tmp_plot_quantity
         if inc_contours:
             if contour_levels==None:
-                ax.contour(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, colors='white')
+                ax.contour(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, n_contours, colors='white')
             else:
                 ax.contour(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, contour_levels, colors='white')
                 #ax.contour(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, contour_levels, colors='white')
@@ -1017,8 +1019,8 @@ class data():
         #color_ax = ax.pcolor(self.mk,self.ss,np.abs(self.BnPEST),cmap=cmap)
         file_name = self.directory + '/PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
-        ax.plot(mq,sq,'wo')
         ax.plot(q*n,s,'w--') 
+        ax.plot(mq,sq,'b+')
         return color_ax
 
 

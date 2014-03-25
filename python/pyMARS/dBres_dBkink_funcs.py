@@ -1,10 +1,11 @@
-import copy
+import copy, itertools
 import numpy as np
 import cPickle as pickle
 import matplotlib.pyplot as pt
 import scipy.ndimage.filters as scipy_filt
 import scipy.interpolate as interp
 import pyMARS.generic_funcs as gen_funcs
+import pyMARS.results_class as results_class
 
 class generic_calculation():
     def single_phasing(self, phasing, field = 'total'):
@@ -344,6 +345,250 @@ class post_processing_results():
         #MARS_settings
         plasma_params = ['ROTE','ETA']
         for i in plasma_params:self.raw_data[i] = data_from_dict('MARS_settings/<<{}>>'.format(i), self.project_dict)
+
+
+
+    def plot_single_PEST(self, params, param_values, I = None, savefig_fname = None,clim = None, phasing = 0, field = 'total'):
+        '''
+        params is the name of the parameters to match
+        param_values is a list of lists of the values of each param
+        I is the I-coil current configuration
+        
+        SRH : 24Mar2014
+        '''
+        if clim == None: clim = [0,1.5]
+
+        valid_keys, actual_values = self.find_relevant_keys(params, param_values)
+        fig, ax = pt.subplots(ncols = 3, sharex = True, sharey = True)
+        replacement_kwargs = {'lines.markersize':4, 'lines.linewidth':0.5}
+        gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*1.0, single_col = True, replacement_kwargs = replacement_kwargs)
+        color_plots = [];
+        combined, results_dict = self.combine_PEST_Vn(valid_keys[0], phasing, field, get_disp = False, return_all_three = True)
+        for ax_tmp, field, title in zip(ax,['BnPEST_vac', 'BnPEST_plasma', 'BnPEST_total'], ['Vacuum','Plasma','Total']):
+            combined.BnPEST = +results_dict[field]
+            color_plots.append(combined.plot_BnPEST(ax_tmp, n=self.n, cmap = 'hot'))
+            ax_tmp.set_title(title)
+            color_plots[-1].set_clim(clim)
+        for i in ax: i.set_xlabel('m')
+        ax[0].set_ylabel('$\sqrt{\Psi_N}$')
+        ax[0].set_xlim([0,28])
+        ax[0].set_ylim([0.4,1.0])
+        #ax[1].annotate('kink-\nresonant', xy=(8, 0.9), xytext=(8.9, 0.6),arrowprops=dict(facecolor='black', shrink=0.05,ec='white'),color='white')
+        #ax[1].annotate('pitch-\nresonant', xy=(6.93, 0.952), xytext=(0.3, 0.7),arrowprops=dict(facecolor='black', shrink=0.05,ec='white'),color='white')
+        fig.tight_layout(pad = 0.3)
+        cbar = pt.colorbar(color_plots[-1], ax = ax.tolist(), ticks = np.linspace(clim[0], clim[1], 4))
+        cbar.set_label('G/kA')
+        if savefig_fname!=None:
+            fig.savefig(savefig_fname+'.pdf')
+            fig.savefig(savefig_fname+'.eps')
+        fig.canvas.draw(); fig.show()
+
+
+    def plot_single_displacement(self, params, param_values, I = None, savefig_fname = None, phasing = 0, field = 'total'):
+        '''
+        params is the name of the parameters to match
+        param_values is a list of lists of the values of each param
+        I is the I-coil current configuration
+        
+        SRH : 24Mar2014
+        '''
+        valid_keys, actual_values = self.find_relevant_keys(params, param_values)
+        fig, ax = pt.subplots(ncols = 2, sharex = True, sharey = True)
+        replacement_kwargs = {'lines.markersize':4, 'lines.linewidth':0.5}
+        gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*1.0, single_col = True, replacement_kwargs = replacement_kwargs)
+        combined, results_dict = self.combine_PEST_Vn(valid_keys[0], phasing, field, get_disp = True, return_all_three = True)
+        combined.plot_Vn_surface(ax = ax[0], multiplier = 40)
+        combined.Bn = +results_dict['Bn_plasma']
+        combined.plot_Bn_surface(ax = ax[1], multiplier = 0.025)
+        ax[1].set_title('$B_n$ plasma')
+        ax[0].set_title('Displacement normal')
+        for i in ax: i.set_xlabel('R (m)')
+        for i in ax: i.grid()
+        ax[0].set_ylabel('Z (m)')
+        ax[0].set_ylim([-1.25,1.25]); i.set_xlim([1.0,2.5])
+        gen_funcs.setup_axis_publication(ax[0], n_xticks = 5, n_yticks = 5)
+        fig.tight_layout(pad = 0.3)
+        if savefig_fname!=None:
+            fig.savefig(savefig_fname+'.pdf')
+            fig.savefig(savefig_fname+'.eps')
+        fig.canvas.draw(); fig.show()
+
+
+    def find_relevant_keys(self, params, param_values):
+        valid_keys = []
+        for values in param_values:
+            valid_keys_tmp = np.ones(len(self.project_dict['sims'].keys()),dtype = bool)
+            for param, value in zip(params, values):
+                min_loc = np.argmin(np.abs(np.array(self.raw_data[param]) - value))
+                valid_keys_tmp *= np.array(self.raw_data[param]) == self.raw_data[param][min_loc]
+            if np.sum(valid_keys_tmp)!=1:
+                raise ValueError('Too many keys matching')
+            
+            valid_keys.append(int(np.array(self.project_dict['sims'].keys())[valid_keys_tmp]))
+        actual_values = []
+        for values, cur_key in zip(param_values, valid_keys):
+            print values
+            actual_values.append([self.raw_data[i][cur_key] for i in params])
+            print actual_values[-1]
+        return valid_keys, actual_values
+
+    def plot_PEST_scan(self, params, param_values, I = None, savefig_fname = None,clim = None, phasing = 0, field = 'total'):
+        '''
+        params is the name of the parameters to match
+        param_values is a list of lists of the values of each param
+        I is the I-coil current configuration
+        
+        SRH : 24Mar2014
+        '''
+
+        if clim == None: clim = [0,1.5]
+        valid_keys, actual_values = self.find_relevant_keys(params, param_values)
+
+        fig, ax = pt.subplots(nrows = len(valid_keys), sharex = True, sharey = True)
+        fig2, ax_big = pt.subplots(nrows = len(valid_keys), ncols = 4,)
+
+        fig_Vn, ax_Vn = pt.subplots(ncols = len(valid_keys), sharex = True, sharey = True)
+        fig_Bn, ax_Bn = pt.subplots(ncols = len(valid_keys), sharex = True, sharey = True)
+        
+        ax_Bn2 = ax_big[:,0]
+        ax2 = ax_big[:,2]
+        ax2_BnPEST_plas = ax_big[:,3]
+        ax_Vn2 = ax_big[:,1]
+
+        for i in ax: gen_funcs.setup_axis_publication(i, n_yticks = 5)
+        for i in ax_Vn: gen_funcs.setup_axis_publication(i, n_yticks = 5, n_xticks = 5)
+        for i in ax_Bn: gen_funcs.setup_axis_publication(i, n_yticks = 5, n_xticks = 5)
+
+        for i in ax2: gen_funcs.setup_axis_publication(i, n_yticks = 5)
+        for i in ax2_BnPEST_plas: gen_funcs.setup_axis_publication(i, n_yticks = 5)
+        for i in ax_Vn2: gen_funcs.setup_axis_publication(i, n_yticks = 5, n_xticks = 5)
+        for i in ax_Bn2: gen_funcs.setup_axis_publication(i, n_yticks = 5, n_xticks = 5)
+        replacement_kwargs = {'lines.markersize':4, 'lines.linewidth':0.5}
+
+        gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*2.0, single_col = True, replacement_kwargs = replacement_kwargs)
+        gen_funcs.setup_publication_image(fig2, height_prop = 1./1.618*1.25, single_col = False, replacement_kwargs = replacement_kwargs)
+
+        replacement_kwargs = {'lines.markersize':4, 'lines.linewidth':0.5}
+        gen_funcs.setup_publication_image(fig_Vn, height_prop = 1./1.618, single_col = True, replacement_kwargs = replacement_kwargs)
+        gen_funcs.setup_publication_image(fig_Bn, height_prop = 1./1.618, single_col = True, replacement_kwargs = replacement_kwargs)
+
+        color_plots = []; color_plots2 = []; color_plots3 = []
+        #valid_keys = [valid_keys[0]]
+        for values, actual_val, cur_key, i in zip(param_values, actual_values, valid_keys, range(len(valid_keys))):
+            #BnPEST
+            combined, tmp_results_dict = self.combine_PEST_Vn(cur_key, phasing, field, get_disp = True, return_all_three = True)
+            color_plots.append(combined.plot_BnPEST(ax[i], n=self.n, cmap = 'hot'))
+            color_plots[-1].set_clim(clim)
+            combined.BnPEST = tmp_results_dict['BnPEST_total']
+            color_plots2.append(combined.plot_BnPEST(ax2[i], n=self.n, cmap = 'hot'))
+            color_plots2[-1].set_clim(clim)
+
+            combined.BnPEST = tmp_results_dict['BnPEST_plasma']
+            color_plots3.append(combined.plot_BnPEST(ax2_BnPEST_plas[i], n=self.n, cmap = 'hot'))
+            color_plots3[-1].set_clim(clim)
+
+            cbar = pt.colorbar(color_plots[-1], cax = gen_funcs.create_cbar_ax(ax[i]), ticks = np.linspace(clim[0], clim[1], 5))
+            cbar2 = pt.colorbar(color_plots3[-1], cax = gen_funcs.create_cbar_ax(ax2_BnPEST_plas[i]), ticks = np.linspace(clim[0], clim[1], 4))
+            ax[i].set_title(' '.join(['{}:{:.2e}'.format(param, value) for param, value in zip(params, actual_val)]))
+            #ax_Bn2[i].set_ylabel(' '.join(['{}:{:.2e}'.format(param, value) for param, value in zip(params, actual_val)]) + '\nZ (m)')
+            cbar.set_label('G/kA')
+            cbar2.set_label('G/kA')
+
+            #Displacement
+            combined.plot_Vn_surface(ax = ax_Vn[i], multiplier = 40)
+            combined.plot_Bn_surface(ax = ax_Bn[i], multiplier = 0.025)
+            combined.plot_Vn_surface(ax = ax_Vn2[i], multiplier = 40)
+            combined.plot_Bn_surface(ax = ax_Bn2[i], multiplier = 0.025)
+        for i in ax_big[:,0]: i.set_ylabel('Z (m)')
+        for i in ax_big[-1,[0,1]]: i.set_xlabel('R (m)')
+        #ax_Vn2[0].set_title('Normal displacement')
+        #ax_Bn2[0].set_title('Bn total')
+        #ax2[0].set_title('Bn total')
+        ax[0].set_xlim([0,28])
+        ax[0].set_ylim([0.4,1.0])
+        ax[-1].set_xlabel('m')
+        for i in ax2: i.set_xlim([0,28]); i.set_ylim([0.4,1.0])
+        for i in ax2_BnPEST_plas: i.set_xlim([0,28]); i.set_ylim([0.4,1.0])
+        for i in ax_Bn2: i.grid()
+        for i in ax_Vn2: i.grid()
+        ax2[-1].set_xlabel('m')
+        ax2_BnPEST_plas[-1].set_xlabel('m')
+
+        for i in [ax_Vn[0], ax_Bn[0]]: i.set_ylim([-1.25,1.25]); i.set_xlim([1.0,2.5])
+        for i in ax: i.set_ylabel('$\sqrt{\Psi_N}$')
+
+        for i in ax_Vn2: i.set_ylim([-1.25,1.25]); i.set_xlim([1.0,2.5])
+        for i in ax_Bn2: i.set_ylim([-1.25,1.25]); i.set_xlim([1.0,2.5])
+        for i in ax2: i.set_ylabel('$\sqrt{\Psi_N}$')
+
+        for i in [fig, fig2, fig_Vn, fig_Bn]: i.tight_layout(pad = 0.3)
+        fig.savefig(savefig_fname+'.pdf')
+        fig.savefig(savefig_fname+'.eps')
+        fig_Vn.savefig(savefig_fname+'_Vn.pdf')
+        fig_Vn.savefig(savefig_fname+'_Vn.eps')
+        fig_Bn.savefig(savefig_fname+'_Bn.pdf')
+        fig_Bn.savefig(savefig_fname+'_Bn.eps')
+        fig2.savefig(savefig_fname+'_all.eps')
+        fig2.savefig(savefig_fname+'_all.pdf')
+        for fig_t in [fig, fig_Vn, fig_Bn, fig2]: fig_t.canvas.draw(); fig_t.show()
+
+        
+    def combine_PEST_Vn(self, cur_key, phasing, field,I = None, get_disp = False, return_all_three = False):
+        '''Mainly a helper function for applying a phasing when using upper-lower and wanting to plot the results
+        
+        SRH : 24Mar2014
+        '''
+        if I == None:
+            I = np.array([1.,-1.,0.,1,-1.,0.]) if self.n==2 else np.array([1.,-1.,1.,-1,-1.,-1.])
+        N = len(I)
+        I0EXP = results_class.I0EXP_calc_real(self.n,I)
+        facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
+        combs = itertools.product(['upper','lower'],['plasma','vacuum'])
+        simuls = {}
+        for loc, typ in combs:
+            tmp = results_class.data(self.project_dict['sims'][cur_key]['dir_dict']['mars_{}_{}_dir'.format(loc, typ)], I0EXP = I0EXP, getpest = True)
+            if get_disp: tmp.get_VPLASMA()
+            simuls['{}_{}'.format(loc,typ)] = copy.deepcopy(tmp)
+
+        R_t, Z_t, B1_t, B2_t, B3_t, Bn_t, BMn_t, BnPEST_t = results_class.combine_data(simuls['upper_plasma'], simuls['lower_plasma'], phasing)
+        R_v, Z_v, B1_v, B2_v, B3_v, Bn_v, BMn_v, BnPEST_v = results_class.combine_data(simuls['upper_vacuum'], simuls['lower_vacuum'], phasing)
+        combined = copy.deepcopy(simuls['upper_plasma'])
+        if field=='total':
+            combined.BnPEST = +BnPEST_t
+            combined.Bn = +Bn_t
+        elif field =='vac':
+            combined.BnPEST = +BnPEST_v
+            combined.Bn = +Bn_v
+        elif field == 'plasma':
+            combined.BnPEST = BnPEST_t - BnPEST_v
+            combined.Bn = Bn_t - Bn_v
+        if get_disp:
+            Vn = results_class.combine_fields_displacement([simuls['lower_plasma'],simuls['lower_vacuum'],simuls['upper_plasma'],simuls['lower_vacuum']] , 'Vn', theta=np.deg2rad(phasing), field_type = 'plas')
+            combined.Vn = Vn
+
+        combined.BnPEST[np.isnan(combined.BnPEST)] = 0
+        combined.Bn[np.isnan(combined.Bn)] = 0
+        if return_all_three:
+            return combined, {'BnPEST_total': +BnPEST_t, 'BnPEST_vac': +BnPEST_v, 'BnPEST_plasma':BnPEST_t - BnPEST_v, 'Bn_total': +Bn_t, 'Bn_vac': +Bn_v, 'Bn_plasma':+Bn_t - Bn_v}
+        return combined
+
+
+#         subplot_plot = 'total'
+#         inc_contours = False
+#         valid_sim_list = []
+#         im_name_list = []
+#         title_list = []
+#         for i in keys: valid_sim_list.append(copy.deepcopy(self.project_dict['sims'][i]))
+#         for i in keys:
+#             #im_name_list.append('{}/ROTE_{:010d}_ETA_{:010d}_{}.png'.format(base_dir, int(scan_data['sims'][i]['MARS_settings']['<<ROTE>>']*10**10), int(scan_data['sims'][i]['MARS_settings']['<<ETA>>']*10**10), subplot_plot))
+#             im_name_list.append('{}/ROTE_{:010d}_ETA_{:010d}'.format(base_dir, int(scan_data['sims'][i]['MARS_settings']['<<ROTE>>']*10**10), int(scan_data['sims'][i]['MARS_settings']['<<ETA>>']*10**10)))
+#             title_list.append('ROTE {:.3e} ETA {:.3e}'.format(scan_data['sims'][i]['MARS_settings']['<<ROTE>>'], scan_data['sims'][i]['MARS_settings']['<<ETA>>']))
+#         print im_name_list
+
+#         input_data = zip(valid_sim_list, im_name_list, itertools.repeat(I0EXP), itertools.repeat(facn), itertools.repeat(subplot_plot), itertools.repeat(n), itertools.repeat(inc_contours), itertools.repeat(clim), title_list)
+
+#         map(scan_pics_func.plot_scan, input_data)
+
 
     def plot_parameters(self, xaxis, yaxis, ax = None, plot_kwargs = None):
         '''Plot  a calculation versus a particular attribute

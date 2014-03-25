@@ -82,7 +82,10 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
                 cur_dict['ang_{}_{}'.format(ab,side)] = []
         print '===== %d ====='%(theta_deg)
         theta = float(theta_deg)/180*np.pi;
-        plot_quantity = combine_fields_displacement(run_data, plot_field, theta=theta, field_type=field_type)
+        if len(run_data)>2:
+            plot_quantity = combine_fields_displacement(run_data, plot_field, theta=theta, field_type=field_type)
+        else:
+            plot_quantity = getattr(run_data[0], plot_field)
         plot_quantity_red = plot_quantity[-1,:-1]
         for i in range(1,len(upper_values)):
             truth = (z_vals_red>=upper_values[i-1])*(z_vals_red<upper_values[i])*(dz<0)
@@ -104,7 +107,7 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
             cur_dict['ang_below_LFS'].append(np.mean(angle[truth]))
             #ax.plot(r_vals_red[truth2], z_vals_red[truth],'-')
         output_dict[theta_deg]=copy.deepcopy(cur_dict)
-    print output_dict[0]['disp_below_HFS'], output_dict[45]['disp_below_HFS']
+    #print output_dict[0]['disp_below_HFS'], output_dict[45]['disp_below_HFS']
     return output_dict
 
 
@@ -172,7 +175,7 @@ class data():
         self.spline_B23 = spline_B23
         self.extract_single()
         if getpest: self.get_PEST(facn =1 )
-        print '-----',  os.getcwd(), os.getpid(), np.sum(np.abs((self.Bn))), np.sum(np.abs((self.BnPEST)))
+
 
     def extract_single(self):
         #os.chdir(self.directory) 
@@ -308,7 +311,7 @@ class data():
         R_EQAC = copy.deepcopy(self.R[II,:])
         Z_EQAC = copy.deepcopy(self.Z[II,:])
         
-        print '--- in pest calc eqac orig',  os.getcwd(), np.sum(np.abs((BnEQAC)))
+        #print '--- in pest calc eqac orig',  os.getcwd(), np.sum(np.abs((BnEQAC)))
         Rs = copy.deepcopy(R_EQAC[-1,:])
         Zs = copy.deepcopy(Z_EQAC[-1,:])
         Rc = (np.min(Rs)+np.max(Rs))/2.
@@ -340,11 +343,11 @@ class data():
         R_Z_PEST[:,0] = R_PEST.flatten()
         R_Z_PEST[:,1] = Z_PEST.flatten()
         #this section is to make it work inthe griddata function
-        print '--- in pest calc eqac',  os.getpid(), os.getcwd(), np.sum(np.abs((BnEQAC)))
+        #print '--- in pest calc eqac',  os.getpid(), os.getcwd(), np.sum(np.abs((BnEQAC)))
         import scipy.interpolate as interp
         BnPEST  = interp.griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
-        print '--- in pest calc nan', os.getpid(), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(R_Z_PEST))
-        print '--- in pest calc eqac*',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST))), np.sum(np.isnan((BnPEST))), np.sum(np.isnan((BnPEST))) >0
+        #print '--- in pest calc nan', os.getpid(), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(R_Z_PEST))
+        #print '--- in pest calc eqac*',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST))), np.sum(np.isnan((BnPEST))), np.sum(np.isnan((BnPEST))) >0
 
         #if_pass = 'fail' if np.sum(np.isnan((BnPEST))) > 0 else 'pass'
         #np.savetxt('{}_RZPEST_{}'.format(os.getpid(), if_pass), R_Z_PEST)
@@ -352,7 +355,7 @@ class data():
         #np.savetxt('{}_RZEQAC_{}'.format(os.getpid(), if_pass), R_Z_EQAC)
         BnPEST.resize(BnEQAC.shape)
         BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST
-        print '--- in pest calc eqac**',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST)))
+        #print '--- in pest calc eqac**',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST)))
 
 
         mk = np.arange(-29,29+1,dtype=int)
@@ -376,7 +379,7 @@ class data():
         BnPEST[0,:] = BnPEST[1,:]
         BnPEST[-1,:] = BnPEST[-2,:]
         self.BnPEST = BnPEST
-        print '--- in pest calc',  os.getcwd(), os.getcwd(), np.sum(np.abs((self.Bn))), np.sum(np.abs((self.BnPEST)))
+        #print '--- in pest calc',  os.getcwd(), os.getcwd(), np.sum(np.abs((self.Bn))), np.sum(np.abs((self.BnPEST)))
 
         new_area = []
         for i in range(0, self.R.shape[0]):
