@@ -212,11 +212,11 @@ class data():
         self.Vr, self.Vz, self.Vphi = MacGetVphys(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.V1,self.V2,self.V3, self.Ns1)
 
 
-    def plot_Bn_surface(self,ax = None, surfaces = None, multiplier = 0.0074, plot_im = False):
-        self.plot_Vn_surface(ax = ax, surfaces = surfaces, multiplier = multiplier, plot_attribute = 'Bn', plot_im = plot_im)
+    def plot_Bn_surface(self,ax = None, surfaces = None, multiplier = 0.0074, plot_im = False, highlight_lower = None):
+        self.plot_Vn_surface(ax = ax, surfaces = surfaces, multiplier = multiplier, plot_attribute = 'Bn', plot_im = plot_im, highlight_lower = highlight_lower)
         print 'Bn'
 
-    def plot_Vn_surface(self,ax = None, surfaces = None, multiplier = 10, plot_attribute = 'Vn', plot_im = False):
+    def plot_Vn_surface(self,ax = None, surfaces = None, multiplier = 10, plot_attribute = 'Vn', plot_im = False, highlight_lower = None):
         if surfaces == None: surfaces = [-1]
         grid_r = self.R*self.R0EXP
         grid_z = self.Z*self.R0EXP
@@ -235,6 +235,10 @@ class data():
             disp_quant = disp_quant[i,:]
             print 'mean abs {:.4e}'.format(np.mean(np.abs(disp_quant)))
             ax.plot(plas_r[i,:-1]+multiplier*norm_r*np.real(disp_quant[:-1]),plas_z[i,:-1]+multiplier*norm_z*np.real(disp_quant[:-1]))
+            if highlight_lower != None:
+                truth_tmp = plas_z[i,:-1]<highlight_lower
+                ax.plot(plas_r[i,truth_tmp]+multiplier*norm_r[truth_tmp]*np.real(disp_quant[truth_tmp]),plas_z[i,truth_tmp]+multiplier*norm_z[truth_tmp]*np.real(disp_quant[truth_tmp]), 'k-', linewidth=2)
+            
             if plot_im: ax.plot(plas_r[i,:-1]+multiplier*norm_r*np.imag(disp_quant[:-1]),plas_z[i,:-1]+multiplier*norm_z*np.imag(disp_quant[:-1]))
 
             #angle = np.arctan2(plas_z[i,:], plas_r[i,:]-run_data[0].R0EXP)

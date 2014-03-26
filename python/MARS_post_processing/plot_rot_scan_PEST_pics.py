@@ -43,12 +43,13 @@ sort_name = 'rote_list'
 
 a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False, ul = ul)
 
+a.plot_single_displacement(['ROTE', 'ETA'], [[5e-3,5.5e-7]], savefig_fname = '/u/haskeysr/displacement_plot')
+
+1/0
 
 a.plot_PEST_scan(['ROTE', 'ETA'], [[1e-3,5.5e-8],[1e-4,5.5e-8],[1e-5,5.5e-8]], savefig_fname = '/u/haskeysr/rote_scan_harms_disp', clim = [0,1.5])
 
-1/0
 a.plot_single_PEST(['ROTE', 'ETA'], [[5e-3,5.5e-7]], savefig_fname = '/u/haskeysr/vacuum_plasma_total', clim = [0,1.5])
-a.plot_single_displacement(['ROTE', 'ETA'], [[5e-3,5.5e-7]], savefig_fname = '/u/haskeysr/displacement_plot')
 
 
 

@@ -397,13 +397,17 @@ class post_processing_results():
         replacement_kwargs = {'lines.markersize':4, 'lines.linewidth':0.5}
         gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*1.0, single_col = True, replacement_kwargs = replacement_kwargs)
         combined, results_dict = self.combine_PEST_Vn(valid_keys[0], phasing, field, get_disp = True, return_all_three = True)
-        combined.plot_Vn_surface(ax = ax[0], multiplier = 40)
+        combined.plot_Vn_surface(ax = ax[0], multiplier = 40, highlight_lower = -0.75)
         combined.Bn = +results_dict['Bn_plasma']
-        combined.plot_Bn_surface(ax = ax[1], multiplier = 0.025)
+        combined.plot_Bn_surface(ax = ax[1], multiplier = 0.025, highlight_lower = -0.75)
         ax[1].set_title('$B_n$ plasma')
         ax[0].set_title('Displacement normal')
         for i in ax: i.set_xlabel('R (m)')
         for i in ax: i.grid()
+        for i in ax: i.plot([2.164,2.374],[1.012,0.504],'-bo')
+        for i in ax: i.plot([2.164,2.374],[-1.012,-0.504],'-bo')
+
+
         ax[0].set_ylabel('Z (m)')
         ax[0].set_ylim([-1.25,1.25]); i.set_xlim([1.0,2.5])
         gen_funcs.setup_axis_publication(ax[0], n_xticks = 5, n_yticks = 5)
