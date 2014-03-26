@@ -154,7 +154,7 @@ class generic_calculation():
             col = xvals_set.index(x)
             output_matrix[row, col] = +current_data[list_index]
         x_mesh, y_mesh = np.meshgrid(xvals_set, yvals_set)
-        color_ax = ax.pcolormesh(x_mesh, y_mesh, scipy_filt.median_filter(np.abs(output_matrix), med_filt_value), cmap=cmap_res, rasterized= 'True')
+        color_ax = ax.pcolormesh(x_mesh, y_mesh, scipy_filt.median_filter(np.abs(output_matrix), med_filt_value), cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
         print color_ax.get_clim()
 
         if clim!=None: color_ax.set_clim(clim)
