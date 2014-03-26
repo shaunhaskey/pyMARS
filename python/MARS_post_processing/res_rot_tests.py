@@ -18,7 +18,7 @@ file_name='/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30/shot
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kpar1/shot_142614_rote_res_scan_30x30_kpar1_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
-#file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
+file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
 
 
 
@@ -26,6 +26,8 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kp
 #file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_post_processing_PEST.pickle'; ul = False
 #file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_ul/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_ul_post_processing_PEST.pickle'; ul = True
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
+
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/shot_142614_rote_res_scan_20x20_kpar1_med_rote_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
@@ -85,7 +87,7 @@ fig.savefig('res_kink_phasing_rote.eps')
 fig.canvas.draw(); fig.show()
 
 
-1/0
+#1/0
 phasings_disp = [0,45,90,135,180,225,270,315]
 if not ul: phasings_disp = [0]
 x_axis = 'ROTE'
@@ -96,7 +98,7 @@ for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,3],[0,3],[0,3]
     #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
     gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False)
     for i, cur_ax in zip(phasings_disp, ax.flatten()):
-        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = field, clim = cur_clim, ax = cur_ax)
+        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 3)
         cur_ax.set_title('$\Delta \phi = {}^o$'.format(i))
     for i in ax[:,0]: i.set_ylabel(y_axis)
     for i in ax[-1,:]: i.set_xlabel(x_axis)
