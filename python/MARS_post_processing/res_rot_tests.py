@@ -27,7 +27,7 @@ file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/sho
 #file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_ul/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_ul_post_processing_PEST.pickle'; ul = True
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
 
-#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/shot_142614_rote_res_scan_20x20_kpar1_med_rote_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/shot_142614_rote_res_scan_20x20_kpar1_med_rote_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
@@ -52,7 +52,10 @@ probe = dBres_dBkink.magnetic_probe(a,' 66M')
 probe_r = dBres_dBkink.magnetic_probe(a,'UISL')
 #probe_r = dBres_dBkink.magnetic_probe(a,'Inner_rad')
 
-
+rot_pts = None
+res_pts = None
+rot_pts = [3.527e+04,4.344e+04,1.281e+04,5.042e+04,6.673e+04,2.882e+04,6.182e+04,1.164e+04,1.633e+04,4.685e+04,3.682e+04,5.380e+04,4.741e+04,5.602e+04,5.475e+04,6.206e+04,4.539e+04,1.738e+04,3.635e+04,4.186e+04]
+res_pts = [2.416e-07,1.754e-07,3.215e-07,2.376e-07,1.945e-07,2.448e-07,2.445e-07,2.840e-07,2.748e-07,2.094e-07,2.017e-07,1.928e-07,2.106e-07,2.156e-07,2.782e-07,2.575e-07,2.361e-07,3.235e-07,2.767e-07,2.167e-07]
 
 # import matplotlib.gridspec as gridspec
 # gs = gridspec.GridSpec(2, 1)#, width_ratios=[7,1])
@@ -66,8 +69,8 @@ probe_r = dBres_dBkink.magnetic_probe(a,'UISL')
 fig, ax = pt.subplots(nrows = 2, sharex = True)
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*1.5, single_col = True)
 for i in ax: gen_funcs.setup_axis_publication(i, n_xticks = 5, n_yticks = 5)
-cax_kink = dBkink.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, ax = ax[0], n_contours = 10, contour_kwargs = {'colors':'w'})
-cax_res = dBres.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, field = 'total', ax = ax[1], n_contours = 10, contour_kwargs = {'colors':'w'})
+cax_kink = dBkink.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, ax = ax[0], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True)
+cax_res = dBres.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, field = 'total', ax = ax[1], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True)
 #xpoint = dBres_dBkink.x_point_displacement_calcs(a, 0)
 #xpoint.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, field = 'plasma', ax = ax[2], n_contours = 15, contour_kwargs = {'colors':'w'})
 for i in ax: i.set_ylabel('$\Delta \phi_{ul}$ (deg)')
@@ -89,58 +92,126 @@ fig.canvas.draw(); fig.show()
 
 #1/0
 phasings_disp = [0,45,90,135,180,225,270,315]
+phasings_disp = [0,90,180,270]
 if not ul: phasings_disp = [0]
 x_axis = 'ROTE'
+x_axis = 'vtor0'
 y_axis = 'ETA'
-field = 'plasma'
-for calc_type, cur_clim, title in zip([dBres, dBkink, probe], [[0,3],[0,3],[0,3]], ['dBres', 'dBkink', 'Probe']):
-    fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
+
+x_axis_label = '$\omega_{0}$'
+y_axis_label = '$\eta_0$'
+fields = ['total','plasma','plasma']
+ylim = [1.e-8,1.e-6]
+xlim = [1.e-6,1.e-2]
+xlim = None
+vlines = None
+#vlines = [60000,15000]
+hlines = None
+#hlines = [3.5e-7,1.75e-8]
+labels = ['$\delta B_{res}^{tot}$ (G/kA)', '$\delta B_{kink}$ (G/kA)', 'Midplanae outboard poloidal probe (G/kA)']
+fnames = ['dBres','dBkink','probe']
+clims = [[0,2.5],[0,2],[0,1.5]]
+clims = [[0,1.5],[0,0.8],[0,1.05]]
+for calc_type, cur_clim, title, fname, field in zip([dBres, dBkink, probe], clims, labels, fnames, fields):
+    replacement_kwargs = {'xtick.labelsize': 7.0,'ytick.labelsize': 7.0}
+    if len(phasings_disp)==8:
+        fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
+        gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False, replacement_kwargs = replacement_kwargs)
+    else:
+        fig, ax = pt.subplots(nrows = 2, ncols = 2, sharex = True, sharey = True)
+        gen_funcs.setup_publication_image(fig, height_prop = 1./1.1, single_col = True, replacement_kwargs = replacement_kwargs)
     #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
-    gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False)
     for i, cur_ax in zip(phasings_disp, ax.flatten()):
-        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 3)
+        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'jet', field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 1, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5})
         cur_ax.set_title('$\Delta \phi = {}^o$'.format(i))
-    for i in ax[:,0]: i.set_ylabel(y_axis)
-    for i in ax[-1,:]: i.set_xlabel(x_axis)
+        if vlines!=None: 
+            for vert_line in vlines: cur_ax.axvline(x=vert_line, color='k')
+        if hlines!=None: 
+            for hor_line in hlines: cur_ax.axhline(y=hor_line, color='k')
+        if res_pts!=None:
+            cur_ax.plot(rot_pts, res_pts, 'k.')
+            cur_ax.plot(rot_pts, np.array(res_pts)/10, 'k.')
+    for i in ax[:,0]: i.set_ylabel(y_axis_label)
+    for i in ax[-1,:]: i.set_xlabel(x_axis_label)
+    if xlim!=None: ax[0,0].set_xlim(xlim)
+    if ylim!=None: ax[0,0].set_ylim(ylim)
     fig.tight_layout(pad = 0.1)
     cbar = pt.colorbar(cax, ax = ax.flatten().tolist())
-    cbar.set_label('{}-{}'.format(title, field))
-    fig.savefig(title+'-'+field+'.pdf')
-    fig.savefig(title+'-'+field+'.eps')
+    #cbar.set_label('{}-{}'.format(title, field))
+    cbar.set_label('{}'.format(title))
+    fig.savefig(fname+'-'+field+'2x2.pdf', bbox_inches = 'tight',pad = 0.1)
+    fig.savefig(fname+'-'+field+'2x2.eps', bbox_inches = 'tight',pad = 0.1)
     fig.canvas.draw(); fig.show()
 
-fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
+
+if len(phasings_disp)==8:
+    fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
+    gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False, replacement_kwargs = replacement_kwargs)
+else:
+    fig, ax = pt.subplots(nrows = 2, ncols = 2, sharex = True, sharey = True)
+    gen_funcs.setup_publication_image(fig, height_prop = 1./1.1, single_col = True, replacement_kwargs = replacement_kwargs)
+
+
 x_axis = 'ROTE'
 y_axis = 'ETA'
-title = 'xpoint'
+x_axis = 'vtor0'
+
+
+x_axis_label = '$\omega_{0}$'
+y_axis_label = '$\eta_0$'
+label = ' displacement at the x-point (a.u)'
+title = 'displacement'
 field = 'plasma'
 #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
-gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False)
+ylim = [1.e-8,1.e-6]
+xlim = [1.e-6,1.e-2]
+
+xlim = None
+# vlines = None
+# vlines = [60000,15000]
+# hlines = None
+# hlines = [3.5e-7,1.75e-8]
+clim = [0,0.035]
+clim = [0,0.02]
+#gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False)
 for i, cur_ax in zip(phasings_disp, ax.flatten()):
     xpoint = dBres_dBkink.x_point_displacement_calcs(a, i)
-    cax = xpoint.plot_2D(i,x_axis,y_axis,cmap_res = 'spectral', field = 'plasma', clim = [0,0.035], ax = cur_ax)
+    cax = xpoint.plot_2D(i,x_axis,y_axis,cmap_res = 'jet', field = 'plasma', clim = clim, ax = cur_ax, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5})
     cur_ax.set_title('$\Delta \phi = {}^o$'.format(i))
-for i in ax[:,0]: i.set_ylabel(y_axis)
-for i in ax[-1,:]: i.set_xlabel(x_axis)
+    if vlines!=None: 
+        for vert_line in vlines: cur_ax.axvline(x=vert_line, color='k')
+    if hlines!=None: 
+        for hor_line in hlines: cur_ax.axhline(y=hor_line, color='k')
+    if res_pts!=None:
+        cur_ax.plot(rot_pts, res_pts, 'k.')
+        cur_ax.plot(rot_pts, np.array(res_pts)/10, 'k.')
+
+for i in ax[:,0]: i.set_ylabel(y_axis_label)
+for i in ax[-1,:]: i.set_xlabel(x_axis_label)
+if xlim!=None: ax[0,0].set_xlim(xlim)
+if ylim!=None: ax[0,0].set_ylim(ylim)
 fig.tight_layout(pad = 0.1)
 cbar = pt.colorbar(cax, ax = ax.flatten().tolist())
-cbar.set_label(title)
-fig.savefig(title+'.pdf')
-fig.savefig(title+'.eps')
+cbar.set_label(label)
+fig.savefig(title+'2x2.pdf', bbox_inches = 'tight',pad = 0.1)
+fig.savefig(title+'2x2.eps', bbox_inches = 'tight',pad = 0.1)
 fig.canvas.draw(); fig.show()
 
+1/0
+
 fig,ax = pt.subplots(nrows = 4, sharex = True)
-gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*3.5, single_col = True)
+gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*3., single_col = True)
 x_log = True
-x_interp = np.linspace(-6,-2,50)
+x_interp = np.linspace(-5,-2,30)
 x_interp = 10**x_interp
 #x_interp = np.linspace(1.e-6,0.01,100)
 eta_list = [5.e-7, 5.5e-8, 1.e-8]
+#eta_list = [5.5e-8, 1.e-8]
 field = 'plasma'
 phasing = 0
 for eta, clr in zip(eta_list, ['b','g','r']):
     #for cur_ax, func, title in zip(ax, [dBres, dBkink, probe, probe_r], ['dBres', 'dBkink', 'probe p', 'probe r']):
-    for cur_ax, func, title in zip(ax, [dBres, dBkink, probe,], ['dBres', 'dBkink', 'poloidal probe']):
+    for cur_ax, func, title in zip(ax, [dBres, dBkink, probe,], ['$\delta B_{res}$ (G/kA)', '$\delta B_{kink}$ (G/kA)', 'poloidal probe (G/kA)']):
         plot_kwargs = {'marker':'o', 'color':clr}
         func.plot_slice_through_2D_data(phasing, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = cur_ax, plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
         plot_kwargs = {'marker':'x', 'color':clr}
@@ -151,12 +222,13 @@ for eta, clr in zip(eta_list, ['b','g','r']):
     xpoint = dBres_dBkink.x_point_displacement_calcs(a, phasing)
     plot_kwargs = {'marker':'o', 'color':clr}
     xpoint.plot_slice_through_2D_data(phasing, x_axis, y_axis, eta, x_interp, field = 'plasma',  ax = ax[-1], plot_kwargs = plot_kwargs, amplitude = True, yaxis_log = False, xaxis_log = x_log)
-    ax[-1].set_ylabel('disp x-point')
+    ax[-1].set_ylabel('disp x-point (a.u)')
 for i in ax: i.grid()
-title ='blue, green, red : eta={}\n dots: plasma, crosses:plasma+vacuum'.format(' '.join(['{:.1e}'.format(i) for i in eta_list]))
+title ='blue, green, red : $\eta_0$={}\n o: plasma, +: vacuum, x: total'.format(', '.join(['{:.1e}'.format(i) for i in eta_list]))
 ax[0].set_title(title)
 ax[0].set_xlim([np.min(x_interp), np.max(x_interp)])
-ax[-1].set_xlabel('ROTE')
+ax[-1].set_xlabel('$\omega_0$')
+for i in ax: gen_funcs.setup_axis_publication(i, n_xticks = None, n_yticks = 5)
 fig.tight_layout(pad = 0.05)
 fig.savefig('simulated_scan_{}_{}.pdf'.format(phasing, field))
 fig.canvas.draw(); fig.show()
@@ -342,7 +414,7 @@ if dB_res_n2_dB_res_sum:
     cbar.ax.set_ylabel('G/kA',fontsize = 16)
     fig.canvas.draw(); fig.show()
 
-1/0
+#1/0
 
 res_vac_list_upper, res_vac_list_lower, res_plas_list_upper, res_plas_list_lower = dBresdBkink.extract_dB_res(rot_pickle)
 amps_vac_comp_upper, amps_vac_comp_lower, amps_plas_comp_upper, amps_plas_comp_lower, amps_tot_comp_upper, amps_tot_comp_lower, mk_list, q_val_list, resonant_close = dBresdBkink.extract_dB_kink(rot_pickle, s_surface)

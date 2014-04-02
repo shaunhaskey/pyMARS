@@ -40,8 +40,14 @@ class generic_calculation():
             output_array[i,:] = np.array(self.single_phasing(curr_phase, field = field))[filter_key]
         return phasing_array, output_array
 
+    def calc_vrot0(self,):
+        '''Convert ROTE to a toroidal rotation in rad/s
+        
+        SRH : 2Apr2014
+        '''
+        pass
 
-    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None, plot_kwargs = None, n_contours = 0, contour_kwargs = None):
+    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None, plot_kwargs = None, n_contours = 0, contour_kwargs = None, plot_ridge = False):
         '''
         Need to select an 'axis' to perform the phase scan along
 
@@ -70,7 +76,8 @@ class generic_calculation():
         phasing_array, output_array = self.phasing_scan(n_phases = n_phases, phasing_array = phasing_array, field = field, filter_key = filter_key)
         rel_axis_grid, phase_grid = np.meshgrid(relevant_axis_values, phasing_array)
         color_ax = ax.pcolormesh(rel_axis_grid, phase_grid, np.abs(output_array), cmap='hot', rasterized= 'True', shading = 'gouraud')
-
+        if plot_ridge: ax.plot(relevant_axis_values, phasing_array[np.argmax(np.abs(output_array), axis = 0)],'b-')
+        if plot_ridge: ax.plot(relevant_axis_values, phasing_array[np.argmin(np.abs(output_array), axis = 0)],'b-')
         if n_contours != 0: color_ax2 = ax.contour(rel_axis_grid, phase_grid, np.abs(output_array), n_contours, **contour_kwargs)
         if xaxis_log: ax.set_xscale('log')
         if yaxis_log: ax.set_yscale('log')
@@ -132,17 +139,21 @@ class generic_calculation():
         if yaxis_log: ax.set_yscale('log')
 
 
-    def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True):
+    def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None):
         '''Plot  a calculation versus a particular attribute
 
         SRH : 12Mar2014
         '''
+        print 'n_contours', n_contours
+        print 'xaxis, yaxis, ', xaxis, yaxis
         no_ax = True if ax==None else False 
         if no_ax: fig,ax = pt.subplots()
         if plot_kwargs == None: plot_kwargs = {}
+        if contour_kwargs == None: contour_kwargs = {}
         comp_func = np.abs if amplitude else np.angle
         xvals = self.parent.raw_data[xaxis]
         yvals = self.parent.raw_data[yaxis]
+        print 'min_max', np.min(xvals), np.max(xvals)
         xvals_set = sorted(set(xvals))
         yvals_set = sorted(set(yvals))
         #current_data = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
@@ -154,7 +165,10 @@ class generic_calculation():
             col = xvals_set.index(x)
             output_matrix[row, col] = +current_data[list_index]
         x_mesh, y_mesh = np.meshgrid(xvals_set, yvals_set)
-        color_ax = ax.pcolormesh(x_mesh, y_mesh, scipy_filt.median_filter(np.abs(output_matrix), med_filt_value), cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
+        tmp = scipy_filt.median_filter(np.abs(output_matrix), med_filt_value)
+        not_nan = np.isfinite(tmp)
+        color_ax = ax.pcolormesh(x_mesh, y_mesh, tmp, cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
+        if n_contours != 0: color_ax2 = ax.contour(x_mesh, y_mesh, tmp, np.linspace(clim[0],clim[1], n_contours), **contour_kwargs)
         print color_ax.get_clim()
 
         if clim!=None: color_ax.set_clim(clim)
@@ -338,14 +352,14 @@ class post_processing_results():
         self.calc_ul = ul
         self.reference_dB_kink = reference_dB_kink
         self.reference_offset = [2,0] if reference_offset == None else reference_offset
-        plasma_params = ['Q95','shot_time','BETAN', 'LI']
+        plasma_params = ['Q95','shot_time','BETAN', 'LI', 'R0EXP', 'B0EXP','v0a']
         self.raw_data = {}
         for i in plasma_params:self.raw_data[i] = data_from_dict(i, self.project_dict)
 
         #MARS_settings
         plasma_params = ['ROTE','ETA']
         for i in plasma_params:self.raw_data[i] = data_from_dict('MARS_settings/<<{}>>'.format(i), self.project_dict)
-
+        self.raw_data['vtor0'] = np.array(self.raw_data['ROTE']) * np.array(self.raw_data['v0a']) / np.array(self.raw_data['R0EXP'])
 
 
     def plot_single_PEST(self, params, param_values, I = None, savefig_fname = None,clim = None, phasing = 0, field = 'total'):
