@@ -18,7 +18,7 @@ file_name='/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30/shot
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kpar1/shot_142614_rote_res_scan_30x30_kpar1_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
-file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
+#file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
 
 
 
@@ -28,6 +28,7 @@ file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/sho
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/shot_142614_rote_res_scan_20x20_kpar1_med_rote_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_146382_rote_res_scan_15x15_kpar1_med_rote/shot_146382_rote_res_scan_15x15_kpar1_med_rote_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
@@ -54,9 +55,11 @@ probe_r = dBres_dBkink.magnetic_probe(a,'UISL')
 
 rot_pts = None
 res_pts = None
+time_pts = None
+time_pts = [1975,1415,2135,1575,1495,1935,1775,2175,2055,1615,1895,1535,1655,1695,1815,1735,1855,2095,2015,1455]
 rot_pts = [3.527e+04,4.344e+04,1.281e+04,5.042e+04,6.673e+04,2.882e+04,6.182e+04,1.164e+04,1.633e+04,4.685e+04,3.682e+04,5.380e+04,4.741e+04,5.602e+04,5.475e+04,6.206e+04,4.539e+04,1.738e+04,3.635e+04,4.186e+04]
 res_pts = [2.416e-07,1.754e-07,3.215e-07,2.376e-07,1.945e-07,2.448e-07,2.445e-07,2.840e-07,2.748e-07,2.094e-07,2.017e-07,1.928e-07,2.106e-07,2.156e-07,2.782e-07,2.575e-07,2.361e-07,3.235e-07,2.767e-07,2.167e-07]
-
+time_plt_pts = [1415, 1735, 2135]
 # import matplotlib.gridspec as gridspec
 # gs = gridspec.GridSpec(2, 1)#, width_ratios=[7,1])
 # fig = pt.figure()
@@ -98,12 +101,13 @@ x_axis = 'ROTE'
 x_axis = 'vtor0'
 y_axis = 'ETA'
 
-x_axis_label = '$\omega_{0}$'
+x_axis_label = '$\omega$ (rad/s)'
 y_axis_label = '$\eta_0$'
 fields = ['total','plasma','plasma']
 ylim = [1.e-8,1.e-6]
 xlim = [1.e-6,1.e-2]
 xlim = None
+xlim = [1.e2,3.e5]
 vlines = None
 #vlines = [60000,15000]
 hlines = None
@@ -111,6 +115,7 @@ hlines = None
 labels = ['$\delta B_{res}^{tot}$ (G/kA)', '$\delta B_{kink}$ (G/kA)', 'Midplanae outboard poloidal probe (G/kA)']
 fnames = ['dBres','dBkink','probe']
 clims = [[0,2.5],[0,2],[0,1.5]]
+clims = [[0,5],[0,5],[0,15]]
 clims = [[0,1.5],[0,0.8],[0,1.05]]
 for calc_type, cur_clim, title, fname, field in zip([dBres, dBkink, probe], clims, labels, fnames, fields):
     replacement_kwargs = {'xtick.labelsize': 7.0,'ytick.labelsize': 7.0}
@@ -129,8 +134,16 @@ for calc_type, cur_clim, title, fname, field in zip([dBres, dBkink, probe], clim
         if hlines!=None: 
             for hor_line in hlines: cur_ax.axhline(y=hor_line, color='k')
         if res_pts!=None:
-            cur_ax.plot(rot_pts, res_pts, 'k.')
-            cur_ax.plot(rot_pts, np.array(res_pts)/10, 'k.')
+            #cur_ax.plot(rot_pts, res_pts, 'k.')
+            #cur_ax.plot(rot_pts, np.array(res_pts)/10, 'k.')
+            for t_tmp in time_plt_pts: 
+                cur_ax.plot(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)], 'k.')
+                cur_ax.text(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)], t_tmp, fontsize=6)
+            for t_tmp in time_plt_pts: 
+                cur_ax.plot(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)]/10, 'k.')
+                cur_ax.text(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)]/10, t_tmp, fontsize=6)
+            #for rot_tmp, res_tmp, t_tmp in zip(rot_pts, res_pts, time_pts): cur_ax.text(rot_tmp, res_tmp, t_tmp, fontsize=7)
+            #for rot_tmp, res_tmp, t_tmp in zip(rot_pts, res_pts, time_pts): cur_ax.text(rot_tmp, res_tmp/10, t_tmp, fontsize=7)
     for i in ax[:,0]: i.set_ylabel(y_axis_label)
     for i in ax[-1,:]: i.set_xlabel(x_axis_label)
     if xlim!=None: ax[0,0].set_xlim(xlim)
@@ -157,16 +170,16 @@ y_axis = 'ETA'
 x_axis = 'vtor0'
 
 
-x_axis_label = '$\omega_{0}$'
-y_axis_label = '$\eta_0$'
+#x_axis_label = '$\omega_{0}$'
+#y_axis_label = '$\eta_0$'
 label = ' displacement at the x-point (a.u)'
 title = 'displacement'
 field = 'plasma'
 #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
-ylim = [1.e-8,1.e-6]
-xlim = [1.e-6,1.e-2]
+#ylim = [1.e-8,1.e-6]
+#xlim = [1.e-6,1.e-2]
 
-xlim = None
+#xlim = None
 # vlines = None
 # vlines = [60000,15000]
 # hlines = None
@@ -183,8 +196,16 @@ for i, cur_ax in zip(phasings_disp, ax.flatten()):
     if hlines!=None: 
         for hor_line in hlines: cur_ax.axhline(y=hor_line, color='k')
     if res_pts!=None:
-        cur_ax.plot(rot_pts, res_pts, 'k.')
-        cur_ax.plot(rot_pts, np.array(res_pts)/10, 'k.')
+        #cur_ax.plot(rot_pts, res_pts, 'k.')
+        #cur_ax.plot(rot_pts, np.array(res_pts)/10, 'k.')
+        for t_tmp in time_plt_pts: 
+            cur_ax.plot(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)], 'k.')
+            cur_ax.text(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)], t_tmp, fontsize=6)
+        for t_tmp in time_plt_pts: 
+            cur_ax.plot(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)]/10, 'k.')
+            cur_ax.text(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)]/10, t_tmp, fontsize=6)
+        #for rot_tmp, res_tmp, t_tmp in zip(rot_pts, res_pts, time_pts): cur_ax.text(rot_tmp, res_tmp, t_tmp, fontsize=7)
+        #for rot_tmp, res_tmp, t_tmp in zip(rot_pts, res_pts, time_pts): cur_ax.text(rot_tmp, res_tmp/10, t_tmp, fontsize=7)
 
 for i in ax[:,0]: i.set_ylabel(y_axis_label)
 for i in ax[-1,:]: i.set_xlabel(x_axis_label)

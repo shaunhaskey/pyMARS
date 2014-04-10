@@ -540,6 +540,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
         #Make sure it is in eV
         if Te0<200: Te0*=1000
         te_success = 1
+        master['Te0'] = Te0
     except IOError:
         print 'Error getting PROFTE data'
     if te_success:
@@ -599,6 +600,9 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     #alf_calc_file.close()
     
     master['ROTE'] = vtorn
+    master['ne0'] = ne0
+    master['taua'] = taua
+
     if te_success: master['ETA'] = eta
     master['OMEGA_NORM'] = omega[0]
     master['TAUWM'] = tauwm

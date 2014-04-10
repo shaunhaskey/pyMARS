@@ -20,6 +20,7 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq/shot_142614_expt_scan_const_eq_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eqV2/shot_142614_expt_scan_const_eqV2_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eqV3/shot_142614_expt_scan_const_eqV3_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq_eta_10-10/shot_142614_expt_scan_const_eq_eta_10-10_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq_eta_10-5/shot_142614_expt_scan_const_eq_eta_10-5_post_processing_PEST.pickle'
 
@@ -41,7 +42,7 @@ dBkink = dBres_dBkink.dBkink_calculations(a)
 probe = dBres_dBkink.magnetic_probe(a,' 66M')
 xpoint = dBres_dBkink.x_point_displacement_calcs(a, 0)
 
-fig, ax = pt.subplots(nrows = 7, sharex = True)
+fig, ax = pt.subplots(nrows = 8, sharex = True)
 gen_func.setup_publication_image(fig, height_prop = 1./1.618*4, single_col = True)
 
 xpoint.plot_single_phasing(0, 'shot_time', field = 'plasma',  ax = ax[0], plot_kwargs = {'marker':'x'})
@@ -57,6 +58,8 @@ dBkink.plot_single_phasing(0, 'shot_time', field = 'plasma', plot_kwargs = {'mar
 ax[5].set_ylabel('dBkink plasma')
 a.plot_parameters('shot_time', 'Q95', ax = ax[6], plot_kwargs = {'marker':'x'})
 ax[6].set_ylabel('q95')
+a.plot_parameters('shot_time', 'ETA', ax = ax[7], plot_kwargs = {'marker':'x'})
+ax[7].set_ylabel('ETA')
 ax[0].set_xlim([np.min(a.raw_data['shot_time']),np.max(a.raw_data['shot_time'])])
 
 for i in ax: 
