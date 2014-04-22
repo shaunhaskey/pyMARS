@@ -6,6 +6,7 @@ import scipy.ndimage.filters as scipy_filt
 import scipy.interpolate as interp
 import pyMARS.generic_funcs as gen_funcs
 import pyMARS.results_class as results_class
+import scipy.interpolate as interp
 
 class generic_calculation():
     def single_phasing(self, phasing, field = 'total'):
@@ -177,6 +178,63 @@ class generic_calculation():
         if no_ax: fig.canvas.draw();fig.show()
         return color_ax
 
+
+    def plot_2D_irregular(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, amplitude = True, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None, n_x = 1000, n_y = 1000, pt_datapts = True):
+        '''Plot  a calculation versus a particular attribute
+        where things aren't on a regular grid - i.e bn/li and q95
+
+        SRH : 18Apr2014
+        '''
+        print 'n_contours', n_contours
+        print 'xaxis, yaxis, ', xaxis, yaxis
+        no_ax = True if ax==None else False 
+        if no_ax: fig,ax = pt.subplots()
+        if contour_kwargs == None: contour_kwargs = {}
+        comp_func = np.abs if amplitude else np.angle
+        x = np.array(self.parent.raw_data[xaxis])
+        y = np.array(self.parent.raw_data[yaxis])
+        z = self.single_phasing(phasing, field = field)
+        fig2, ax2 = pt.subplots()
+        truth = (x<3.67)*(x>3.65)
+        ax2.plot(y[truth], comp_func(np.array(z)[truth]))
+        fig2.canvas.draw(); fig2.show()
+        np.savetxt('x.txt',x)
+        np.savetxt('y.txt',y)
+        np.savetxt('z_imag.txt',np.imag(z))
+        np.savetxt('z_real.txt',np.real(z))
+        print np.min(x), np.max(x), np.min(y), np.max(y)
+        x_vals = np.linspace(np.min(x), np.max(x), n_x)
+        y_vals = np.linspace(np.min(y), np.max(y), n_y)
+        x_grid,y_grid = np.meshgrid(x_vals, y_vals)
+        zl = interp.griddata((x,y), z, (x_grid.flatten(), y_grid.flatten())).reshape(x_grid.shape)
+        tmp = comp_func(zl)
+        tmp = np.ma.array(tmp, mask=np.isnan(tmp))
+        print tmp
+        color_ax = ax.pcolormesh(x_grid, y_grid, tmp, cmap=cmap_res, rasterized= 'True')#, shading = 'gouraud')
+
+        if n_contours != 0: color_ax2 = ax.contour(x_grid, y_grid, tmp, np.linspace(clim[0],clim[1], n_contours), **contour_kwargs)
+        if pt_datapts: ax.plot(x, y, 'k.')
+        if clim!=None: color_ax.set_clim(clim)
+        print color_ax.get_clim()
+        if xaxis_log: ax.set_xscale('log')
+        if yaxis_log: ax.set_yscale('log')
+        if no_ax: fig.canvas.draw();fig.show()
+        return color_ax
+
+# im2 = ax[1].pcolormesh(x_grid, y_grid, np.angle(zl,deg=True), cmap = 'RdBu')
+# for i in ax: i.plot(x,y,'k.')
+# im.set_clim([0,8])
+# im.set_clim([0,2.0])
+# im2.set_clim([-180,180])
+# cbar = pt.colorbar(im,ax = ax[0])
+# cbar2 = pt.colorbar(im2,ax = ax[1])
+# ax[0].set_ylim([0.5,4.5])
+# ax[0].set_xlim([2.5,6.8])
+# cbar.set_label('abs 66M')
+# cbar2.set_label('phase 66M')
+# fig.canvas.draw(); fig.show()
+
+
 class dBres_calculations(generic_calculation):
     def __init__(self, parent, mean_sum = 'sum',):
         '''This class does all the dBres calculations
@@ -221,6 +279,33 @@ class dBres_calculations(generic_calculation):
             elif self.mean_sum == 'mean':
                 output_data.append(tmp/n_harms)
         return output_data
+
+
+    def single_phasing_individual_harms(self,curr_phase, field = 'plasma'):
+        '''Return the individual harmonics that are resonant
+        curr_phase is in degrees
+        field is total, plasma or vacuum
+
+        SRH : 18Apr2014
+        '''
+        #print 'dB res applying single phasing phase :', curr_phase
+        output_data = []
+        if self.calc_ul:
+            n_items = len(self.raw_data['{}_res_upper'.format(field)])
+        else:
+            n_items = len(self.raw_data['{}_res_'.format(field)])
+        for ii in range(0,n_items):
+            if self.calc_ul:
+                tmp = apply_phasing(self.raw_data['{}_res_upper'.format(field)][ii], self.raw_data['{}_res_lower'.format(field)][ii], np.deg2rad(curr_phase), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
+                n_harms = len(self.raw_data['{}_res_upper'.format(field)][ii])
+            else:
+                tmp = self.raw_data['{}_res_{}'.format(field, '')][ii]
+                n_harms = len(self.raw_data['{}_res_{}'.format(field, '')][ii])
+            output_data.append(tmp)
+        return output_data
+
+
+
 
 class magnetic_probe(generic_calculation):
     def __init__(self, parent, probe,):
@@ -339,7 +424,7 @@ def return_sort_indices(input_data):
     return sorted(range(len(input_data)), key=lambda k: input_data[k])
     
 class post_processing_results():
-    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset = None, reference_dB_kink='plas',sort_name = 'q95_list', try_many_phasings = True, ul = True):
+    def __init__(self, file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = 5, reference_offset = None, reference_dB_kink='plas',sort_name = 'q95_list', try_many_phasings = True, ul = True, mars_params = None):
         '''This object is a way to put all post processing calculations etc.. together
 
         SRH : 8Mar2014
@@ -355,11 +440,17 @@ class post_processing_results():
         plasma_params = ['Q95','shot_time','BETAN', 'LI', 'R0EXP', 'B0EXP','v0a']
         self.raw_data = {}
         for i in plasma_params:self.raw_data[i] = data_from_dict(i, self.project_dict)
-
+        self.raw_data['BNLI']=np.array(self.raw_data['BETAN'])/np.array(self.raw_data['LI'])
         #MARS_settings
-        plasma_params = ['ROTE','ETA']
-        for i in plasma_params:self.raw_data[i] = data_from_dict('MARS_settings/<<{}>>'.format(i), self.project_dict)
-        self.raw_data['vtor0'] = np.array(self.raw_data['ROTE']) * np.array(self.raw_data['v0a']) / np.array(self.raw_data['R0EXP'])
+        if mars_params == None: mars_params = ['ROTE','ETA']
+        for i in mars_params:self.raw_data[i] = data_from_dict('MARS_settings/<<{}>>'.format(i), self.project_dict)
+        
+        try:
+            mars_params.index('ROTE')
+            self.raw_data['vtor0'] = np.array(self.raw_data['ROTE']) * np.array(self.raw_data['v0a']) / np.array(self.raw_data['R0EXP'])
+        except ValueError:
+            print 'ROTE not in the mars params'
+
 
 
     def plot_single_PEST(self, params, param_values, I = None, savefig_fname = None,clim = None, phasing = 0, field = 'total'):
@@ -636,8 +727,8 @@ class post_processing_results():
         fig2, ax2 = pt.subplots(nrows = 3, ncols = 2, sharex = True, )
         
         
-        print self.time_list
-        tmp = sorted(zip(self.time_list, range(len(self.res_vac_list_upper))), key = lambda sort_val:sort_val[0])
+        print self.raw_data['shot_time']
+        tmp = sorted(zip(self.raw_data['shot_time'], range(len(self.res_vac_list_upper))), key = lambda sort_val:sort_val[0])
         #tmp = np.sort([[t, res] for t, res in zip(self.time_list, range(len(self.res_vac_list_upper)))],axis = 0)
         #print tmp
         #for ii in range(0,len(self.res_vac_list_upper)):
