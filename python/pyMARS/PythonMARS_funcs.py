@@ -548,7 +548,9 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
         lundquist = lundquist_calc(spitz_resist, L = R0EXP, va=v0a)
         eta = 1./lundquist
         #Hack to force eta to scale without knowing the normalisation
-        eta = 1.e-7/((3200/Te0)**-1.5)
+        eta_h_res = 5.e-7
+        eta_h_Te = 3200
+        eta = eta_h_res/((eta_h_Te/Te0)**-1.5)
 
 #    nichz = N_ELEMENTS(ichz)
 
@@ -557,6 +559,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     omega = 2.0*np.pi*ichz*taua
 
     output_string = ['From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro with mod from 8/1/2014']
+    output_string.append('Scaling using eta h res : {:.4e} equivalent to {:.4e}'.format(eta_h_res, eta_h_Te))
     output_string.append('=======================================')
     output_string.append('Input values')
     output_string.append('=======================================')

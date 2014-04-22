@@ -13,8 +13,9 @@ import PythonMARS_funcs as pyMARS
 import multiprocessing
 import itertools, os
 
-qsub_workers = 50
+qsub_workers = 20
 file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
+file_name = '/u/haskeysr/mars/shot_142614_expt_scan_NC_const_eqV1/shot_142614_expt_scan_NC_const_eqV1_post_processing_PEST.pickle'
 with file(file_name, 'r') as file_handle: scan_data = pickle.load(file_handle)
 
 
@@ -43,7 +44,7 @@ for i, cur_key in enumerate(key_list):
     key_list_string  = ' '.join([str(j) for j in cur_key])
     job_name = 'job_{}.job'.format(i)
     
-    execute_command = '{} {} > {}\n'.format(execute_func, key_list_string, job_name + '.log')
+    execute_command = '{} {} {} > {}\n'.format(execute_func, file_name, key_list_string, job_name + '.log')
     job_string += execute_command
     with file(job_name, 'w') as job_handle: job_handle.write(job_string)
     os.system('qsub ' + job_name)
