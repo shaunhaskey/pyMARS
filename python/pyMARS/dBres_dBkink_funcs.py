@@ -462,34 +462,44 @@ class post_processing_results():
         SRH : 24Mar2014
         '''
         if clim == None: clim = [0,1.5]
-
-        valid_keys, actual_values = self.find_relevant_keys(params, param_values)
-        fig, ax = pt.subplots(ncols = 3, sharex = True, sharey = True)
+        nrows = len(param_values)
+        fig, ax = pt.subplots(ncols = 3, nrows = nrows, sharex = True, sharey = True)
+        if len(ax.shape)==1: ax=ax[np.newaxis,:]
         replacement_kwargs = {'lines.markersize':4, 'lines.linewidth':0.5}
-        gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*1.0, single_col = True, replacement_kwargs = replacement_kwargs)
+        gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*nrows*0.75, single_col = True, replacement_kwargs = replacement_kwargs)
         color_plots = [];
-        combined, results_dict = self.combine_PEST_Vn(valid_keys[0], phasing, field, get_disp = False, return_all_three = True)
-        for ax_tmp, field, title in zip(ax,['BnPEST_vac', 'BnPEST_plasma', 'BnPEST_total'], ['Vacuum','Plasma','Total']):
-            combined.BnPEST = +results_dict[field]
-            color_plots.append(combined.plot_BnPEST(ax_tmp, n=self.n, cmap = 'hot'))
-            ax_tmp.set_title(title)
-            color_plots[-1].set_clim(clim)
-        for i in ax: i.set_xlabel('m')
-        ax[0].set_ylabel('$\sqrt{\Psi_N}$')
-        ax[0].set_xlim([0,28])
-        ax[0].set_ylim([0.4,1.0])
+        for cur_row, cur_param in enumerate(param_values):
+            ax_tmp_row = ax[cur_row,:]
+            valid_keys, actual_values = self.find_relevant_keys(params, [cur_param])
+            combined, results_dict = self.combine_PEST_Vn(valid_keys[0], phasing, field, get_disp = False, return_all_three = True)
+            for ax_tmp, field, title in zip(ax_tmp_row.tolist(),['BnPEST_vac', 'BnPEST_plasma', 'BnPEST_total'], ['Vacuum','Plasma','Total']):
+                combined.BnPEST = +results_dict[field]
+                color_plots.append(combined.plot_BnPEST(ax_tmp, n=self.n, cmap = 'hot'))
+                if cur_row==0: ax_tmp.set_title(title)
+                color_plots[-1].set_clim(clim)
+
+        for i in ax[-1,:]: i.set_xlabel('m')
+        for i in ax[:,0]: i.set_ylabel('$\sqrt{\Psi_N}$')
+        #ax[0].set_ylabel('$\sqrt{\Psi_N}$')
+        ax[0,0].set_xlim([0,20])
+        ax[0,0].set_ylim([0.5,1.0])
         #ax[1].annotate('kink-\nresonant', xy=(8, 0.9), xytext=(8.9, 0.6),arrowprops=dict(facecolor='black', shrink=0.05,ec='white'),color='white')
         #ax[1].annotate('pitch-\nresonant', xy=(6.93, 0.952), xytext=(0.3, 0.7),arrowprops=dict(facecolor='black', shrink=0.05,ec='white'),color='white')
+        for i in ax[-1,:]: gen_funcs.setup_axis_publication(i, n_xticks = 4)
+        for i in ax[:,0]: gen_funcs.setup_axis_publication(i, n_yticks = 5)
         fig.tight_layout(pad = 0.3)
-        cbar = pt.colorbar(color_plots[-1], ax = ax.tolist(), ticks = np.linspace(clim[0], clim[1], 4))
-        cbar.set_label('G/kA')
+
+        for i in range(ax.shape[0]):
+            cbar = pt.colorbar(color_plots[-1], ax = ax[i,:].tolist(), ticks = np.linspace(clim[0], clim[1], 4))
+            cbar.set_label('G/kA')
+
         if savefig_fname!=None:
-            fig.savefig(savefig_fname+'.pdf')
-            fig.savefig(savefig_fname+'.eps')
+            fig.savefig(savefig_fname+'.pdf',bbox_inches='tight',pad=0.2)
+            fig.savefig(savefig_fname+'.eps',bbox_inches='tight',pad=0.2)
         fig.canvas.draw(); fig.show()
 
 
-    def plot_single_displacement(self, params, param_values, I = None, savefig_fname = None, phasing = 0, field = 'total'):
+    def plot_single_displacement(self, params, param_values, I = None, savefig_fname = None, phasing = 0, field = 'total', aspect = False):
         '''
         params is the name of the parameters to match
         param_values is a list of lists of the values of each param
@@ -516,6 +526,8 @@ class post_processing_results():
         ax[0].set_ylabel('Z (m)')
         ax[0].set_ylim([-1.25,1.25]); i.set_xlim([1.0,2.5])
         gen_funcs.setup_axis_publication(ax[0], n_xticks = 5, n_yticks = 5)
+        if aspect:
+            for i in ax: i.set_aspect('equal')
         fig.tight_layout(pad = 0.3)
         if savefig_fname!=None:
             fig.savefig(savefig_fname+'.pdf')
@@ -616,8 +628,8 @@ class post_processing_results():
         ax[0].set_xlim([0,28])
         ax[0].set_ylim([0.4,1.0])
         ax[-1].set_xlabel('m')
-        for i in ax2: i.set_xlim([0,28]); i.set_ylim([0.4,1.0])
-        for i in ax2_BnPEST_plas: i.set_xlim([0,28]); i.set_ylim([0.4,1.0])
+        for i in ax2: i.set_xlim([0,20]); i.set_ylim([0.5,1.0])
+        for i in ax2_BnPEST_plas: i.set_xlim([0,20]); i.set_ylim([0.5,1.0])
         for i in ax_Bn2: i.grid()
         for i in ax_Vn2: i.grid()
         ax2[-1].set_xlabel('m')
@@ -674,7 +686,7 @@ class post_processing_results():
         if get_disp:
             Vn = results_class.combine_fields_displacement([simuls['lower_plasma'],simuls['lower_vacuum'],simuls['upper_plasma'],simuls['lower_vacuum']] , 'Vn', theta=np.deg2rad(phasing), field_type = 'plas')
             combined.Vn = Vn
-
+        print '*** BnPEST nan sum:', np.sum(np.isnan(combined.BnPEST))
         combined.BnPEST[np.isnan(combined.BnPEST)] = 0
         combined.Bn[np.isnan(combined.Bn)] = 0
         if return_all_three:
