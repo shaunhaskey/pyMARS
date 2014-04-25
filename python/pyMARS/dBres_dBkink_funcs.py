@@ -17,6 +17,7 @@ class generic_calculation():
         SRH : 12Mar2014
         '''
         if self.calc_ul:
+            self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)]
             return apply_phasing(self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)], np.deg2rad(phasing), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
         else:
             return self.raw_data['{}_{}_{}'.format(field, self.calc_type, '')]
@@ -48,7 +49,7 @@ class generic_calculation():
         '''
         pass
 
-    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None, plot_kwargs = None, n_contours = 0, contour_kwargs = None, plot_ridge = False):
+    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None, plot_kwargs = None, n_contours = 0, contour_kwargs = None, plot_ridge = False, clim = None):
         '''
         Need to select an 'axis' to perform the phase scan along
 
@@ -77,9 +78,15 @@ class generic_calculation():
         phasing_array, output_array = self.phasing_scan(n_phases = n_phases, phasing_array = phasing_array, field = field, filter_key = filter_key)
         rel_axis_grid, phase_grid = np.meshgrid(relevant_axis_values, phasing_array)
         color_ax = ax.pcolormesh(rel_axis_grid, phase_grid, np.abs(output_array), cmap='hot', rasterized= 'True', shading = 'gouraud')
-        if plot_ridge: ax.plot(relevant_axis_values, phasing_array[np.argmax(np.abs(output_array), axis = 0)],'b-')
-        if plot_ridge: ax.plot(relevant_axis_values, phasing_array[np.argmin(np.abs(output_array), axis = 0)],'b-')
-        if n_contours != 0: color_ax2 = ax.contour(rel_axis_grid, phase_grid, np.abs(output_array), n_contours, **contour_kwargs)
+        if clim!=None: color_ax.set_clim(clim)
+        if plot_ridge: ax.plot(relevant_axis_values, np.rad2deg(np.unwrap(np.deg2rad(phasing_array[np.argmax(np.abs(output_array), axis = 0)]))),'b-')
+        if plot_ridge: ax.plot(relevant_axis_values, np.rad2deg(np.unwrap(np.deg2rad(phasing_array[np.argmin(np.abs(output_array), axis = 0)]))),'b-')
+
+        if n_contours != 0: 
+            tmp_clim = color_ax.get_clim()
+            contours = np.linspace(tmp_clim[0], tmp_clim[1], n_contours)
+            print contours
+            color_ax2 = ax.contour(rel_axis_grid, phase_grid, np.abs(output_array), contours, **contour_kwargs)
         if xaxis_log: ax.set_xscale('log')
         if yaxis_log: ax.set_yscale('log')
         ax.set_ylim([np.min(phasing_array), np.max(phasing_array)])
@@ -89,7 +96,7 @@ class generic_calculation():
 
         return color_ax
 
-    def plot_single_phasing(self, phasing, xaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True):
+    def plot_single_phasing(self, phasing, xaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, multiplier = 1):
         '''Plot  a calculation versus a particular attribute
 
         SRH : 12Mar2014
@@ -101,7 +108,7 @@ class generic_calculation():
         indices = return_sort_indices(self.parent.raw_data[xaxis])
         no_ax = True if ax==None else False 
         if no_ax: fig,ax = pt.subplots()
-        ax.plot([self.parent.raw_data[xaxis][i] for i in indices], [comp_func(calc_val[i]) for i in indices], **plot_kwargs)
+        ax.plot([self.parent.raw_data[xaxis][i] for i in indices], np.array([comp_func(calc_val[i]) for i in indices])*np.array(multiplier), **plot_kwargs)
         if no_ax: fig.canvas.draw();fig.show()
 
     def plot_slice_through_2D_data(self, phasing, xaxis, yaxis, y_const, slice_vals_x, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, yaxis_log = True, xaxis_log = True):
@@ -253,6 +260,8 @@ class dBres_calculations(generic_calculation):
             self.raw_data['plasma_res_{}'.format(coil)] = []
             for tot, vac in zip(self.raw_data['total_res_{}'.format(coil)], self.raw_data['vacuum_res_{}'.format(coil)]):
                 self.raw_data['plasma_res_{}'.format(coil)].append(tot - vac)
+        self.raw_data['res_m_vals'] = data_from_dict('responses/resonant_response_mq', self.parent.project_dict)
+
 
     def single_phasing(self,curr_phase, field = 'plasma'):
         '''Find the dB_res values using a single phasing
@@ -305,8 +314,6 @@ class dBres_calculations(generic_calculation):
         return output_data
 
 
-
-
 class magnetic_probe(generic_calculation):
     def __init__(self, parent, probe,):
         '''This class does all the probe calculations
@@ -322,14 +329,14 @@ class magnetic_probe(generic_calculation):
         self.probe_ind = (self.parent.project_dict['details']['pickup_coils']['probe']).index(probe)
         for coil in locs:
             tmp = data_from_dict('vacuum_{}_response4'.format(coil), self.parent.project_dict)
-            self.raw_data['vacuum_{}_{}'.format(self.calc_type, coil)] = [i[self.probe_ind] for i in tmp]
+            self.raw_data['vacuum_{}_{}'.format(self.calc_type, coil)] = np.array([i[self.probe_ind] for i in tmp])
             tmp = data_from_dict('plasma_{}_response4'.format(coil), self.parent.project_dict)
-            self.raw_data['total_{}_{}'.format(self.calc_type, coil)] = [i[self.probe_ind] for i in tmp]
+            self.raw_data['total_{}_{}'.format(self.calc_type, coil)] = np.array([i[self.probe_ind] for i in tmp])
         for coil in locs:
             self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)] = []
             for tot, vac in zip(self.raw_data['total_{}_{}'.format(self.calc_type, coil)], self.raw_data['vacuum_probe_{}'.format(coil)]):
                 self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)].append(tot - vac)
-
+            self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)] = np.array(self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)])
 
 class dBkink_calculations(generic_calculation):
     def __init__(self, parent,):

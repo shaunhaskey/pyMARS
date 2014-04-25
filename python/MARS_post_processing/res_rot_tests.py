@@ -29,7 +29,7 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kp
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/shot_142614_rote_res_scan_20x20_kpar1_med_rote_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_146382_rote_res_scan_15x15_kpar1_med_rote/shot_146382_rote_res_scan_15x15_kpar1_med_rote_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/mars/project1_redone/project1_redone_post_processing_PEST.pickle'; mars_params = []
+#file_name = '/home/srh112/NAMP_datafiles/mars/project1_redone/project1_redone_post_processing_PEST.pickle'; mars_params = []
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
 
@@ -54,7 +54,8 @@ probe = dBres_dBkink.magnetic_probe(a,' 66M')
 #probe = dBres_dBkink.magnetic_probe(a,'Inner_pol')
 probe_r = dBres_dBkink.magnetic_probe(a,'UISL')
 #probe_r = dBres_dBkink.magnetic_probe(a,'Inner_rad')
-1/0
+
+#1/0
 rot_pts = None
 res_pts = None
 time_pts = None
@@ -74,28 +75,38 @@ time_plt_pts = [1415, 1735, 2135]
 fig, ax = pt.subplots(nrows = 2, sharex = True)
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*1.5, single_col = True)
 for i in ax: gen_funcs.setup_axis_publication(i, n_xticks = 5, n_yticks = 5)
-cax_kink = dBkink.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, ax = ax[0], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True)
-cax_res = dBres.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, field = 'total', ax = ax[1], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True)
+#cax_kink = dBkink.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, ax = ax[0], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True)
+#cax_res = dBres.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, field = 'total', ax = ax[1], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True)
+#cax_kink = dBkink.plot_phasing_scan('vtor0',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, ax = ax[0], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True)
+#cax_res = dBres.plot_phasing_scan('vtor0',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, field = 'total', ax = ax[1], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True)
+clim_kink = [0,1.25]
+clim_res = [0,2.0]
+kink_field = 'plasma'
+res_field = 'total'
+cax_kink = dBkink.plot_phasing_scan('vtor0',filter_names = ['ETA'], filter_values = [3.7926901907322539e-07], xaxis_log = True, field = kink_field, ax = ax[0], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True, clim = clim_kink)
+cax_res = dBres.plot_phasing_scan('vtor0',filter_names = ['ETA'], filter_values = [3.7926901907322539e-07], xaxis_log = True, field = res_field, ax = ax[1], n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True, clim = clim_res)
 #xpoint = dBres_dBkink.x_point_displacement_calcs(a, 0)
 #xpoint.plot_phasing_scan('ROTE',filter_names = ['ETA'], filter_values = [1.1288378916846883e-06], xaxis_log = True, field = 'plasma', ax = ax[2], n_contours = 15, contour_kwargs = {'colors':'w'})
 for i in ax: i.set_ylabel('$\Delta \phi_{ul}$ (deg)')
-ax[-1].set_xlabel('ROTE')
+ax[-1].set_xlabel('$\omega_0$ (rad/s)')
 cbar = pt.colorbar(cax_kink, cax = gen_funcs.create_cbar_ax(ax[0]), ticks = np.linspace(cax_kink.get_clim()[0], cax_kink.get_clim()[1], 5))
 #cbar = pt.colorbar(cax_kink, cax = gen_funcs.create_cbar_ax(ax[0]))
 gen_funcs.cbar_ticks(cbar)
-cbar.set_label('$\delta B_{kink}$ total')
+cbar.set_label('$\delta B_{kink}$ '+kink_field)
 
 cbar = pt.colorbar(cax_res, cax = gen_funcs.create_cbar_ax(ax[1]), ticks = np.linspace(cax_res.get_clim()[0], cax_res.get_clim()[1], 5))
 #gen_funcs.cbar_ticks(cbar)
-cbar.set_label('$\delta B_{res}$ total')
+cbar.set_label('$\delta B_{res}$ ' + res_field)
 #gs.tight_layout(fig, pad = 0.1)
+xlim = [3.e3,3.e5]
+ax[-1].set_xlim(xlim)
 fig.tight_layout(pad = 0.1)
 fig.savefig('res_kink_phasing_rote.pdf')
 fig.savefig('res_kink_phasing_rote.eps')
 fig.canvas.draw(); fig.show()
 
 
-#1/0
+
 phasings_disp = [0,45,90,135,180,225,270,315]
 phasings_disp = [0,90,180,270]
 if not ul: phasings_disp = [0]
@@ -110,6 +121,7 @@ ylim = [1.e-8,1.e-6]
 xlim = [1.e-6,1.e-2]
 xlim = None
 xlim = [1.e2,3.e5]
+xlim = [3.e3,3.e5]
 vlines = None
 #vlines = [60000,15000]
 hlines = None
@@ -155,7 +167,7 @@ for calc_type, cur_clim, title, fname, field in zip([dBres, dBkink, probe], clim
     #cbar.set_label('{}-{}'.format(title, field))
     cbar.set_label('{}'.format(title))
     fig.savefig(fname+'-'+field+'2x2.pdf', bbox_inches = 'tight',pad = 0.1)
-    fig.savefig(fname+'-'+field+'2x2.eps', bbox_inches = 'tight',pad = 0.1)
+    fig.savefig(fname+'-'+field+'2x2.svg', bbox_inches = 'tight',pad = 0.1)
     fig.canvas.draw(); fig.show()
 
 
@@ -217,10 +229,10 @@ fig.tight_layout(pad = 0.1)
 cbar = pt.colorbar(cax, ax = ax.flatten().tolist())
 cbar.set_label(label)
 fig.savefig(title+'2x2.pdf', bbox_inches = 'tight',pad = 0.1)
-fig.savefig(title+'2x2.eps', bbox_inches = 'tight',pad = 0.1)
+fig.savefig(title+'2x2.svg', bbox_inches = 'tight',pad = 0.1)
 fig.canvas.draw(); fig.show()
 
-1/0
+
 
 fig,ax = pt.subplots(nrows = 4, sharex = True)
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*3., single_col = True)
