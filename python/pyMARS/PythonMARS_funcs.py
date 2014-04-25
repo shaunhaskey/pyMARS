@@ -548,7 +548,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
         lundquist = lundquist_calc(spitz_resist, L = R0EXP, va=v0a)
         eta = 1./lundquist
         #Hack to force eta to scale without knowing the normalisation
-        eta_h_res = 5.e-7
+        eta_h_res = 1.e-8
         eta_h_Te = 3200
         eta = eta_h_res/((eta_h_Te/Te0)**-1.5)
 
