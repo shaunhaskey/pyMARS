@@ -188,7 +188,7 @@ class generic_calculation():
 
     def plot_2D_irregular(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, amplitude = True, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None, n_x = 1000, n_y = 1000, pt_datapts = True):
         '''Plot  a calculation versus a particular attribute
-        where things aren't on a regular grid - i.e bn/li and q95
+        where things arent on a regular grid - i.e bn/li and q95
 
         SRH : 18Apr2014
         '''
@@ -502,11 +502,12 @@ class post_processing_results():
 
         if savefig_fname!=None:
             fig.savefig(savefig_fname+'.pdf',bbox_inches='tight',pad=0.2)
+            fig.savefig(savefig_fname+'.svg',bbox_inches='tight',pad=0.2)
             fig.savefig(savefig_fname+'.eps',bbox_inches='tight',pad=0.2)
         fig.canvas.draw(); fig.show()
 
 
-    def plot_single_displacement(self, params, param_values, I = None, savefig_fname = None, phasing = 0, field = 'total', aspect = False):
+    def plot_single_displacement(self, params, param_values, I = None, savefig_fname = None, phasing = 0, field = 'total', aspect = False, include_mag = True):
         '''
         params is the name of the parameters to match
         param_values is a list of lists of the values of each param
@@ -515,21 +516,24 @@ class post_processing_results():
         SRH : 24Mar2014
         '''
         valid_keys, actual_values = self.find_relevant_keys(params, param_values)
-        fig, ax = pt.subplots(ncols = 2, sharex = True, sharey = True)
+        ncols = 2 if include_mag else 1
+        fig, ax = pt.subplots(ncols = ncols, sharex = True, sharey = True)
+        if ncols==1: ax = [ax]
         replacement_kwargs = {'lines.markersize':4, 'lines.linewidth':0.5}
-        gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*1.0, single_col = True, replacement_kwargs = replacement_kwargs)
+        mult = 1 if ncols==2 else 1.4
+        gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*mult, single_col = True, replacement_kwargs = replacement_kwargs)
         combined, results_dict = self.combine_PEST_Vn(valid_keys[0], phasing, field, get_disp = True, return_all_three = True)
+        multiplier = 40
         combined.plot_Vn_surface(ax = ax[0], multiplier = 40, highlight_lower = -0.75)
-        combined.Bn = +results_dict['Bn_plasma']
-        combined.plot_Bn_surface(ax = ax[1], multiplier = 0.025, highlight_lower = -0.75)
-        ax[1].set_title('$B_n$ plasma')
-        ax[0].set_title('Displacement normal')
+        ax[0].set_title('Norm Displacement x{}'.format(multiplier))
+        if ncols==2:
+            combined.Bn = +results_dict['Bn_plasma']
+            combined.plot_Bn_surface(ax = ax[1], multiplier = 0.025, highlight_lower = -0.75)
+            ax[1].set_title('$B_n$ plasma')
         for i in ax: i.set_xlabel('R (m)')
         for i in ax: i.grid()
         for i in ax: i.plot([2.164,2.374],[1.012,0.504],'-bo')
         for i in ax: i.plot([2.164,2.374],[-1.012,-0.504],'-bo')
-
-
         ax[0].set_ylabel('Z (m)')
         ax[0].set_ylim([-1.25,1.25]); i.set_xlim([1.0,2.5])
         gen_funcs.setup_axis_publication(ax[0], n_xticks = 5, n_yticks = 5)
@@ -538,25 +542,31 @@ class post_processing_results():
         fig.tight_layout(pad = 0.3)
         if savefig_fname!=None:
             fig.savefig(savefig_fname+'.pdf')
+            fig.savefig(savefig_fname+'.svg')
             fig.savefig(savefig_fname+'.eps')
         fig.canvas.draw(); fig.show()
 
 
     def find_relevant_keys(self, params, param_values):
-        valid_keys = []
+        '''This assumes that a grid of simulations has been done, and finds the closest answer for each axis in params.
+        The intersection of these should be a unique value because everything was done on a grid
+
+        SRH: 25Apr2014
+        '''
+        valid_keys = []; valid_index = []
         for values in param_values:
             valid_keys_tmp = np.ones(len(self.project_dict['sims'].keys()),dtype = bool)
             for param, value in zip(params, values):
                 min_loc = np.argmin(np.abs(np.array(self.raw_data[param]) - value))
-                valid_keys_tmp *= np.array(self.raw_data[param]) == self.raw_data[param][min_loc]
+                valid_keys_tmp *= (np.array(self.raw_data[param]) == self.raw_data[param][min_loc])
             if np.sum(valid_keys_tmp)!=1:
                 raise ValueError('Too many keys matching')
-            
+            valid_index.append(np.argmax(valid_keys_tmp))
             valid_keys.append(int(np.array(self.project_dict['sims'].keys())[valid_keys_tmp]))
         actual_values = []
-        for values, cur_key in zip(param_values, valid_keys):
+        for values, cur_key, idx in zip(param_values, valid_keys, valid_index):
             print values
-            actual_values.append([self.raw_data[i][cur_key] for i in params])
+            actual_values.append([self.raw_data[i][idx] for i in params])
             print actual_values[-1]
         return valid_keys, actual_values
 
@@ -650,14 +660,15 @@ class post_processing_results():
         for i in ax2: i.set_ylabel('$\sqrt{\Psi_N}$')
 
         for i in [fig, fig2, fig_Vn, fig_Bn]: i.tight_layout(pad = 0.3)
-        fig.savefig(savefig_fname+'.pdf')
-        fig.savefig(savefig_fname+'.eps')
-        fig_Vn.savefig(savefig_fname+'_Vn.pdf')
-        fig_Vn.savefig(savefig_fname+'_Vn.eps')
-        fig_Bn.savefig(savefig_fname+'_Bn.pdf')
-        fig_Bn.savefig(savefig_fname+'_Bn.eps')
+        #fig.savefig(savefig_fname+'.pdf')
+        #fig.savefig(savefig_fname+'.eps')
+        #fig_Vn.savefig(savefig_fname+'_Vn.pdf')
+        #fig_Vn.savefig(savefig_fname+'_Vn.eps')
+        #fig_Bn.savefig(savefig_fname+'_Bn.pdf')
+        #fig_Bn.savefig(savefig_fname+'_Bn.eps')
         fig2.savefig(savefig_fname+'_all.eps')
         fig2.savefig(savefig_fname+'_all.pdf')
+        fig2.savefig(savefig_fname+'_all.svg')
         for fig_t in [fig, fig_Vn, fig_Bn, fig2]: fig_t.canvas.draw(); fig_t.show()
 
         

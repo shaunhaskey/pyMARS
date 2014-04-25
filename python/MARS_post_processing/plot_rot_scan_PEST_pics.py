@@ -22,6 +22,7 @@ file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/sho
 #file_name = '/u/haskeysr/mars/shot_146382_rote_res_scan_15x15_kpar1_med_rote/shot_146382_rote_res_scan_15x15_kpar1_med_rote_post_processing_PEST.pickle'
 
 
+file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/shot_142614_rote_res_scan_20x20_kpar1_med_rote_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_post_processing_PEST.pickle'; ul = False
 #file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase/shot_142614_rote_res_scan_5x5_kpar1_low_rote_single_phase_post_processing_PEST.pickle'; ul = False
@@ -47,13 +48,35 @@ a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_ma
 #fig1 in the paper?
 #a.plot_single_PEST(['ROTE', 'ETA'], [[5e-3,1e-7]], savefig_fname = '/u/haskeysr/vacuum_plasma_total', clim = [0,1.5], phasing = 270)
 
+vals_to_plot = [[0.10000000000000001, 2.3357214690901212e-07],[0.0088586679041008226, 2.3357214690901212e-07],[0.00078475997035146064, 2.3357214690901212e-07]]
+a.plot_single_PEST(['ROTE', 'ETA'], [vals_to_plot[0], vals_to_plot[2]], savefig_fname = '/u/haskeysr/vacuum_plasma_total2', clim = [0,1.2], phasing = 0)
+1/0
+a.plot_PEST_scan(['ROTE', 'ETA'], vals_to_plot, savefig_fname = '/u/haskeysr/rote_scan_harms_disp', clim = [0,1.2])
+
 #fig2 in the paper at the moment
-#a.plot_single_displacement(['ROTE', 'ETA'], [[5e-3,5.5e-7]], savefig_fname = '/u/haskeysr/displacement_plot', aspect=True)
+a.plot_single_displacement(['ROTE', 'ETA'], [vals_to_plot[2]], savefig_fname = '/u/haskeysr/displacement_plot', aspect=True, include_mag = False)
+#a.plot_single_displacement(['ROTE', 'ETA'], [[5e-3,5.5e-7]], savefig_fname = '/u/haskeysr/displacement_plot', aspect=True, include_mag = False)
+
+
+1/0
+1/0
+#works with the flat resistivity profiles from the early scans
 a.plot_single_PEST(['ROTE', 'ETA'], [[5e-4,1e-6]], savefig_fname = '/u/haskeysr/vacuum_plasma_total', clim = [0,1.5], phasing = 270)
 a.plot_single_PEST(['ROTE', 'ETA'], [[5e-4,1e-6],[5e-2,1e-6]], savefig_fname = '/u/haskeysr/vacuum_plasma_total2', clim = [0,1.5], phasing = 270)
-1/0
 
+#works with the flat resistivity profiles from the early scans
+a.plot_single_PEST(['ROTE', 'ETA'], [[3.e-4,3.e-8],[2.e-2,3.e-8]], savefig_fname = '/u/haskeysr/vacuum_plasma_total2', clim = [0,1.5], phasing = 270)
+
+
+
+a.plot_single_PEST(['ROTE', 'ETA'], [[3.e-4,3.e-8]], savefig_fname = '/u/haskeysr/vacuum_plasma_total2', clim = [0,1.5], phasing = 270)
+
+#Works with the flat resistivity profiles
 a.plot_PEST_scan(['ROTE', 'ETA'], [[1e-3,5.5e-8],[1e-4,5.5e-8],[1e-5,5.5e-8]], savefig_fname = '/u/haskeysr/rote_scan_harms_disp', clim = [0,1.5])
+
+a.plot_PEST_scan(['ROTE', 'ETA'], [[1e-1,2.335e-7],[1e-2,2.335e-7],[1e-3,2.335e-7]], savefig_fname = '/u/haskeysr/rote_scan_harms_disp', clim = [0,1.5])
+
+1/0
 
 
 
