@@ -28,6 +28,11 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kp
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_15x15_kpar1/shot_142614_rote_res_scan_15x15_kpar1_post_processing_PEST.pickle'
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/shot_142614_rote_res_scan_20x20_kpar1_med_rote_post_processing_PEST.pickle'
+
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_25x20_kpar1_med_rote/shot_142614_rote_res_scan_25x20_kpar1_med_rote_post_processing_PEST.pickle'
+
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1/shot_142614_rote_scan_100_kpar1_post_processing_PEST.pickle'
+
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_146382_rote_res_scan_15x15_kpar1_med_rote/shot_146382_rote_res_scan_15x15_kpar1_med_rote_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/project1_redone/project1_redone_post_processing_PEST.pickle'; mars_params = []
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/shot_142614_expt_scan_post_processing_PEST.pickle'
@@ -41,7 +46,7 @@ s_surface = 0.92
 fixed_harmonic = 3
 reference_dB_kink = 'plas'
 reference_dB_kink = 'plasma'
-reference_offset = [2,0]
+reference_offset = [4,0]
 sort_name = 'rote_list'
 
 
@@ -59,10 +64,25 @@ probe_r = dBres_dBkink.magnetic_probe(a,'UISL')
 rot_pts = None
 res_pts = None
 time_pts = None
-time_pts = [1975,1415,2135,1575,1495,1935,1775,2175,2055,1615,1895,1535,1655,1695,1815,1735,1855,2095,2015,1455]
-rot_pts = [3.527e+04,4.344e+04,1.281e+04,5.042e+04,6.673e+04,2.882e+04,6.182e+04,1.164e+04,1.633e+04,4.685e+04,3.682e+04,5.380e+04,4.741e+04,5.602e+04,5.475e+04,6.206e+04,4.539e+04,1.738e+04,3.635e+04,4.186e+04]
-res_pts = [2.416e-07,1.754e-07,3.215e-07,2.376e-07,1.945e-07,2.448e-07,2.445e-07,2.840e-07,2.748e-07,2.094e-07,2.017e-07,1.928e-07,2.106e-07,2.156e-07,2.782e-07,2.575e-07,2.361e-07,3.235e-07,2.767e-07,2.167e-07]
+
+expt_file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V3/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V3_post_processing_PEST.pickle'
+expt = dBres_dBkink.post_processing_results(expt_file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False, ul = ul, mars_params = mars_params)
+time_pts = expt.raw_data['shot_time']
+eta_pts = expt.raw_data['ETA']
+rote_pts = expt.raw_data['ROTE']
+vtor0_pts = expt.raw_data['vtor0']
+
+
+vals_to_plot = [[0.10000000000000001, 2.3357214690901212e-07],[0.0088586679041008226, 2.3357214690901212e-07],[0.0020691380811147901, 2.3357214690901212e-07]]
+
+#vals_to_plot = [[0.085, 2.3357214690901212e-07],[0.0088586679041008226, 2.3357214690901212e-07],[0.0013, 2.3357214690901212e-07]]
+
+#1/0
+#time_pts = [1975,1415,2135,1575,1495,1935,1775,2175,2055,1615,1895,1535,1655,1695,1815,1735,1855,2095,2015,1455]
+#rot_pts = [3.527e+04,4.344e+04,1.281e+04,5.042e+04,6.673e+04,2.882e+04,6.182e+04,1.164e+04,1.633e+04,4.685e+04,3.682e+04,5.380e+04,4.741e+04,5.602e+04,5.475e+04,6.206e+04,4.539e+04,1.738e+04,3.635e+04,4.186e+04]
+#res_pts = [2.416e-07,1.754e-07,3.215e-07,2.376e-07,1.945e-07,2.448e-07,2.445e-07,2.840e-07,2.748e-07,2.094e-07,2.017e-07,1.928e-07,2.106e-07,2.156e-07,2.782e-07,2.575e-07,2.361e-07,3.235e-07,2.767e-07,2.167e-07]
 time_plt_pts = [1415, 1735, 2135]
+time_plt_pts = [1735, 1895, 2135]
 # import matplotlib.gridspec as gridspec
 # gs = gridspec.GridSpec(2, 1)#, width_ratios=[7,1])
 # fig = pt.figure()
@@ -92,7 +112,7 @@ ax[-1].set_xlabel('$\omega_0$ (rad/s)')
 cbar = pt.colorbar(cax_kink, cax = gen_funcs.create_cbar_ax(ax[0]), ticks = np.linspace(cax_kink.get_clim()[0], cax_kink.get_clim()[1], 5))
 #cbar = pt.colorbar(cax_kink, cax = gen_funcs.create_cbar_ax(ax[0]))
 gen_funcs.cbar_ticks(cbar)
-cbar.set_label('$\delta B_{kink}$ '+kink_field)
+cbar.set_label('$\delta B_{RFA}$ '+kink_field)
 
 cbar = pt.colorbar(cax_res, cax = gen_funcs.create_cbar_ax(ax[1]), ticks = np.linspace(cax_res.get_clim()[0], cax_res.get_clim()[1], 5))
 #gen_funcs.cbar_ticks(cbar)
@@ -111,26 +131,42 @@ phasings_disp = [0,45,90,135,180,225,270,315]
 phasings_disp = [0,90,180,270]
 if not ul: phasings_disp = [0]
 x_axis = 'ROTE'
-x_axis = 'vtor0'
+#x_axis = 'vtor0'
 y_axis = 'ETA'
 
-x_axis_label = '$\omega$ (rad/s)'
+if x_axis=='ROTE' :
+    expt_pts_rot = rote_pts 
+elif x_axis=='vtor0':
+    expt_pts_rot = vtor0_pts
+else:
+    raise ValueError()
+
+if y_axis=='ETA' :
+    expt_pts_res = eta_pts
+else:
+    raise ValueError()
+
+#x_axis_label = '$\omega$ (rad/s)'
+x_axis_label = '$\omega$ (rad/s)' if x_axis == 'vtor0' else '$\omega_0$'
 y_axis_label = '$\eta_0$'
 fields = ['total','plasma','plasma']
 ylim = [1.e-8,1.e-6]
 xlim = [1.e-6,1.e-2]
 xlim = None
 xlim = [1.e2,3.e5]
-xlim = [3.e3,3.e5]
+xlim = [3.e3,3.e5] if x_axis == 'vtor0' else [1.e-3, 0.12]#[0.0012239067526504149, 0.1]
+
 vlines = None
 #vlines = [60000,15000]
 hlines = None
 #hlines = [3.5e-7,1.75e-8]
-labels = ['$\delta B_{res}^{tot}$ (G/kA)', '$\delta B_{kink}$ (G/kA)', 'Midplanae outboard poloidal probe (G/kA)']
+labels = ['$\delta B_{res}^{tot}$ (G/kA)', '$\delta B_{RFA}$ (G/kA)', 'Midplanae outboard poloidal probe (G/kA)']
 fnames = ['dBres','dBkink','probe']
 clims = [[0,2.5],[0,2],[0,1.5]]
 clims = [[0,5],[0,5],[0,15]]
 clims = [[0,1.5],[0,0.8],[0,1.05]]
+clims = [[0,1.5],[0,0.4],[0,1.05]]
+#clims = [[-np.pi, np.pi],[-np.pi,np.pi],[-np.pi,np.pi]]
 for calc_type, cur_clim, title, fname, field in zip([dBres, dBkink, probe], clims, labels, fnames, fields):
     replacement_kwargs = {'xtick.labelsize': 7.0,'ytick.labelsize': 7.0}
     if len(phasings_disp)==8:
@@ -141,23 +177,25 @@ for calc_type, cur_clim, title, fname, field in zip([dBres, dBkink, probe], clim
         gen_funcs.setup_publication_image(fig, height_prop = 1./1.1, single_col = True, replacement_kwargs = replacement_kwargs)
     #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
     for i, cur_ax in zip(phasings_disp, ax.flatten()):
-        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'jet', field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 1, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5})
+        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'jet', field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 1, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5}, amplitude = True)
         cur_ax.set_title('$\Delta \phi = {}^o$'.format(i))
         if vlines!=None: 
             for vert_line in vlines: cur_ax.axvline(x=vert_line, color='k')
         if hlines!=None: 
             for hor_line in hlines: cur_ax.axhline(y=hor_line, color='k')
-        if res_pts!=None:
-            #cur_ax.plot(rot_pts, res_pts, 'k.')
-            #cur_ax.plot(rot_pts, np.array(res_pts)/10, 'k.')
-            for t_tmp in time_plt_pts: 
-                cur_ax.plot(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)], 'k.')
-                cur_ax.text(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)], t_tmp, fontsize=6)
-            for t_tmp in time_plt_pts: 
-                cur_ax.plot(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)]/10, 'k.')
-                cur_ax.text(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)]/10, t_tmp, fontsize=6)
-            #for rot_tmp, res_tmp, t_tmp in zip(rot_pts, res_pts, time_pts): cur_ax.text(rot_tmp, res_tmp, t_tmp, fontsize=7)
-            #for rot_tmp, res_tmp, t_tmp in zip(rot_pts, res_pts, time_pts): cur_ax.text(rot_tmp, res_tmp/10, t_tmp, fontsize=7)
+        if time_plt_pts!=None and i == 0:
+            #cur_ax.plot(expt_pts_rot, expt_pts_res, 'k.')
+            #cur_ax.plot(expt_pts_rot, np.array(expt_pts_res)/10, 'k.')
+            for t_tmp in time_plt_pts:  
+                cur_ax.plot(expt_pts_rot[time_pts.index(t_tmp)], expt_pts_res[time_pts.index(t_tmp)], 'k.')
+                cur_ax.text(expt_pts_rot[time_pts.index(t_tmp)], expt_pts_res[time_pts.index(t_tmp)], t_tmp, fontsize=6)
+                if i==0: cur_ax.plot([tmp_ind[0] for tmp_ind in vals_to_plot], [tmp_ind[1] for tmp_ind in vals_to_plot], 'kd')
+            #for t_tmp in time_plt_pts: 
+            #    cur_ax.plot(expt_pts_rot[time_pts.index(t_tmp)], expt_pts_res[time_pts.index(t_tmp)]/10, 'k.')
+            #    cur_ax.text(expt_pts_rot[time_pts.index(t_tmp)], expt_pts_res[time_pts.index(t_tmp)]/10, t_tmp, fontsize=6)
+
+            #for rot_tmp, res_tmp, t_tmp in zip(expt_pts_rot, expt_pts_res, time_pts): cur_ax.text(rot_tmp, res_tmp, t_tmp, fontsize=7)
+            #for rot_tmp, res_tmp, t_tmp in zip(expt_pts_rot, expt_pts_res, time_pts): cur_ax.text(rot_tmp, res_tmp/10, t_tmp, fontsize=7)
     for i in ax[:,0]: i.set_ylabel(y_axis_label)
     for i in ax[-1,:]: i.set_xlabel(x_axis_label)
     if xlim!=None: ax[0,0].set_xlim(xlim)
@@ -179,9 +217,9 @@ else:
     gen_funcs.setup_publication_image(fig, height_prop = 1./1.1, single_col = True, replacement_kwargs = replacement_kwargs)
 
 
-x_axis = 'ROTE'
-y_axis = 'ETA'
-x_axis = 'vtor0'
+# x_axis = 'ROTE'
+# y_axis = 'ETA'
+# x_axis = 'vtor0'
 
 
 #x_axis_label = '$\omega_{0}$'
@@ -209,17 +247,18 @@ for i, cur_ax in zip(phasings_disp, ax.flatten()):
         for vert_line in vlines: cur_ax.axvline(x=vert_line, color='k')
     if hlines!=None: 
         for hor_line in hlines: cur_ax.axhline(y=hor_line, color='k')
-    if res_pts!=None:
-        #cur_ax.plot(rot_pts, res_pts, 'k.')
-        #cur_ax.plot(rot_pts, np.array(res_pts)/10, 'k.')
+    if expt_pts_rot!=None and i==0:
+        #cur_ax.plot(expt_pts_rot, expt_pts_res, 'k.')
+        #cur_ax.plot(expt_pts_rot, np.array(expt_pts_res)/10, 'k.')
         for t_tmp in time_plt_pts: 
-            cur_ax.plot(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)], 'k.')
-            cur_ax.text(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)], t_tmp, fontsize=6)
-        for t_tmp in time_plt_pts: 
-            cur_ax.plot(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)]/10, 'k.')
-            cur_ax.text(rot_pts[time_pts.index(t_tmp)], res_pts[time_pts.index(t_tmp)]/10, t_tmp, fontsize=6)
-        #for rot_tmp, res_tmp, t_tmp in zip(rot_pts, res_pts, time_pts): cur_ax.text(rot_tmp, res_tmp, t_tmp, fontsize=7)
-        #for rot_tmp, res_tmp, t_tmp in zip(rot_pts, res_pts, time_pts): cur_ax.text(rot_tmp, res_tmp/10, t_tmp, fontsize=7)
+            cur_ax.plot(expt_pts_rot[time_pts.index(t_tmp)], expt_pts_res[time_pts.index(t_tmp)], 'k.')
+            cur_ax.text(expt_pts_rot[time_pts.index(t_tmp)], expt_pts_res[time_pts.index(t_tmp)], t_tmp, fontsize=6)
+            if i==0: cur_ax.plot([tmp_ind[0] for tmp_ind in vals_to_plot], [tmp_ind[1] for tmp_ind in vals_to_plot], 'kd')
+        #for t_tmp in time_plt_pts: 
+        #    cur_ax.plot(expt_pts_rot[time_pts.index(t_tmp)], expt_pts_res[time_pts.index(t_tmp)]/10, 'k.')
+        #    cur_ax.text(expt_pts_rot[time_pts.index(t_tmp)], expt_pts_res[time_pts.index(t_tmp)]/10, t_tmp, fontsize=6)
+        #for rot_tmp, res_tmp, t_tmp in zip(expt_pts_rot, expt_pts_res, time_pts): cur_ax.text(rot_tmp, res_tmp, t_tmp, fontsize=7)
+        #for rot_tmp, res_tmp, t_tmp in zip(expt_pts_rot, expt_pts_res, time_pts): cur_ax.text(rot_tmp, res_tmp/10, t_tmp, fontsize=7)
 
 for i in ax[:,0]: i.set_ylabel(y_axis_label)
 for i in ax[-1,:]: i.set_xlabel(x_axis_label)
@@ -233,11 +272,12 @@ fig.savefig(title+'2x2.svg', bbox_inches = 'tight',pad = 0.1)
 fig.canvas.draw(); fig.show()
 
 
-
+1/0
 fig,ax = pt.subplots(nrows = 4, sharex = True)
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*3., single_col = True)
 x_log = True
 x_interp = np.linspace(-5,-2,30)
+x_interp = np.linspace(-4,-2,30)
 x_interp = 10**x_interp
 #x_interp = np.linspace(1.e-6,0.01,100)
 eta_list = [5.e-7, 5.5e-8, 1.e-8]

@@ -43,7 +43,7 @@ phase_machine_ntor = 0
 s_surface = 0.92
 fixed_harmonic = 3
 reference_dB_kink = 'plas'
-reference_offset = [2,0]
+reference_offset = [4,0]
 sort_name = 'time_list'
 
 fig, ax = pt.subplots(nrows = 6, ncols = 1, sharex = True)
@@ -65,7 +65,8 @@ count = 0
 V_runs = [1,2,3,4,5,6]
 eta_vals = ['1e-6', '5e-7', '1e-7', '7e-8', '3e-8', '1e-8']
 eta_vals = ['5e-7', '1e-7', '7e-8']
-eta_vals = ['1e-8']
+eta_vals = ['1e-7']
+
 
 #for V in V_runs:
 gen_func.setup_publication_image(fig, height_prop = 1.5, single_col = True)
@@ -106,10 +107,10 @@ for eta in eta_vals:
             multiplier = np.abs(np.interp(np.sort(a.raw_data['shot_time']), icoil[:,0], icoil[:,1])/1000)
         if x_point_ax!=None:
             xpoint.plot_single_phasing(phasing, 'shot_time', field = 'plasma',  ax = x_point_ax, plot_kwargs = plot_style, multiplier = multiplier)
-            x_point_ax.set_ylabel('X-point Disp')
+            x_point_ax.set_ylabel('X-pt Disp (au)')
         if rote_ax!=None and count == 0:
-            a.plot_parameters('shot_time', 'ROTE', ax = rote_ax, plot_kwargs = {'marker':'x'})
-            rote_ax.set_ylabel('ROTE')
+            a.plot_parameters('shot_time', 'vtor0', ax = rote_ax, plot_kwargs = {'marker':'x'})
+            rote_ax.set_ylabel('TorRot(rad/s)')
         if dBres_plas_ax!=None:
             dBres.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = True, ax = dBres_plas_ax, multiplier = multiplier)
             dBres_plas_ax.set_ylabel(r'$\delta B_{res}^{plas}$ (G)')
@@ -137,7 +138,7 @@ for eta in eta_vals:
                 #probe_plas_ax.plot(tmp_time, tmp_probe,'b-', rasterized = True)
         if dBkink_plas_ax!=None:
             dBkink.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = True, ax = dBkink_plas_ax, multiplier = multiplier)
-            dBkink_plas_ax.set_ylabel(r'$\delta B_{kink}^{plas}$')
+            dBkink_plas_ax.set_ylabel(r'$\delta B_{\mathrm{RFA}}$ (G)')
         if q95_ax!=None:
             a.plot_parameters('shot_time', 'Q95', ax = q95_ax, plot_kwargs = {'marker':'x'})
             q95_ax.set_ylabel(r'$q_{95}$')
@@ -155,14 +156,14 @@ for eta in eta_vals:
                 for t_tmp, j in zip(vline_times, vline_labels):
                     i.axvline(t_tmp)
                     i.text(t_tmp,np.mean(i.get_ylim()),j,rotation = 90, verticalalignment='center')
-                gen_func.setup_axis_publication(i, n_yticks = 4)
         for i in cur_ax: i.grid(True)
         count+=1
+for i in ax.flatten():gen_func.setup_axis_publication(i, n_yticks = 4)
 for i in ax[-1,:]: i.set_xlabel('Time (ms)')
 ax[-1,-1].set_xlim([1450,2200])
 gen_func.setup_axis_publication(ax[-1,0], n_xticks = 5)
 fig.tight_layout(pad = 0.1)
-fig.savefig('comparison_oliver_data_allV{}.pdf'.format(const_rot))
+for end in ['svg','eps','pdf']:fig.savefig('comparison_oliver_data_allV{}.{}'.format(const_rot,end))
 fig.canvas.draw(); fig.show()
 
 
@@ -223,7 +224,7 @@ for eta in eta_vals:
     #ax_harms[1].set_ylabel('Resonant harm phase (rad)')
     for i in ax_harms:i.grid(True)
     fig_harms.tight_layout(pad = 0.1)
-    fig_harms.savefig('harms_{}_{}.pdf'.format(eta, const_rot))
+    for end in ['svg','eps','pdf']:fig_harms.savefig('harms_{}_{}.{}'.format(eta, const_rot,end))
     fig_harms.canvas.draw(); fig_harms.show()
 
 1/0

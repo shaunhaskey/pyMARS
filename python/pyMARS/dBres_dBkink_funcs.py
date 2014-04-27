@@ -49,7 +49,7 @@ class generic_calculation():
         '''
         pass
 
-    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None, plot_kwargs = None, n_contours = 0, contour_kwargs = None, plot_ridge = False, clim = None):
+    def plot_phasing_scan(self, axis_name, n_phases = 360, phasing_array = None, field = 'total', filter_names = None, filter_values = None, xaxis_log = False, yaxis_log = False, ax = None, plot_kwargs = None, n_contours = 0, contour_kwargs = None, plot_ridge = False, clim = None, unwrap = False):
         '''
         Need to select an 'axis' to perform the phase scan along
 
@@ -64,12 +64,14 @@ class generic_calculation():
 
         if filter_names == None: filter_names = []; filter_values = []
         first_time = True
+        filter_key = np.ones(len(self.parent.raw_data['Q95']), dtype=bool)
         for name, value in zip(filter_names, filter_values):
             tmp_vals = np.array(self.parent.raw_data[name])
             new_value = tmp_vals[np.argmin(np.abs(tmp_vals - value))]
 
             if first_time:
-                filter_key = (np.array(self.parent.raw_data[name]) == new_value)
+                pass
+                #filter_key = (np.array(self.parent.raw_data[name]) == new_value)
             else:
                 filter_key *= (np.array(self.parent.raw_data[name]) == new_value)
         relevant_axis_values = np.array(self.parent.raw_data[axis_name])[filter_key]
@@ -79,8 +81,17 @@ class generic_calculation():
         rel_axis_grid, phase_grid = np.meshgrid(relevant_axis_values, phasing_array)
         color_ax = ax.pcolormesh(rel_axis_grid, phase_grid, np.abs(output_array), cmap='hot', rasterized= 'True', shading = 'gouraud')
         if clim!=None: color_ax.set_clim(clim)
-        if plot_ridge: ax.plot(relevant_axis_values, np.rad2deg(np.unwrap(np.deg2rad(phasing_array[np.argmax(np.abs(output_array), axis = 0)]))),'b-')
-        if plot_ridge: ax.plot(relevant_axis_values, np.rad2deg(np.unwrap(np.deg2rad(phasing_array[np.argmin(np.abs(output_array), axis = 0)]))),'b-')
+        if plot_ridge: 
+            for min_max in [np.argmax, np.argmin]:
+                if unwrap:
+                    #ax.plot(relevant_axis_values, np.rad2deg(np.unwrap(np.deg2rad(phasing_array[np.argmax(np.abs(output_array), axis = 0)]))),'b-')
+                    ax.plot(relevant_axis_values, np.rad2deg(np.unwrap(np.deg2rad(phasing_array[min_max(np.abs(output_array), axis = 0)]))),'b.', markersize=3)
+                else:
+                    #ax.plot(relevant_axis_values, phasing_array[np.argmax(np.abs(output_array), axis = 0)],'b-')
+                    ax.plot(relevant_axis_values, phasing_array[min_max(np.abs(output_array), axis = 0)],'b.', markersize=3)
+
+        #if plot_ridge: Xb
+        #    ax.plot(relevant_axis_values, np.rad2deg(np.unwrap(np.deg2rad(phasing_array[np.argmin(np.abs(output_array), axis = 0)]))),'b-')
 
         if n_contours != 0: 
             tmp_clim = color_ax.get_clim()
@@ -92,9 +103,11 @@ class generic_calculation():
         ax.set_ylim([np.min(phasing_array), np.max(phasing_array)])
         ax.set_xlim([np.min(rel_axis_grid), np.max(rel_axis_grid)])
         if no_ax: fig.canvas.draw();fig.show()
-
-
+        self.cur_phasing_scan_z = np.abs(output_array)
+        self.cur_phasing_scan_x = rel_axis_grid
+        self.cur_phasing_scan_y = phase_grid
         return color_ax
+
 
     def plot_single_phasing(self, phasing, xaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, multiplier = 1):
         '''Plot  a calculation versus a particular attribute
@@ -173,7 +186,7 @@ class generic_calculation():
             col = xvals_set.index(x)
             output_matrix[row, col] = +current_data[list_index]
         x_mesh, y_mesh = np.meshgrid(xvals_set, yvals_set)
-        tmp = scipy_filt.median_filter(np.abs(output_matrix), med_filt_value)
+        tmp = scipy_filt.median_filter(comp_func(output_matrix), med_filt_value)
         not_nan = np.isfinite(tmp)
         color_ax = ax.pcolormesh(x_mesh, y_mesh, tmp, cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
         if n_contours != 0: color_ax2 = ax.contour(x_mesh, y_mesh, tmp, np.linspace(clim[0],clim[1], n_contours), **contour_kwargs)
@@ -1705,10 +1718,11 @@ def calculate_db_kink(mk_list, q_val_list, n, reference, to_be_calculated):
     return answer, mode_list, max_loc_list
 
 
-def calculate_db_kink2(mk_list, q_val_list, n, reference, to_be_calculated, reference_offset = [0,0]):
+def calculate_db_kink2(mk_list, q_val_list, n, reference, to_be_calculated, reference_offset = None):
     '''
     Calculate db_kink based on the maximum value
     '''
+    if reference_offset == None: reference_offset = [0,0]
     answer = []; mode_list = []; max_loc_list = []
     answer_phase = []
     #answer_phase = []
