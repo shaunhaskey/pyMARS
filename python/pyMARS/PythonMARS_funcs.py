@@ -511,6 +511,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 
     ne0 = np.loadtxt(file_loc_dir + '/PROFDEN',skiprows = 1)[0,1]
     vtor0 = np.loadtxt(file_loc_dir + '/PROFROT',skiprows = 1)[0,1]
+    
 
     #Make sure we are in rad/s
     if vtor0<200: vtor0*=1000
@@ -557,6 +558,9 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     #omega = ichz/f_v0a
     #Fixed based on email from Matt on 8/1/2014
     omega = 2.0*np.pi*ichz*taua
+    master['ASPCT'] = float(extract_value(master['dir_dict']['chease_dir'] + '/log_chease','ASPCT',' '))
+    eta_norm = mu0 * R0EXP * v0a / ((1./master['ASPCT'])**2)
+    master['eta_norm'] = +eta_norm
 
     output_string = ['From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro with mod from 8/1/2014']
     output_string.append('Scaling using eta h res : {:.4e} equivalent to {:.4e}'.format(eta_h_res, eta_h_Te))
@@ -594,6 +598,8 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
         output_string.append('Spitzer_resist : {:.4e} Ohm m'.format(spitz_resist))
         output_string.append('Lundquist number : {:.4e}'.format(lundquist))
         output_string.append('ETA : {:.4e}'.format(eta))
+    output_string.append('ASPCT : {:.4e}'.format(master['ASPCT']))
+    output_string.append('ETA norm : {:.4e}'.format(master['eta_norm']))
     
     for i in range(0,len(output_string)):
         output_string[i]+='\n'
