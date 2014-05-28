@@ -34,6 +34,8 @@ single_based_on_time = True
 if single_based_on_time:
     base_dir = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/efit/'
     base_dir2 = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/times/'
+    #NEED TO MODIFY THIS BASE DIR HERE.... to the spitzer ones
+
     fig2, ax_orig2 = pt.subplots(ncols = 2, nrows = 2, sharex = True); ax3 = ax_orig2.flatten()
     import pyMARS.generic_funcs as gen_funcs
     gen_funcs.setup_publication_image(fig2, height_prop = 1./1.618*1.2, single_col = True)

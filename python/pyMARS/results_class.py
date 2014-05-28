@@ -48,6 +48,7 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
     phasing_vals is the list of phasings the calculations are performed for
     ul - not really implemented yet, but says if its upper lower data
     SRH : 31Jan2014
+    SRH : 28May2014: changed the integral to an 'average value'
     '''
     plot_field = 'Vn'; field_type = 'total'
     #run_data = extract_data(base_dir, I0EXP, ul=ul, Nchi=Nchi, get_VPLASMA=1, plas_vac = False)
@@ -73,6 +74,9 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
     angle = np.arctan2(plas_z[-1,:], plas_r[-1,:]-run_data[0].R0EXP)
     z_vals_red = z_vals[:-1]
     r_vals_red = r_vals[:-1]
+    print 'Disp mean calc'
+    def disp_int(plot_quantity_red, truth, dl, angle):
+        return np.sum(np.abs(plot_quantity_red[truth])*dl[truth])/np.sum(dl[truth]), np.mean(angle[truth])
 
     for theta_deg in phasing_vals:
         cur_dict = {}
@@ -87,24 +91,38 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
         else:
             plot_quantity = getattr(run_data[0], plot_field)
         plot_quantity_red = plot_quantity[-1,:-1]
+        #truth = (z_vals_red>=upper_values[i-1])*(z_vals_red<upper_values[i])*(dz<0)
         for i in range(1,len(upper_values)):
             truth = (z_vals_red>=upper_values[i-1])*(z_vals_red<upper_values[i])*(dz<0)
-            cur_dict['disp_above_HFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
-            cur_dict['ang_above_HFS'].append(np.mean(angle[truth]))
+            disp, ang = disp_int(plot_quantity_red, truth, dl, angle)
+            cur_dict['disp_above_HFS'].append(+disp); cur_dict['ang_above_HFS'].append(+ang)
+            #cur_dict['disp_above_HFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            #cur_dict['disp_above_HFS'].append(np.sum(np.abs(plot_quantity_red[truth])*dl[truth])/np.sum(dl[truth]))
+            #cur_dict['ang_above_HFS'].append(np.mean(angle[truth]))
             #ax.plot(r_vals_red[truth1], z_vals_red[truth1],'--')
+
             truth = (z_vals_red>=upper_values[i-1])*(z_vals_red<upper_values[i])*(dz>0)
-            cur_dict['disp_above_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
-            cur_dict['ang_above_LFS'].append(np.mean(angle[truth]))
+            disp, ang = disp_int(plot_quantity_red, truth, dl, angle)
+            cur_dict['disp_above_LFS'].append(+disp); cur_dict['ang_above_LFS'].append(+ang)
+            #cur_dict['disp_above_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            #cur_dict['disp_above_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            #cur_dict['ang_above_LFS'].append(np.mean(angle[truth]))
             #ax.plot(r_vals_red[truth2], z_vals_red[truth2],'-')
         for i in range(1,len(lower_values)):
             truth = (z_vals_red<lower_values[i-1])*(z_vals_red>=lower_values[i])*(dz<0)
+            disp, ang = disp_int(plot_quantity_red, truth, dl, angle)
+            cur_dict['disp_below_HFS'].append(+disp); cur_dict['ang_below_HFS'].append(+ang)
             #print upper_values[i-1], upper_values[i], np.sum(truth)
-            cur_dict['disp_below_HFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
-            cur_dict['ang_below_HFS'].append(np.mean(angle[truth]))
+            #cur_dict['disp_below_HFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            #cur_dict['ang_below_HFS'].append(np.mean(angle[truth]))
             #ax.plot(r_vals_red[truth1], z_vals_red[truth1],'--')
+
             truth = (z_vals_red<lower_values[i-1])*(z_vals_red>=lower_values[i])*(dz>0)
-            cur_dict['disp_below_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
-            cur_dict['ang_below_LFS'].append(np.mean(angle[truth]))
+            disp, ang = disp_int(plot_quantity_red, truth, dl, angle)
+            cur_dict['disp_below_LFS'].append(+disp); cur_dict['ang_below_LFS'].append(+ang)
+
+            #cur_dict['disp_below_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
+            #cur_dict['ang_below_LFS'].append(np.mean(angle[truth]))
             #ax.plot(r_vals_red[truth2], z_vals_red[truth],'-')
         output_dict[theta_deg]=copy.deepcopy(cur_dict)
     #print output_dict[0]['disp_below_HFS'], output_dict[45]['disp_below_HFS']

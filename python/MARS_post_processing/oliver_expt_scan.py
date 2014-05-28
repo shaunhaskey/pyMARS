@@ -37,6 +37,8 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq_eta_10-10/shot_142614_expt_scan_const_eq_eta_10-10_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_const_eq_eta_10-5/shot_142614_expt_scan_const_eq_eta_10-5_post_processing_PEST.pickle'
 
+
+#Ideal cases
 phasing = 0
 n = 3
 phase_machine_ntor = 0
@@ -66,8 +68,10 @@ V_runs = [1,2,3,4,5,6]
 eta_vals = ['1e-6', '5e-7', '1e-7', '7e-8', '3e-8', '1e-8']
 eta_vals = ['5e-7', '1e-7', '7e-8']
 eta_vals = ['1e-7']
+eta_vals = ['1e-8']
 
-
+ideal = False
+spitz = True
 #for V in V_runs:
 gen_func.setup_publication_image(fig, height_prop = 1.5, single_col = True)
 for eta in eta_vals:
@@ -83,10 +87,21 @@ for eta in eta_vals:
         I_coil_ax, rote_ax, probe_plas_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
         V = V_dict[eta]
         if const_rot:
-            file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
+            if ideal:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
+            elif spitz:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
+            else:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
         else:
-            file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
+            if ideal:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
+            elif spitz:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
+            else:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_V{}/shot_142614_expt_scan_NC_V{}_post_processing_PEST.pickle'.format(V,V)
+        print file_name
         reference_dB_kink = 'plasma'
         a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
 
@@ -179,9 +194,15 @@ for eta in eta_vals:
             V_dict = V_dict_non_const
         V = V_dict[eta]
         if const_rot:
-            file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
+            if not ideal:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
+            else:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
         else:
-            file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
+            if not ideal:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
+            else:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_V{}/shot_142614_expt_scan_NC_V{}_post_processing_PEST.pickle'.format(V,V)
         reference_dB_kink = 'plasma'
         a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
@@ -218,7 +239,7 @@ for eta in eta_vals:
                     #ax_harms[1].plot(x_axis, np.angle(tmp_c[i,:]), color='b', marker = '.')
                     #ax_harms[0].text(tmp_a.shape[1]-1, np.abs(tmp_b[i,-1]), str(a.raw_data['shot_time'][i]))
                 initial += 1
-    ax_harms[0].set_title('{}-{}ms $\eta=${}'.format(min_time, max_time, eta))
+    #ax_harms[0].set_title('{}-{}ms $\eta=${}'.format(min_time, max_time, eta))
     ax_harms[-1].set_xlabel('m')
     for i in ax_harms: i.set_ylabel('Resonant harm amp (G/kA)')
     #ax_harms[1].set_ylabel('Resonant harm phase (rad)')

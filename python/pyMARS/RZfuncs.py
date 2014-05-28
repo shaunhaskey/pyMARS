@@ -1,6 +1,5 @@
 import numpy as np
 #import matplotlib.pyplot as pt
-import matplotlib.mlab as mlab
 from scipy.interpolate import *
 from scipy.interpolate import griddata as scipy_griddata
 import os,copy
