@@ -38,7 +38,7 @@ def plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = '', figname =
             ax.plot(a[:,0], vals*scale, label = label_string, **style)
             if inc_text: ax.text(a[0,0],vals[1]*scale, label_string)
     if log_y: ax.set_yscale('log')
-    if legend:ax.legend(loc = 'best')
+    if legend:ax.legend(loc = 'best', fontsize = 8)
 #ax.legend(loc='best')
 prof_prefix = 'dtrot142614.0'
 figname = 'toroidal_rotation_profiles_NC.pdf'

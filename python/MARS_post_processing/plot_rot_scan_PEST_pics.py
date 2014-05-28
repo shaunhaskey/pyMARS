@@ -47,11 +47,23 @@ a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_ma
 
 #fig1 in the paper?
 #a.plot_single_PEST(['ROTE', 'ETA'], [[5e-3,1e-7]], savefig_fname = '/u/haskeysr/vacuum_plasma_total', clim = [0,1.5], phasing = 270)
+vals_to_plot = [[0.10000000000000001, 2.3357214690901212e-07],[0.088586679041008226, 2.3357214690901212e-07],[0.00078475997035146064, 2.3357214690901212e-07]]
+vals_to_plot = [[0.10000000000000001, 2.3357214690901212e-07],[0.01, 2.3357214690901212e-07],[0.002, 2.3357214690901212e-07]]
 
-vals_to_plot = [[0.10000000000000001, 2.3357214690901212e-07],[0.0088586679041008226, 2.3357214690901212e-07],[0.00078475997035146064, 2.3357214690901212e-07]]
-a.plot_single_PEST(['ROTE', 'ETA'], [vals_to_plot[0], vals_to_plot[2]], savefig_fname = '/u/haskeysr/vacuum_plasma_total2', clim = [0,1.2], phasing = 0)
+vals_to_plot = [[0.10000000000000001, 2.3357214690901212e-08],[0.01, 2.3357214690901212e-08],[0.002, 2.3357214690901212e-08]]
+
+vals_to_plot = [[0.10000000000000001, 5.e-08],[0.01, 5.e-08],[0.002, 5.e-08]]
+
+a.plot_PEST_scan(['ROTE', 'ETA'], vals_to_plot, savefig_fname = '/u/haskeysr/rote_scan_harms_disp', clim = [0,1.35], inc_Bn=False)
+
 1/0
-a.plot_PEST_scan(['ROTE', 'ETA'], vals_to_plot, savefig_fname = '/u/haskeysr/rote_scan_harms_disp', clim = [0,1.2])
+a.plot_multiple_phasings(['ROTE', 'ETA'], [vals_to_plot[0]], savefig_fname = '/u/haskeysr/vac_phasing', clim = [0,2.0], phasing = [0, 90,180,270], field = 'vac')
+
+for i in range(1):
+    a.plot_single_PEST(['ROTE', 'ETA'], [vals_to_plot[0], vals_to_plot[2]], savefig_fname = '/u/haskeysr/vacuum_plasma_total2', clim = [0,1.35], phasing = 0)
+
+a.plot_single_PEST(['ROTE', 'ETA'], [vals_to_plot[0], vals_to_plot[2]], savefig_fname = '/u/haskeysr/vacuum_plasma_total2', clim = [0,1.35], phasing = 0)
+
 
 #fig2 in the paper at the moment
 a.plot_single_displacement(['ROTE', 'ETA'], [vals_to_plot[2]], savefig_fname = '/u/haskeysr/displacement_plot', aspect=True, include_mag = False)

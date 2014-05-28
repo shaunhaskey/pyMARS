@@ -345,6 +345,17 @@ def extract_NW(master):
     #print 'NW : ' + str(master['NW'])
     return master
 
+def extract_aspect(master):
+    master['NW'] = int(round(float(extract_value(master['dir_dict']['chease_dir'] + '/log_chease','NW',' '))))
+    with file(master['dir_dict']['chease_dir'] + '/log_chease','r') as filehandle:
+        lines = filehandle.readlines()
+    for i in lines:
+        if i.find('ASPECT RATIO')>=0 and i.find('a/R')>=0:
+            print i, (i.lstrip(' ').split(' '))[0]
+            master['ASPECT'] = float((i.lstrip(' ').split(' '))[0])
+            break
+    return master
+
 
 #-------- fxrun section ---------------
 #def fxin_create(master,M1,M2,R0EXP,B0EXP, PEST=0):
@@ -549,9 +560,12 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
         lundquist = lundquist_calc(spitz_resist, L = R0EXP, va=v0a)
         eta = 1./lundquist
         #Hack to force eta to scale without knowing the normalisation
-        eta_h_res = 1.e-8
-        eta_h_Te = 3200
-        eta = eta_h_res/((eta_h_Te/Te0)**-1.5)
+        eta_norm = 4.*np.pi*10**-7*v0a*R0EXP / master['ASPECT']**2
+        master['ETA_NORM'] = +eta_norm
+        eta = spitz_resist/eta_norm
+        #eta_h_res = 1.e-8
+        #eta_h_Te = 3200
+        #eta = eta_h_res/((eta_h_Te/Te0)**-1.5)
 
 #    nichz = N_ELEMENTS(ichz)
 
@@ -563,7 +577,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     master['eta_norm'] = +eta_norm
 
     output_string = ['From /u/lanctot/mars/utils/MARSplot/write_mars_params.pro with mod from 8/1/2014']
-    output_string.append('Scaling using eta h res : {:.4e} equivalent to {:.4e}'.format(eta_h_res, eta_h_Te))
+    #output_string.append('Scaling using eta h res : {:.4e} equivalent to {:.4e}'.format(eta_h_res, eta_h_Te))
     output_string.append('=======================================')
     output_string.append('Input values')
     output_string.append('=======================================')
@@ -596,7 +610,9 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     if te_success:
         output_string.append('============== Resistivity =================')
         output_string.append('Spitzer_resist : {:.4e} Ohm m'.format(spitz_resist))
-        output_string.append('Lundquist number : {:.4e}'.format(lundquist))
+        output_string.append('ASPECT RATIO : {:.4e}'.format(master['ASPECT']))
+        output_string.append('ETA_NORM : {:.4e}'.format(master['ETA_NORM']))
+        #output_string.append('Lundquist number : {:.4e}'.format(lundquist))
         output_string.append('ETA : {:.4e}'.format(eta))
     output_string.append('ASPCT : {:.4e}'.format(master['ASPCT']))
     output_string.append('ETA norm : {:.4e}'.format(master['eta_norm']))
