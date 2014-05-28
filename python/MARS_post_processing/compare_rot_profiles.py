@@ -28,7 +28,7 @@ if various_times:
     fig.canvas.draw(); fig.show()
     fig2.canvas.draw(); fig2.show()
 
-single_based_on_time = False
+single_based_on_time = True
 
 if single_based_on_time:
     base_dir = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan/efit/'
@@ -59,7 +59,7 @@ if single_based_on_time:
     fig2.savefig('profiles.eps')
     fig2.canvas.draw(); fig2.show()
 
-single_based_on_dir = True
+single_based_on_dir = False
 if single_based_on_dir:
     base_dirs = ['/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/qmult1.000/exp1.000/RES48.3293_ROTE0.0113/RUN_rfa_upper.p/',
                  '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/qmult1.000/exp1.000/RES100.0000_ROTE0.0113/RUN_rfa_upper.p/']

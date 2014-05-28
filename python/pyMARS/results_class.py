@@ -350,6 +350,10 @@ class data():
         #print '--- in pest calc eqac',  os.getpid(), os.getcwd(), np.sum(np.abs((BnEQAC)))
         import scipy.interpolate as interp
         BnPEST  = interp.griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
+        print '***', np.sum(np.isnan(BnPEST)), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(BnEQAC.flatten())), np.sum(np.isnan(R_Z_PEST)), BnEQAC.shape
+        BnPEST[np.isnan(BnPEST)] = 0
+        print '*** remove NaNs', np.sum(np.isnan(BnPEST)), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(BnEQAC.flatten())), np.sum(np.isnan(R_Z_PEST)), BnEQAC.shape
+
         #print '--- in pest calc nan', os.getpid(), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(R_Z_PEST))
         #print '--- in pest calc eqac*',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST))), np.sum(np.isnan((BnPEST))), np.sum(np.isnan((BnPEST))) >0
 
@@ -359,6 +363,7 @@ class data():
         #np.savetxt('{}_RZEQAC_{}'.format(os.getpid(), if_pass), R_Z_EQAC)
         BnPEST.resize(BnEQAC.shape)
         BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST
+        print '***', np.sum(np.isnan(BnPEST))
         #print '--- in pest calc eqac**',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST)))
 
 
@@ -366,9 +371,27 @@ class data():
         mk.resize(1,len(mk))
 
         #Fourier transform the data
-        expmchi = np.exp(np.dot(-self.chi.transpose(),mk)*1j)
-        BMnPEST = np.dot(BnPEST,expmchi)*(self.chi[0,1]-self.chi[0,0])/2./np.pi
-
+        for i in range(1000):
+            tmp1 = -self.chi.transpose()
+            tmp = np.dot(tmp1, mk)*1j
+            expmchi = np.exp(tmp)
+            tmp2 = (self.chi[0,1]-self.chi[0,0])/2./np.pi
+            real_pt = np.real(BnPEST)
+            imag_pt = np.imag(BnPEST)
+            real_pt[np.abs(real_pt)<1.e-9] = 0.
+            imag_pt[np.abs(imag_pt)<1.e-9] = 0.
+            BnPEST = real_pt + 1j*imag_pt
+            BMnPEST = np.dot(BnPEST,expmchi)*tmp2
+            n_nans = np.sum(np.isnan(BMnPEST))
+            if n_nans==0:
+                print 'number of attempts:',i
+                break
+            
+        if n_nans>0:
+            BMnPEST = np.dot(BnPEST,expmchi)*tmp2
+            print 'NANs still exist!'
+            print '*** BMnPEST', np.sum(np.isnan(BMnPEST)), np.sum(np.isnan(expmchi))
+            #1/0
         mm = np.arange(-29,29+1,dtype=int)
         mm2 = np.arange(-29,29+1,dtype=int)
 
@@ -379,11 +402,13 @@ class data():
         self.mk.resize(1,len(self.mk))
         print 'PEST, facn = %.2f'%(facn)
         BnPEST  = BMnPEST[:,II.flatten()]/facn
+        print '*** error finishes here I think...', np.sum(np.isnan(BnPEST))
 
         BnPEST[0,:] = BnPEST[1,:]
         BnPEST[-1,:] = BnPEST[-2,:]
         self.BnPEST = BnPEST
         #print '--- in pest calc',  os.getcwd(), os.getcwd(), np.sum(np.abs((self.Bn))), np.sum(np.abs((self.BnPEST)))
+        print '***', np.sum(np.isnan(self.BnPEST))
 
         new_area = []
         for i in range(0, self.R.shape[0]):

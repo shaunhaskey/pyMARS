@@ -486,7 +486,8 @@ def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN
         print '!!! before NW', os.getcwd()
         #Extract required values from CHEASE log file
         project_dict['sims'][i] = pyMARS_funcs.extract_NW(project_dict['sims'][i])
-        print '!!! after NW', os.getcwd()
+        project_dict['sims'][i] = pyMARS_funcs.extract_aspect(project_dict['sims'][i])
+        print '!!! after NW and aspect', os.getcwd()
 
         #Link required files
         if multiple_efits:
