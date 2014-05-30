@@ -290,7 +290,7 @@ def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
     BM1 = BM1[0:Ns,:]*BNORM
     BM2 = BM2[0:Ns,:]*BNORM
     BM3 = BM3[0:Ns,:]*BNORM
-
+    #print BM1[200,10], BM2[200,10], BM3[200,10], Ns, BM1.shape
     #NEED TO KNOW WHY THIS SECTION IS INCLUDED - to do with half grid???!!
     if spline_B23==2:
         print 'spine_B23 is 2'
@@ -313,6 +313,7 @@ def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
         BM3new[-1,:] = BM3new[-2,:]
         BM3 = copy.deepcopy(BM3new)
 
+    #print BM1[201,10], BM2[201,10], BM3[201,10], Ns, BM1.shape
     return BM1, BM2, BM3, Mm
 
 
