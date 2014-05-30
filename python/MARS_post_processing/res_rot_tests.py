@@ -31,6 +31,9 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kp
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res_post_processing_PEST.pickle'
 
+file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1_expt_res/shot_142614_rote_scan_100_kpar1_expt_res_post_processing_PEST.pickle'
+
+
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_25x20_kpar1_med_rote/shot_142614_rote_res_scan_25x20_kpar1_med_rote_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1/shot_142614_rote_scan_100_kpar1_post_processing_PEST.pickle'
@@ -129,6 +132,7 @@ if detailed_phasing:
     fig.savefig('res_kink_phasing_rote.eps')
     fig.canvas.draw(); fig.show()
 
+1/0
 phasings_disp = [0,45,90,135,180,225,270,315]
 phasings_disp = [0,90,180,270]
 if not ul: phasings_disp = [0]

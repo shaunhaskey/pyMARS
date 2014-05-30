@@ -377,10 +377,8 @@ class dBkink_calculations(generic_calculation):
         #get data for the reference harmonics
         if self.calc_ul:
             self.raw_data['reference'] = get_reference(self.raw_data['{}_kink_upper'.format(self.parent.reference_dB_kink)], self.raw_data['{}_kink_lower'.format(self.parent.reference_dB_kink)], np.linspace(0,2.*np.pi,100), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
-            print '!!!!!!!!!!!!!!!', len(self.raw_data['reference']), self.raw_data['reference'][0].shape
         else:
             self.raw_data['reference'] = get_reference(self.raw_data['{}_kink_'.format(self.parent.reference_dB_kink, '')], None, np.linspace(0,2.*np.pi,100), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor, ul = False)
-            print '!!!!!!!!!!!!!!!', len(self.raw_data['reference']), self.raw_data['reference'][0].shape
 
         #Find the actual harmonic value
         for field in ['total', 'vacuum', 'plasma']:
@@ -464,12 +462,20 @@ class post_processing_results():
         #MARS_settings
         if mars_params == None: mars_params = ['ROTE','ETA']
         for i in mars_params:self.raw_data[i] = data_from_dict('MARS_settings/<<{}>>'.format(i), self.project_dict)
-        
         try:
-            mars_params.index('ROTE')
-            self.raw_data['vtor0'] = np.array(self.raw_data['ROTE']) * np.array(self.raw_data['v0a']) / np.array(self.raw_data['R0EXP'])
-        except ValueError:
-            print 'ROTE not in the mars params'
+            self.raw_data[i] = data_from_dict('vtor0', self.project_dict)
+        except:
+            print 'vtor0 not available, trying to calculate it'
+            try:
+                mars_params.index('ROTE')
+                self.raw_data['vtor0'] = np.array(self.raw_data['ROTE']) * np.array(self.raw_data['v0a']) / np.array(self.raw_data['R0EXP'])
+            except ValueError:
+                print 'ROTE not in the mars params'
+        try:
+            self.raw_data[i] = data_from_dict('vtor95', self.project_dict)
+        except:
+            print 'vtor95 not available'
+            
 
 
 

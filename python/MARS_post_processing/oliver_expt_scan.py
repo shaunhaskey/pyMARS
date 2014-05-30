@@ -1,9 +1,7 @@
 import numpy as np
-import cPickle as pickle
 import matplotlib.pyplot as pt
 import pyMARS.dBres_dBkink_funcs as dBres_dBkink
 import pyMARS.generic_funcs as gen_func
-import copy
 
 def moving_average(a, n=3) :
     ret = np.cumsum(a, dtype=float)
@@ -48,10 +46,10 @@ reference_dB_kink = 'plas'
 reference_offset = [4,0]
 sort_name = 'time_list'
 
-fig, ax = pt.subplots(nrows = 6, ncols = 1, sharex = True)
+fig, ax = pt.subplots(nrows = 7, ncols = 1, sharex = True)
 ax = np.array(ax)[:,np.newaxis]
 
-I_coil_ax, x_point_ax, rote_ax, dBres_plas_ax, dBres_tot_ax, probe_plas_ax, dBkink_plas_ax, q95_ax, eta_ax = [None]*9
+I_coil_ax, x_point_ax, rote_ax, dBres_plas_ax, dBres_tot_ax, probe_plas_ax, dBkink_plas_ax, q95_ax, eta_ax, probe_phase_ax = [None]*10
 #I_coil_ax, rote_ax, x_point_ax, probe_plas_ax, dBres_plas_ax, dBres_tot_ax, dBkink_plas_ax = [None]*len(ax)
 #I_coil_ax, x_point_ax, rote_ax, dBres_plas_ax, dBres_tot_ax, probe_plas_ax, dBkink_plas_ax, q95_ax, eta_ax = ax
 #I_coil_ax, rote_ax, x_point_ax, probe_plas_ax, dBres_plas_ax, dBres_tot_ax, dBkink_plas_ax,eta_ax = ax
@@ -70,8 +68,9 @@ eta_vals = ['5e-7', '1e-7', '7e-8']
 eta_vals = ['1e-7']
 eta_vals = ['1e-8']
 
+vary_expt = True
 ideal = False
-spitz = True
+spitz = False
 #for V in V_runs:
 gen_func.setup_publication_image(fig, height_prop = 1.5, single_col = True)
 for eta in eta_vals:
@@ -82,19 +81,24 @@ for eta in eta_vals:
         else:
             V_dict = V_dict_non_const
         cur_ax = ax[:,index]
-        print cur_ax
         #I_coil_ax, rote_ax, x_point_ax, probe_plas_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
-        I_coil_ax, rote_ax, probe_plas_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
+        I_coil_ax, rote_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
         V = V_dict[eta]
         if const_rot:
-            if ideal:
+            if vary_expt:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
+            elif ideal:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal_post_processing_PEST.pickle'
             elif spitz:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
             else:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
         else:
-            if ideal:
+            if vary_expt:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_post_processing_PEST.pickle'
+                pass
+            elif ideal:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
             elif spitz:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
@@ -123,8 +127,13 @@ for eta in eta_vals:
         if x_point_ax!=None:
             xpoint.plot_single_phasing(phasing, 'shot_time', field = 'plasma',  ax = x_point_ax, plot_kwargs = plot_style, multiplier = multiplier)
             x_point_ax.set_ylabel('X-pt Disp (au)')
+            x_point_ax.set_ylim([0,x_point_ax.get_ylim()[1]*1.15])
         if rote_ax!=None and count == 0:
             a.plot_parameters('shot_time', 'vtor0', ax = rote_ax, plot_kwargs = {'marker':'x'})
+            try:
+                a.plot_parameters('shot_time', 'vtor95', ax = rote_ax, plot_kwargs = {'marker':'o'})
+            except:
+                print 'cant plot vtor95, not available'
             rote_ax.set_ylabel('TorRot(rad/s)')
         if dBres_plas_ax!=None:
             dBres.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = True, ax = dBres_plas_ax, multiplier = multiplier)
@@ -149,8 +158,29 @@ for eta in eta_vals:
                 probe_plas_ax.plot(tmp_time, tmp_probe_n1,'r-', rasterized = True, label='n=1')
                 probe_plas_ax.plot(tmp_time, tmp_probe,'k-', rasterized = True, label='n=3')
                 probe_plas_ax.legend(loc='upper left',fontsize=8)
-                tmp_probe[tmp_time>1860]+=2
+                #tmp_probe[tmp_time>1860]+=2
                 #probe_plas_ax.plot(tmp_time, tmp_probe,'b-', rasterized = True)
+            probe_plas_ax.set_ylim([0,probe_plas_ax.get_ylim()[1]*1.15])
+        if probe_phase_ax!=None:
+            probe.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = False, ax = probe_phase_ax, multiplier = multiplier*0+1)
+            probe_expt = np.loadtxt('142614mpp.003', skiprows = 2)
+            probe_expt_n1 = np.loadtxt('142614mpp.001', skiprows = 2)
+            min_max = [np.argmin(np.abs(probe_expt[:,0] - i)) for i in [1400,2200]]
+            probe_phase_ax.set_ylabel('Probe (rad)')
+            icoil_cur = 1 #kA
+            if count == 0: 
+                n = 20
+                #tmp_probe = moving_average(probe_expt[min_max[0]:min_max[1],1], n=n)
+                #tmp_probe_n1 = moving_average(probe_expt_n1[min_max[0]:min_max[1],1], n=n)
+                tmp_probe = np.deg2rad(probe_expt[min_max[0]:min_max[1],1])+(95-174)
+                tmp_probe_n1 = np.deg2rad(probe_expt_n1[min_max[0]:min_max[1],1])
+                tmp_time = probe_expt[min_max[0]:min_max[1],0]
+                probe_phase_ax.plot(tmp_time, tmp_probe_n1,'r-', rasterized = True, label='n=1')
+                probe_phase_ax.plot(tmp_time, tmp_probe,'k-', rasterized = True, label='n=3')
+                probe_phase_ax.legend(loc='upper left',fontsize=8)
+                #tmp_probe[tmp_time>1860]+=2
+                #probe_plas_ax.plot(tmp_time, tmp_probe,'b-', rasterized = True)
+            probe_phase_ax.set_ylim([-np.pi, np.pi])
         if dBkink_plas_ax!=None:
             dBkink.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = True, ax = dBkink_plas_ax, multiplier = multiplier)
             dBkink_plas_ax.set_ylabel(r'$\delta B_{\mathrm{RFA}}$ (G)')
@@ -174,13 +204,15 @@ for eta in eta_vals:
         for i in cur_ax: i.grid(True)
         count+=1
 for i in ax.flatten():gen_func.setup_axis_publication(i, n_yticks = 4)
+for lab,i in enumerate(ax.flatten()):
+    min, max = i.get_ylim()
+    i.text(2000, min + 0.8*(max-min), '({})'.format(chr(lab + ord('a'))))
 for i in ax[-1,:]: i.set_xlabel('Time (ms)')
 ax[-1,-1].set_xlim([1450,2200])
 gen_func.setup_axis_publication(ax[-1,0], n_xticks = 5)
 fig.tight_layout(pad = 0.1)
 for end in ['svg','eps','pdf']:fig.savefig('comparison_oliver_data_allV{}.{}'.format(const_rot,end))
 fig.canvas.draw(); fig.show()
-
 
 #for V in V_runs:
 for eta in eta_vals:
@@ -211,7 +243,6 @@ for eta in eta_vals:
         dBkink = dBres_dBkink.dBkink_calculations(a)
         probe = dBres_dBkink.magnetic_probe(a,' 66M')
         xpoint = dBres_dBkink.x_point_displacement_calcs(a, phasing)
-
         tmp_a = np.array(dBres.single_phasing_individual_harms(phasing,field='plasma'))
         tmp_b = np.array(dBres.single_phasing_individual_harms(phasing,field='total'))
         tmp_c = np.array(dBres.single_phasing_individual_harms(phasing,field='vacuum'))
@@ -226,20 +257,12 @@ for eta in eta_vals:
         for i in range(0,tmp_a.shape[0]):
             clr = (a.raw_data['shot_time'][i] - min_shot_time)/float(range_shot_time)
             clr = clr*0.9
-            print clr, a.raw_data['shot_time'][i]
             if int(a.raw_data['shot_time'][i])>=min_time and int(a.raw_data['shot_time'][i])<=max_time:
-                #ax_harms[0].plot(x_axis, np.abs(tmp_a[i,:]), color=str(clr), marker = 'o')
-                #ax_harms[1].plot(x_axis, np.angle(tmp_a[i,:]), color=str(clr), marker = 'o')
-                #ax_harms[0].text(tmp_a.shape[1]-1, np.abs(tmp_a[i,-1]), str(a.raw_data['shot_time'][i])+'plasma')
                 cur_ax.plot(x_axis, np.abs(tmp_b[i,:]), color=str(clr), marker = 'x')
-                #ax_harms[1].plot(x_axis, np.angle(tmp_b[i,:]), color=str(clr), marker = 'x')
-                #ax_harms[0].text(tmp_a.shape[1]-1, np.abs(tmp_b[i,-1]), str(a.raw_data['shot_time'][i])+ 'total')
                 if initial==0:
                     cur_ax.plot(x_axis, np.abs(tmp_c[i,:]), color='b', marker = '.')
-                    #ax_harms[1].plot(x_axis, np.angle(tmp_c[i,:]), color='b', marker = '.')
-                    #ax_harms[0].text(tmp_a.shape[1]-1, np.abs(tmp_b[i,-1]), str(a.raw_data['shot_time'][i]))
                 initial += 1
-    #ax_harms[0].set_title('{}-{}ms $\eta=${}'.format(min_time, max_time, eta))
+    #ax_harms[0].set_title('{}-{}ms $\eta=${n}'.format(min_time, max_time, eta))
     ax_harms[-1].set_xlabel('m')
     for i in ax_harms: i.set_ylabel('Resonant harm amp (G/kA)')
     #ax_harms[1].set_ylabel('Resonant harm phase (rad)')

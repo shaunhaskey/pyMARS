@@ -521,7 +521,10 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 #         os.chdir(master['dir_dict']['mars_upper_vacuum_dir'])
 
     ne0 = np.loadtxt(file_loc_dir + '/PROFDEN',skiprows = 1)[0,1]
-    vtor0 = np.loadtxt(file_loc_dir + '/PROFROT',skiprows = 1)[0,1]
+    profrot = np.loadtxt(file_loc_dir + '/PROFROT',skiprows = 1)
+    vtor0 = profrot[0,1]
+    vtor95 = profrot[np.argmin(np.abs(profrot[:,0] - 0.95)),1]
+    #vtor0 = np.loadtxt(file_loc_dir + '/PROFROT',skiprows = 1)[0,1]
     
 
     #Make sure we are in rad/s
@@ -627,7 +630,8 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
     master['ROTE'] = vtorn
     master['ne0'] = ne0
     master['taua'] = taua
-
+    master['vtor95'] = vtor95
+    master['vtor0'] = vtor0
     if te_success: master['ETA'] = eta
     master['OMEGA_NORM'] = omega[0]
     master['TAUWM'] = tauwm

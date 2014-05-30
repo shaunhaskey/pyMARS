@@ -30,6 +30,8 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_30x30_kp
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote/shot_142614_rote_res_scan_20x20_kpar1_med_rote_post_processing_PEST.pickle'
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1/shot_142614_rote_scan_100_kpar1_post_processing_PEST.pickle'
+file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1_expt_res/shot_142614_rote_scan_100_kpar1_expt_res_post_processing_PEST.pickle'
+
 
 phasing = 0
 n = 3
@@ -74,8 +76,10 @@ fig, ax = pt.subplots(nrows = 3)#, sharex = True)
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*2.25, single_col = True)
 for i in ax: gen_funcs.setup_axis_publication(i, n_xticks = 5, n_yticks = 5)
 clim_kink = [0,0.5]
+clim_kink = [0,0.4]
 #clim_kink = [0,2.5]
 clim_res = [0,2.0]
+clim_res = [0,0.8]
 kink_field = 'plasma'
 #kink_field = 'total'
 res_field = 'total'
