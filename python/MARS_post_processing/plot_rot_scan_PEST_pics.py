@@ -54,6 +54,21 @@ vals_to_plot = [[0.10000000000000001, 2.3357214690901212e-08],[0.01, 2.335721469
 
 vals_to_plot = [[0.10000000000000001, 5.e-08],[0.01, 5.e-08],[0.002, 5.e-08]]
 
+valid_keys, actual_values = a.find_relevant_keys(['ROTE','ETA'], [vals_to_plot[2]])
+combined, results_dict = a.combine_PEST_Vn(valid_keys[0], 0, 'plasma', get_disp = True, return_all_three = True)
+grid_r = combined.R*combined.R0EXP
+grid_z = combined.Z*combined.R0EXP
+plas_r = grid_r[0:combined.Vn.shape[0],:]
+plas_z = grid_z[0:combined.Vn.shape[0],:]
+#ax.plot(plas_r[i,:],plas_z[i,:],'-')
+disp_quant = combined.Vn[-1,:]
+fig,ax = pt.subplots()
+ax.plot(np.abs(disp_quant))
+fig.canvas.draw(); fig.show()
+r_vals = plas_r[-1,:]
+z_vals = plas_z[-1,:]
+dl = np.sqrt(np.diff(z_vals)**2 + np.diff(r_vals)**2)
+
 a.plot_PEST_scan(['ROTE', 'ETA'], vals_to_plot, savefig_fname = '/u/haskeysr/rote_scan_harms_disp', clim = [0,1.35], inc_Bn=False)
 
 1/0

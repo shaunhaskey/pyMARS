@@ -14,6 +14,7 @@ def combine_fields_displacement(input_data, attr_name, theta = 0, field_type='pl
     '''Used for combining the displacement fields
     Should replace with a single phasing function to reduce duplication!
 
+    input_data = [total_lower, vacuum_lower, total_upper, vacuum_upper]
     SRH: 31Jan2014
     '''
     print 'combining property : ', attr_name
@@ -48,7 +49,7 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
     phasing_vals is the list of phasings the calculations are performed for
     ul - not really implemented yet, but says if its upper lower data
     SRH : 31Jan2014
-    SRH : 28May2014: changed the integral to an 'average value'
+    SRH : 28May2014: changed the integral to an average value
     '''
     plot_field = 'Vn'; field_type = 'total'
     #run_data = extract_data(base_dir, I0EXP, ul=ul, Nchi=Nchi, get_VPLASMA=1, plas_vac = False)

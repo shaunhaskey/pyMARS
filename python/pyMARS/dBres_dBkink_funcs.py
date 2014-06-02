@@ -160,7 +160,7 @@ class generic_calculation():
         if yaxis_log: ax.set_yscale('log')
 
 
-    def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None):
+    def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None, multiplier = 1):
         '''Plot  a calculation versus a particular attribute
 
         SRH : 12Mar2014
@@ -189,7 +189,7 @@ class generic_calculation():
             col = xvals_set.index(x)
             output_matrix[row, col] = +current_data[list_index]
         x_mesh, y_mesh = np.meshgrid(xvals_set, yvals_set)
-        tmp = scipy_filt.median_filter(comp_func(output_matrix) + offset, med_filt_value)
+        tmp = scipy_filt.median_filter(comp_func(output_matrix) + offset, med_filt_value) * multiplier
         if comp_func == np.angle:tmp = (tmp + np.pi)%(2.*np.pi) - np.pi
         not_nan = np.isfinite(tmp)
         color_ax = ax.pcolormesh(x_mesh, y_mesh, tmp, cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
@@ -411,7 +411,7 @@ class x_point_displacement_calcs(generic_calculation):
                 ang_key = j.replace('disp','ang')
                 self.output_data[ang_key].append(self.parent.project_dict['sims'][i]['displacement_responses'][phasing][ang_key])
         disp_x_point = self.disp_bounds(upper_values, lower_values, self.output_data, LFS = True, HFS = True, lower_bound = None, upper_bound = None)
-        self.raw_data['plasma_{}_'.format(self.calc_type)] = disp_x_point
+        self.raw_data['plasma_{}_'.format(self.calc_type)] = copy.deepcopy(disp_x_point)
 
     def disp_bounds(self, upper_values, lower_values, output_data, LFS = False, HFS = False, lower_bound = None, upper_bound = None):
         if upper_bound == None: upper_bound = 0.6*np.min(lower_values)
@@ -421,11 +421,17 @@ class x_point_displacement_calcs(generic_calculation):
         truth_upper = (upper_values>=lower_bound)*(upper_values<=upper_bound)
         truth_lower = (lower_values>=lower_bound)*(lower_values<=upper_bound)
         answer_list = []
-        for i in self.parent.project_dict['sims'].keys():
+        for ind, tmp_key in enumerate(self.parent.project_dict['sims'].keys()):
             tmp = 0
-            if HFS==True:tmp+=np.sum(np.array(output_data['disp_above_HFS'][i-1])[truth_upper]) + np.sum(np.array(output_data['disp_below_HFS'])[i-1][truth_upper])
-            if LFS==True:tmp+=np.sum(np.array(output_data['disp_above_LFS'][i-1])[truth_lower]) + np.sum(np.array(output_data['disp_below_LFS'])[i-1][truth_lower])
-            answer_list.append(tmp)
+            #SRH : 2June2014
+            #The use of use of the upper lower truth seemed to be incorrect
+            #if HFS==True:tmp+=np.sum(np.array(output_data['disp_above_HFS'][ind])[truth_upper]) + np.sum(np.array(output_data['disp_below_HFS'])[ind][truth_upper])
+            #if LFS==True:tmp+=np.sum(np.array(output_data['disp_above_LFS'][ind])[truth_lower]) + np.sum(np.array(output_data['disp_below_LFS'])[ind][truth_lower])
+            if HFS==True:tmp+=np.sum(np.array(output_data['disp_above_HFS'][ind])[truth_upper]) + np.sum(np.array(output_data['disp_below_HFS'])[ind][truth_lower])
+            if LFS==True:tmp+=np.sum(np.array(output_data['disp_above_LFS'][ind])[truth_upper]) + np.sum(np.array(output_data['disp_below_LFS'])[ind][truth_lower])
+            #answer_list.append(tmp)
+            #Denominator is because of the new average measure, the 2* is because of HFS and LFS
+            answer_list.append(tmp/(2.*np.sum(truth_upper)+2.*np.sum(truth_lower)))
         return answer_list
 
 
@@ -459,7 +465,7 @@ class post_processing_results():
         self.calc_ul = ul
         self.reference_dB_kink = reference_dB_kink
         self.reference_offset = [2,0] if reference_offset == None else reference_offset
-        plasma_params = ['Q95','shot_time','BETAN', 'LI', 'R0EXP', 'B0EXP','v0a']
+        plasma_params = ['Q95','QMAX','shot_time','BETAN', 'LI', 'R0EXP', 'B0EXP','v0a']
         self.raw_data = {}
         for i in plasma_params:self.raw_data[i] = data_from_dict(i, self.project_dict)
         self.raw_data['BNLI']=np.array(self.raw_data['BETAN'])/np.array(self.raw_data['LI'])
