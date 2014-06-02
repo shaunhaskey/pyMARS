@@ -56,6 +56,7 @@ if single_based_on_time:
                     if i.find('ETA')>=0: 
                         ETA = float(i.split('=')[1].rstrip('\n').rstrip(','))
                         ETA = 7.e-8
+                        ETA = 1.3e-8
                         print ETA
                 d = c[:,1]**(-3./2)
                 d = d/d[0]*ETA

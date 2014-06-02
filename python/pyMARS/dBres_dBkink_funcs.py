@@ -172,6 +172,9 @@ class generic_calculation():
         if plot_kwargs == None: plot_kwargs = {}
         if contour_kwargs == None: contour_kwargs = {}
         comp_func = np.abs if amplitude else np.angle
+        
+        offset = 0 if amplitude else -np.deg2rad(phasing)/2
+        print 'offset : ', offset
         xvals = self.parent.raw_data[xaxis]
         yvals = self.parent.raw_data[yaxis]
         print 'min_max', np.min(xvals), np.max(xvals)
@@ -186,7 +189,8 @@ class generic_calculation():
             col = xvals_set.index(x)
             output_matrix[row, col] = +current_data[list_index]
         x_mesh, y_mesh = np.meshgrid(xvals_set, yvals_set)
-        tmp = scipy_filt.median_filter(comp_func(output_matrix), med_filt_value)
+        tmp = scipy_filt.median_filter(comp_func(output_matrix) + offset, med_filt_value)
+        if comp_func == np.angle:tmp = (tmp + np.pi)%(2.*np.pi) - np.pi
         not_nan = np.isfinite(tmp)
         color_ax = ax.pcolormesh(x_mesh, y_mesh, tmp, cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
         if n_contours != 0: color_ax2 = ax.contour(x_mesh, y_mesh, tmp, np.linspace(clim[0],clim[1], n_contours), **contour_kwargs)
@@ -463,7 +467,7 @@ class post_processing_results():
         if mars_params == None: mars_params = ['ROTE','ETA']
         for i in mars_params:self.raw_data[i] = data_from_dict('MARS_settings/<<{}>>'.format(i), self.project_dict)
         try:
-            self.raw_data[i] = data_from_dict('vtor0', self.project_dict)
+            self.raw_data['vtor0'] = copy.deepcopy(data_from_dict('vtor0', self.project_dict))
         except:
             print 'vtor0 not available, trying to calculate it'
             try:
@@ -472,7 +476,7 @@ class post_processing_results():
             except ValueError:
                 print 'ROTE not in the mars params'
         try:
-            self.raw_data[i] = data_from_dict('vtor95', self.project_dict)
+            self.raw_data['vtor95'] = copy.deepcopy(data_from_dict('vtor95', self.project_dict))
         except:
             print 'vtor95 not available'
             

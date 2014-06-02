@@ -8,6 +8,7 @@ def moving_average(a, n=3) :
     ret[n:] = ret[n:] - ret[:-n]
     return ret[n - 1:] / n
 
+
 file_name = '/home/srh112/NAMP_datafiles/mars/single_run_through_test_142614_V2/single_run_through_test_142614_V2_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan/shot_142614_rote_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_w_damp/shot_142614_rote_scan_w_damp_post_processing_PEST.pickle'
@@ -46,10 +47,10 @@ reference_dB_kink = 'plas'
 reference_offset = [4,0]
 sort_name = 'time_list'
 
-fig, ax = pt.subplots(nrows = 7, ncols = 1, sharex = True)
+fig, ax = pt.subplots(nrows = 8, ncols = 1, sharex = True)
 ax = np.array(ax)[:,np.newaxis]
 
-I_coil_ax, x_point_ax, rote_ax, dBres_plas_ax, dBres_tot_ax, probe_plas_ax, dBkink_plas_ax, q95_ax, eta_ax, probe_phase_ax = [None]*10
+I_coil_ax, x_point_ax, rote_ax, dBres_plas_ax, dBres_tot_ax, probe_plas_ax, dBkink_plas_ax, q95_ax, eta_ax, probe_phase_ax, edge_rot_ax = [None]*11
 #I_coil_ax, rote_ax, x_point_ax, probe_plas_ax, dBres_plas_ax, dBres_tot_ax, dBkink_plas_ax = [None]*len(ax)
 #I_coil_ax, x_point_ax, rote_ax, dBres_plas_ax, dBres_tot_ax, probe_plas_ax, dBkink_plas_ax, q95_ax, eta_ax = ax
 #I_coil_ax, rote_ax, x_point_ax, probe_plas_ax, dBres_plas_ax, dBres_tot_ax, dBkink_plas_ax,eta_ax = ax
@@ -67,12 +68,12 @@ eta_vals = ['1e-6', '5e-7', '1e-7', '7e-8', '3e-8', '1e-8']
 eta_vals = ['5e-7', '1e-7', '7e-8']
 eta_vals = ['1e-7']
 eta_vals = ['1e-8']
-
+vary_pvisc = False
 vary_expt = True
 ideal = False
 spitz = False
 #for V in V_runs:
-gen_func.setup_publication_image(fig, height_prop = 1.5, single_col = True)
+gen_func.setup_publication_image(fig, height_prop = 1.5*ax.shape[0]/6., single_col = True)
 for eta in eta_vals:
     #gen_func.setup_publication_image(fig, height_prop = 1./1.618*, single_col = False)
     for const_rot, index, plot_style in zip([False, True], [0,0],[{'marker':'x'}, {'marker':'o'}]):
@@ -82,10 +83,13 @@ for eta in eta_vals:
             V_dict = V_dict_non_const
         cur_ax = ax[:,index]
         #I_coil_ax, rote_ax, x_point_ax, probe_plas_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
-        I_coil_ax, rote_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
+        #I_coil_ax, rote_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
+        I_coil_ax, rote_ax, edge_rot_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
         V = V_dict[eta]
         if const_rot:
-            if vary_expt:
+            if vary_pvisc:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0_post_processing_PEST.pickle'
+            elif vary_expt:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
             elif ideal:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
@@ -95,7 +99,9 @@ for eta in eta_vals:
             else:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
         else:
-            if vary_expt:
+            if vary_pvisc:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0-5/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0-5_post_processing_PEST.pickle'
+            elif vary_expt:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_post_processing_PEST.pickle'
                 pass
             elif ideal:
@@ -126,15 +132,25 @@ for eta in eta_vals:
             multiplier = np.abs(np.interp(np.sort(a.raw_data['shot_time']), icoil[:,0], icoil[:,1])/1000)
         if x_point_ax!=None:
             xpoint.plot_single_phasing(phasing, 'shot_time', field = 'plasma',  ax = x_point_ax, plot_kwargs = plot_style, multiplier = multiplier)
-            x_point_ax.set_ylabel('X-pt Disp (au)')
+            x_point_ax.set_ylabel('Disp (m)')
             x_point_ax.set_ylim([0,x_point_ax.get_ylim()[1]*1.15])
         if rote_ax!=None and count == 0:
-            a.plot_parameters('shot_time', 'vtor0', ax = rote_ax, plot_kwargs = {'marker':'x'})
+            a.plot_parameters('shot_time', 'vtor0', ax = rote_ax, plot_kwargs = {'marker':'x', 'label':'Core Rot'})
+            # try:
+            #     a.plot_parameters('shot_time', 'vtor95', ax = rote_ax, plot_kwargs = {'marker':'o'})
+            # except:
+            #     print 'cant plot vtor95, not available'
+            rote_ax.set_ylabel('(rad/s)')
+            rote_ax.legend(loc='lower left',fontsize=8)
+            rote_ax.set_ylim([0,rote_ax.get_ylim()[1]])
+        if edge_rot_ax!=None and count == 0:
             try:
-                a.plot_parameters('shot_time', 'vtor95', ax = rote_ax, plot_kwargs = {'marker':'o'})
+                a.plot_parameters('shot_time', 'vtor95', ax = edge_rot_ax, plot_kwargs = {'marker':'x', 'label':'Edge Rot'})
             except:
                 print 'cant plot vtor95, not available'
-            rote_ax.set_ylabel('TorRot(rad/s)')
+            edge_rot_ax.set_ylabel('(rad/s)')
+            edge_rot_ax.set_ylim([0,edge_rot_ax.get_ylim()[1]])
+            edge_rot_ax.legend(loc='lower left',fontsize=8)
         if dBres_plas_ax!=None:
             dBres.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = True, ax = dBres_plas_ax, multiplier = multiplier)
             dBres_plas_ax.set_ylabel(r'$\delta B_{res}^{plas}$ (G)')
@@ -151,10 +167,10 @@ for eta in eta_vals:
             probe_plas_ax.set_ylabel('Probe (G)')
             icoil_cur = 1 #kA
             if count == 0: 
-                n = 20
-                tmp_probe = moving_average(probe_expt[min_max[0]:min_max[1],1]/icoil_cur, n=n)
-                tmp_probe_n1 = moving_average(probe_expt_n1[min_max[0]:min_max[1],1]/icoil_cur, n=n)
-                tmp_time = moving_average(probe_expt[min_max[0]:min_max[1],0],n=n)
+                n_pts = 20
+                tmp_probe = moving_average(probe_expt[min_max[0]:min_max[1],1]/icoil_cur, n=n_pts)
+                tmp_probe_n1 = moving_average(probe_expt_n1[min_max[0]:min_max[1],1]/icoil_cur, n=n_pts)
+                tmp_time = moving_average(probe_expt[min_max[0]:min_max[1],0],n=n_pts)
                 probe_plas_ax.plot(tmp_time, tmp_probe_n1,'r-', rasterized = True, label='n=1')
                 probe_plas_ax.plot(tmp_time, tmp_probe,'k-', rasterized = True, label='n=3')
                 probe_plas_ax.legend(loc='upper left',fontsize=8)
@@ -165,19 +181,22 @@ for eta in eta_vals:
             probe.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = False, ax = probe_phase_ax, multiplier = multiplier*0+1)
             probe_expt = np.loadtxt('142614mpp.003', skiprows = 2)
             probe_expt_n1 = np.loadtxt('142614mpp.001', skiprows = 2)
-            min_max = [np.argmin(np.abs(probe_expt[:,0] - i)) for i in [1400,2200]]
+            min_max = [np.argmin(np.abs(probe_expt[:,0] - i)) for i in [1605,2200]]
             probe_phase_ax.set_ylabel('Probe (rad)')
             icoil_cur = 1 #kA
             if count == 0: 
-                n = 20
-                #tmp_probe = moving_average(probe_expt[min_max[0]:min_max[1],1], n=n)
-                #tmp_probe_n1 = moving_average(probe_expt_n1[min_max[0]:min_max[1],1], n=n)
-                tmp_probe = np.deg2rad(probe_expt[min_max[0]:min_max[1],1])+(95-174)
-                tmp_probe_n1 = np.deg2rad(probe_expt_n1[min_max[0]:min_max[1],1])
+                n_pts = 20
+                #tmp_probe = moving_average(probe_expt[min_max[0]:min_max[1],1], n=n_pts)
+                #tmp_probe_n1 = moving_average2(probe_expt_n1[min_max[0]:min_max[1],1], n=n_pts)
+                tmp_probe = np.deg2rad(probe_expt[min_max[0]:min_max[1],1]+(95-174))
+                tmp_probe = (tmp_probe-1.49+np.pi)%(2.*np.pi) + 1.49-np.pi
+                #tmp_probe = np.angle(moving_average(np.cos(tmp_probe) + 1j* np.sin(tmp_probe), n=n_pts))
+                #tmp_time = moving_average(probe_expt[min_max[0]:min_max[1],0],n=n_pts)
+                #tmp_probe_n1 = np.deg2rad(probe_expt_n1[min_max[0]:min_max[1],1])
                 tmp_time = probe_expt[min_max[0]:min_max[1],0]
-                probe_phase_ax.plot(tmp_time, tmp_probe_n1,'r-', rasterized = True, label='n=1')
+                #probe_phase_ax.plot(tmp_time, tmp_probe_n1,'r-', rasterized = True, label='n=1')
                 probe_phase_ax.plot(tmp_time, tmp_probe,'k-', rasterized = True, label='n=3')
-                probe_phase_ax.legend(loc='upper left',fontsize=8)
+                probe_phase_ax.legend(loc='best',fontsize=8)
                 #tmp_probe[tmp_time>1860]+=2
                 #probe_plas_ax.plot(tmp_time, tmp_probe,'b-', rasterized = True)
             probe_phase_ax.set_ylim([-np.pi, np.pi])
@@ -228,11 +247,15 @@ for eta in eta_vals:
         if const_rot:
             if not ideal:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
+            elif spitz:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
             else:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
         else:
             if not ideal:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
+            elif spitz:
+                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
             else:
                 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_V{}/shot_142614_expt_scan_NC_V{}_post_processing_PEST.pickle'.format(V,V)
@@ -268,7 +291,7 @@ for eta in eta_vals:
     #ax_harms[1].set_ylabel('Resonant harm phase (rad)')
     for i in ax_harms:i.grid(True)
     fig_harms.tight_layout(pad = 0.1)
-    for end in ['svg','eps','pdf']:fig_harms.savefig('harms_{}_{}.{}'.format(eta, const_rot,end))
+    for end in ['svg','eps','pdf']:fig_harms.savefig('harms_{}_{}.{}'.format(eta, const_rot, end))
     fig_harms.canvas.draw(); fig_harms.show()
 
 1/0

@@ -31,7 +31,6 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kp
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res_post_processing_PEST.pickle'
 
-file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1_expt_res/shot_142614_rote_scan_100_kpar1_expt_res_post_processing_PEST.pickle'
 
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_25x20_kpar1_med_rote/shot_142614_rote_res_scan_25x20_kpar1_med_rote_post_processing_PEST.pickle'
@@ -71,6 +70,7 @@ res_pts = None
 time_pts = None
 
 expt_file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V3/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V3_post_processing_PEST.pickle'
+expt_file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
 expt = dBres_dBkink.post_processing_results(expt_file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False, ul = ul, mars_params = mars_params)
 time_pts = expt.raw_data['shot_time']
 eta_pts = expt.raw_data['ETA']
@@ -79,6 +79,8 @@ vtor0_pts = expt.raw_data['vtor0']
 
 
 vals_to_plot = [[0.10000000000000001, 2.3357214690901212e-07],[0.0088586679041008226, 2.3357214690901212e-07],[0.0020691380811147901, 2.3357214690901212e-07]]
+
+vals_to_plot = [[0.10000000000000001, 5.5e-08],[0.0088586679041008226, 5.5e-08],[0.0020691380811147901, 5.5e-08]]
 
 #vals_to_plot = [[0.085, 2.3357214690901212e-07],[0.0088586679041008226, 2.3357214690901212e-07],[0.0013, 2.3357214690901212e-07]]
 
@@ -132,7 +134,7 @@ if detailed_phasing:
     fig.savefig('res_kink_phasing_rote.eps')
     fig.canvas.draw(); fig.show()
 
-1/0
+
 phasings_disp = [0,45,90,135,180,225,270,315]
 phasings_disp = [0,90,180,270]
 if not ul: phasings_disp = [0]
@@ -155,9 +157,9 @@ else:
 #x_axis_label = '$\omega$ (rad/s)'
 x_axis_label = '$\omega$ (rad/s)' if x_axis == 'vtor0' else '$\omega_0$'
 y_axis_label = '$\eta_0$'
-fields = ['total','plasma','plasma']
+fields = ['total','plasma','plasma', 'plasma']
 ylim = [1.e-8,1.e-6]
-#ylim = [5.e-9,5.e-7]
+ylim = [5.e-9,5.e-7]
 xlim = [1.e-6,1.e-2]
 xlim = None
 xlim = [1.e2,3.e5]
@@ -167,15 +169,19 @@ vlines = None
 #vlines = [60000,15000]
 hlines = None
 #hlines = [3.5e-7,1.75e-8]
-labels = ['$\delta B_{res}^{tot}$ (G/kA)', '$\delta B_{RFA}$ (G/kA)', 'Midplanae outboard poloidal probe (G/kA)']
-fnames = ['dBres','dBkink','probe']
+labels = ['$\delta B_{res}^{tot}$ (G/kA)', '$\delta B_{RFA}$ (G/kA)', 'Midplane outboard poloidal probe (G/kA)', 'Midplane outboard poloidal probe (rad)']
+fnames = ['dBres','dBkink','probe','probe_phase']
 clims = [[0,2.5],[0,2],[0,1.5]]
 clims = [[0,5],[0,5],[0,15]]
 clims = [[0,1.5],[0,0.8],[0,1.05]]
-clims = [[0,1.5],[0,0.4],[0,1.05]]
+clims = [[0,1.5],[0,0.4],[0,1.05],[-np.pi,np.pi]]
 #clims = [[0,1.25],[0,0.3],[0,1.05]]
 #clims = [[-np.pi, np.pi],[-np.pi,np.pi],[-np.pi,np.pi]]
-for calc_type, cur_clim, title, fname, field in zip([dBres, dBkink, probe], clims, labels, fnames, fields):
+data =  [dBres, dBkink, probe, probe]
+cmaps =  ['jet', 'jet', 'jet', 'RdBu']
+funcs = [np.abs, np.abs, np.abs, np.angle]
+amplitudes = [True, True, True, False]
+for calc_type, cur_clim, title, fname, field, cmap, amp in zip(data, clims, labels, fnames, fields, cmaps, amplitudes):
     replacement_kwargs = {'xtick.labelsize': 7.0,'ytick.labelsize': 7.0}
     if len(phasings_disp)==8:
         fig, ax = pt.subplots(nrows = 2, ncols = 4, sharex = True, sharey = True)
@@ -185,7 +191,7 @@ for calc_type, cur_clim, title, fname, field in zip([dBres, dBkink, probe], clim
         gen_funcs.setup_publication_image(fig, height_prop = 1./1.1, single_col = True, replacement_kwargs = replacement_kwargs)
     #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
     for i, cur_ax in zip(phasings_disp, ax.flatten()):
-        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = 'jet', field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 1, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5}, amplitude = True)
+        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = cmap, field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 1, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5}, amplitude = amp)
         cur_ax.set_title('$\Delta \phi = {}^o$'.format(i))
         if vlines!=None: 
             for vert_line in vlines: cur_ax.axvline(x=vert_line, color='k')
@@ -232,7 +238,7 @@ else:
 
 #x_axis_label = '$\omega_{0}$'
 #y_axis_label = '$\eta_0$'
-label = ' displacement at the x-point (a.u)'
+label = ' displacement at the x-point (m/kA)'
 title = 'displacement'
 field = 'plasma'
 #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
