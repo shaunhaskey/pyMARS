@@ -31,8 +31,6 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kp
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res_post_processing_PEST.pickle'
 
-
-
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_25x20_kpar1_med_rote/shot_142614_rote_res_scan_25x20_kpar1_med_rote_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1/shot_142614_rote_scan_100_kpar1_post_processing_PEST.pickle'
@@ -191,7 +189,7 @@ for calc_type, cur_clim, title, fname, field, cmap, amp in zip(data, clims, labe
         gen_funcs.setup_publication_image(fig, height_prop = 1./1.1, single_col = True, replacement_kwargs = replacement_kwargs)
     #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
     for i, cur_ax in zip(phasings_disp, ax.flatten()):
-        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = cmap, field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 1, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5}, amplitude = amp)
+        cax = calc_type.plot_2D(i,x_axis,y_axis,cmap_res = cmap, field = field, clim = cur_clim, ax = cur_ax, med_filt_value = 1, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5}, amplitude = amp,)
         cur_ax.set_title('$\Delta \phi = {}^o$'.format(i))
         if vlines!=None: 
             for vert_line in vlines: cur_ax.axvline(x=vert_line, color='k')
@@ -238,7 +236,7 @@ else:
 
 #x_axis_label = '$\omega_{0}$'
 #y_axis_label = '$\eta_0$'
-label = ' displacement at the x-point (m/kA)'
+label = ' displacement at the x-point (mm/kA)'
 title = 'displacement'
 field = 'plasma'
 #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618, single_col = False)
@@ -251,11 +249,12 @@ field = 'plasma'
 # hlines = None
 # hlines = [3.5e-7,1.75e-8]
 clim = [0,0.035]
-clim = [0,0.02]
+clim = [0,2.25]
 #gen_funcs.setup_publication_image(fig, height_prop = 1./2.0, single_col = False)
 for i, cur_ax in zip(phasings_disp, ax.flatten()):
     xpoint = dBres_dBkink.x_point_displacement_calcs(a, i)
-    cax = xpoint.plot_2D(i,x_axis,y_axis,cmap_res = 'jet', field = 'plasma', clim = clim, ax = cur_ax, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5})
+    #x1000 for mm
+    cax = xpoint.plot_2D(i,x_axis,y_axis,cmap_res = 'jet', field = 'plasma', clim = clim, ax = cur_ax, n_contours = 15, contour_kwargs = {'colors':'k', 'linewidths':0.5}, multiplier = 1000.)
     cur_ax.set_title('$\Delta \phi = {}^o$'.format(i))
     if vlines!=None: 
         for vert_line in vlines: cur_ax.axvline(x=vert_line, color='k')

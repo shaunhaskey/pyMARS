@@ -470,7 +470,7 @@ class post_processing_results():
         for i in plasma_params:self.raw_data[i] = data_from_dict(i, self.project_dict)
         self.raw_data['BNLI']=np.array(self.raw_data['BETAN'])/np.array(self.raw_data['LI'])
         #MARS_settings
-        if mars_params == None: mars_params = ['ROTE','ETA']
+        if mars_params == None: mars_params = ['ROTE','ETA',]
         for i in mars_params:self.raw_data[i] = data_from_dict('MARS_settings/<<{}>>'.format(i), self.project_dict)
         try:
             self.raw_data['vtor0'] = copy.deepcopy(data_from_dict('vtor0', self.project_dict))
@@ -485,10 +485,11 @@ class post_processing_results():
             self.raw_data['vtor95'] = copy.deepcopy(data_from_dict('vtor95', self.project_dict))
         except:
             print 'vtor95 not available'
-            
-
-
-
+        try:
+            self.raw_data['ETA_NORM'] = copy.deepcopy(data_from_dict('ETA_NORM', self.project_dict))
+            self.raw_data['RES'] = np.array(self.raw_data['ETA']) * np.array(self.raw_data['ETA_NORM'])
+        except:
+            print 'Problem un-normalising ETA, probably because ETA_NORM is not available'
 
     def plot_multiple_phasings(self, params, param_values, I = None, savefig_fname = None,clim = None, phasing = None, field = 'total'):
         '''
@@ -839,7 +840,7 @@ class post_processing_results():
 #         map(scan_pics_func.plot_scan, input_data)
 
 
-    def plot_parameters(self, xaxis, yaxis, ax = None, plot_kwargs = None):
+    def plot_parameters(self, xaxis, yaxis, ax = None, plot_kwargs = None, multiplier = 1):
         '''Plot  a calculation versus a particular attribute
 
         SRH : 12Mar2014
@@ -848,7 +849,7 @@ class post_processing_results():
         indices = return_sort_indices(self.raw_data[xaxis])
         no_ax = True if ax==None else False 
         if no_ax: fig,ax = pt.subplots()
-        ax.plot([self.raw_data[xaxis][i] for i in indices], [self.raw_data[yaxis][i] for i in indices], **plot_kwargs)
+        ax.plot([self.raw_data[xaxis][i] for i in indices], [self.raw_data[yaxis][i]*multiplier for i in indices], **plot_kwargs)
         if no_ax: fig.canvas.draw();fig.show()
 
 

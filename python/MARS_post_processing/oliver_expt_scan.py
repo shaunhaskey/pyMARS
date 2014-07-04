@@ -47,7 +47,7 @@ reference_dB_kink = 'plas'
 reference_offset = [4,0]
 sort_name = 'time_list'
 
-fig, ax = pt.subplots(nrows = 8, ncols = 1, sharex = True)
+fig, ax = pt.subplots(nrows = 9, ncols = 1, sharex = True)
 ax = np.array(ax)[:,np.newaxis]
 
 I_coil_ax, x_point_ax, rote_ax, dBres_plas_ax, dBres_tot_ax, probe_plas_ax, dBkink_plas_ax, q95_ax, eta_ax, probe_phase_ax, edge_rot_ax = [None]*11
@@ -68,49 +68,86 @@ eta_vals = ['1e-6', '5e-7', '1e-7', '7e-8', '3e-8', '1e-8']
 eta_vals = ['5e-7', '1e-7', '7e-8']
 eta_vals = ['1e-7']
 eta_vals = ['1e-8']
+eta = '1e-8'
 vary_pvisc = False
 vary_expt = True
 ideal = False
 spitz = False
 #for V in V_runs:
-gen_func.setup_publication_image(fig, height_prop = 1.5*ax.shape[0]/6., single_col = True)
+
+if vary_pvisc:
+    file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar2-0/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar2-0_post_processing_PEST.pickle',
+                 '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0_post_processing_PEST.pickle']
+elif vary_expt:
+    file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_post_processing_PEST.pickle',
+                 '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_post_processing_PEST.pickle']
+    # file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_post_processing_PEST.pickle',
+    #              '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_post_processing_PEST.pickle']
+    file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_006/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_006_post_processing_PEST.pickle',
+                  '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_006/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_006_post_processing_PEST.pickle']
+    #file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_004/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_004_post_processing_PEST.pickle',
+    #              '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_004/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_004_post_processing_PEST.pickle']
+    file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_005/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_005_post_processing_PEST.pickle',
+                  '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_005/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_005_post_processing_PEST.pickle']
+    #file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_PVISC0/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_PVISC0_post_processing_PEST.pickle',
+    #              '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_PVISC0/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_PVISC0_post_processing_PEST.pickle']
+elif ideal:
+    file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle', 
+                 '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle']
+    file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle',
+                 '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal_post_processing_PEST.pickle']
+elif spitz:
+    file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle',
+                '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'] 
+else:
+    file_names = ['/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V_dict_non_const[eta],V_dict_non_const[eta]),
+                 '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V_dict_const[eta],V_dict_const[eta])]
+
+
+gen_func.setup_publication_image(fig, height_prop = 1.5*ax.shape[0]/7., single_col = True)
 for eta in eta_vals:
     #gen_func.setup_publication_image(fig, height_prop = 1./1.618*, single_col = False)
-    for const_rot, index, plot_style in zip([False, True], [0,0],[{'marker':'x'}, {'marker':'o'}]):
-        if const_rot:
-            V_dict = V_dict_const
-        else:
-            V_dict = V_dict_non_const
+    #for const_rot, index, plot_style in zip([False, True], [0,0],[{'marker':'x'}, {'marker':'o'}]):
+    for file_name, index, plot_style in zip(file_names, [0,0],[{'marker':'x'}, {'marker':'o'}]):
+        # if const_rot:
+        #     V_dict = V_dict_const
+        # else:
+        #     V_dict = V_dict_non_const
         cur_ax = ax[:,index]
         #I_coil_ax, rote_ax, x_point_ax, probe_plas_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
         #I_coil_ax, rote_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
-        I_coil_ax, rote_ax, edge_rot_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
-        V = V_dict[eta]
-        if const_rot:
-            if vary_pvisc:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0_post_processing_PEST.pickle'
-            elif vary_expt:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
-            elif ideal:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal_post_processing_PEST.pickle'
-            elif spitz:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
-            else:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
-        else:
-            if vary_pvisc:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0-5/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0-5_post_processing_PEST.pickle'
-            elif vary_expt:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_post_processing_PEST.pickle'
-                pass
-            elif ideal:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
-            elif spitz:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
-            else:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
-        #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_V{}/shot_142614_expt_scan_NC_V{}_post_processing_PEST.pickle'.format(V,V)
+        I_coil_ax, rote_ax, edge_rot_ax, eta_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
+        #V = V_dict[eta]
+        # if const_rot:
+        #     if vary_pvisc:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0_post_processing_PEST.pickle'
+        #     elif vary_expt:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_post_processing_PEST.pickle'
+        #         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_006/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_006_post_processing_PEST.pickle'
+        #         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_PVISC0/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_PVISC0_post_processing_PEST.pickle'
+        #     elif ideal:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal_post_processing_PEST.pickle'
+        #     elif spitz:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
+        #     else:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
+        # else:
+        #     if vary_pvisc:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar2-0/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar2-0_post_processing_PEST.pickle'
+        #     elif vary_expt:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_post_processing_PEST.pickle'
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_post_processing_PEST.pickle'
+        #         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_006/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_006_post_processing_PEST.pickle'
+        #         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_PVISC0/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_PVISC0_post_processing_PEST.pickle'
+        #     elif ideal:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
+        #     elif spitz:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
+        #     else:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
+        # #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_V{}/shot_142614_expt_scan_NC_V{}_post_processing_PEST.pickle'.format(V,V)
         print file_name
         reference_dB_kink = 'plasma'
         a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
@@ -131,26 +168,34 @@ for eta in eta_vals:
             I_coil_ax.set_ylabel('MP (kA)')
             multiplier = np.abs(np.interp(np.sort(a.raw_data['shot_time']), icoil[:,0], icoil[:,1])/1000)
         if x_point_ax!=None:
-            xpoint.plot_single_phasing(phasing, 'shot_time', field = 'plasma',  ax = x_point_ax, plot_kwargs = plot_style, multiplier = multiplier)
-            x_point_ax.set_ylabel('Disp (m)')
+            xpoint.plot_single_phasing(phasing, 'shot_time', field = 'plasma',  ax = x_point_ax, plot_kwargs = plot_style, multiplier = multiplier*1000.)
+            x_point_ax.set_ylabel('Disp (mm)')
             x_point_ax.set_ylim([0,x_point_ax.get_ylim()[1]*1.15])
         if rote_ax!=None and count == 0:
-            a.plot_parameters('shot_time', 'vtor0', ax = rote_ax, plot_kwargs = {'marker':'x', 'label':'Core Rot'})
+            a.plot_parameters('shot_time', 'vtor0', ax = rote_ax, plot_kwargs = {'marker':'x', 'label':r'$\omega_{center}$'}, multiplier = 1./1000)
+            a.plot_parameters('shot_time', 'vtor95', ax = rote_ax, plot_kwargs = {'marker':'.', 'label':r'$\omega_{edge}$ x10'}, multiplier = 10./1000)
             # try:
             #     a.plot_parameters('shot_time', 'vtor95', ax = rote_ax, plot_kwargs = {'marker':'o'})
             # except:
             #     print 'cant plot vtor95, not available'
-            rote_ax.set_ylabel('(rad/s)')
-            rote_ax.legend(loc='lower left',fontsize=8)
-            rote_ax.set_ylim([0,rote_ax.get_ylim()[1]])
+            rote_ax.set_ylabel('(krad/s)')
+            #rote_ax.legend(loc='lower left',fontsize=8)
+            rote_ax.set_ylim([0,rote_ax.get_ylim()[1]*1.2])
+            legend = rote_ax.legend(loc='upper left',fontsize=8, ncol = 2)
+            legend.draw_frame(False)
         if edge_rot_ax!=None and count == 0:
             try:
-                a.plot_parameters('shot_time', 'vtor95', ax = edge_rot_ax, plot_kwargs = {'marker':'x', 'label':'Edge Rot'})
+                #a.plot_parameters('shot_time', 'vtor95', ax = edge_rot_ax, plot_kwargs = {'marker':'x', 'label':'Edge Rot'})
+                a.plot_parameters('shot_time', 'Q95', ax = edge_rot_ax, plot_kwargs = {'marker':'x', 'label':'$q_{95}$'})
+                a.plot_parameters('shot_time', 'QMAX', ax = edge_rot_ax, plot_kwargs = {'marker':'d', 'label':'$q_{edge}$'})
+                a.plot_parameters('shot_time', 'BETAN', ax = edge_rot_ax, plot_kwargs = {'marker':'.', 'label':r'$\beta_N$(\%) x10'}, multiplier = 10)
+                #a.plot_parameters('shot_time', 'ETA', ax = edge_rot_ax, plot_kwargs = {'marker':'.', 'label':'ETA'}, multiplier = 1.e8)
             except:
                 print 'cant plot vtor95, not available'
-            edge_rot_ax.set_ylabel('(rad/s)')
-            edge_rot_ax.set_ylim([0,edge_rot_ax.get_ylim()[1]])
-            edge_rot_ax.legend(loc='lower left',fontsize=8)
+            #edge_rot_ax.set_ylabel('(rad/s)')
+            edge_rot_ax.set_ylim([0,edge_rot_ax.get_ylim()[1]*1.25])
+            legend = edge_rot_ax.legend(loc='lower left',fontsize=8, ncol = 3)
+            legend.draw_frame(False)
         if dBres_plas_ax!=None:
             dBres.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = True, ax = dBres_plas_ax, multiplier = multiplier)
             dBres_plas_ax.set_ylabel(r'$\delta B_{res}^{plas}$ (G)')
@@ -173,7 +218,8 @@ for eta in eta_vals:
                 tmp_time = moving_average(probe_expt[min_max[0]:min_max[1],0],n=n_pts)
                 probe_plas_ax.plot(tmp_time, tmp_probe_n1,'r-', rasterized = True, label='n=1')
                 probe_plas_ax.plot(tmp_time, tmp_probe,'k-', rasterized = True, label='n=3')
-                probe_plas_ax.legend(loc='upper left',fontsize=8)
+                legend = probe_plas_ax.legend(loc='upper left',fontsize=8)
+                legend.draw_frame(False)
                 #tmp_probe[tmp_time>1860]+=2
                 #probe_plas_ax.plot(tmp_time, tmp_probe,'b-', rasterized = True)
             probe_plas_ax.set_ylim([0,probe_plas_ax.get_ylim()[1]*1.15])
@@ -196,7 +242,8 @@ for eta in eta_vals:
                 tmp_time = probe_expt[min_max[0]:min_max[1],0]
                 #probe_phase_ax.plot(tmp_time, tmp_probe_n1,'r-', rasterized = True, label='n=1')
                 probe_phase_ax.plot(tmp_time, tmp_probe,'k-', rasterized = True, label='n=3')
-                probe_phase_ax.legend(loc='best',fontsize=8)
+                legend = probe_phase_ax.legend(loc='best',fontsize=8)
+                legend.draw_frame(False)
                 #tmp_probe[tmp_time>1860]+=2
                 #probe_plas_ax.plot(tmp_time, tmp_probe,'b-', rasterized = True)
             probe_phase_ax.set_ylim([-np.pi, np.pi])
@@ -206,9 +253,12 @@ for eta in eta_vals:
         if q95_ax!=None:
             a.plot_parameters('shot_time', 'Q95', ax = q95_ax, plot_kwargs = {'marker':'x'})
             q95_ax.set_ylabel(r'$q_{95}$')
-        if eta_ax!=None:
-            a.plot_parameters('shot_time', 'ETA', ax = eta_ax, plot_kwargs = {'marker':'x'})
-            eta_ax.set_ylabel(r'$\eta$')
+        if eta_ax!=None and count==0:
+            a.plot_parameters('shot_time', 'RES', ax = eta_ax, plot_kwargs = {'marker':'.', 'label':r'$\eta_{center}$'}, multiplier = 1.e8)
+            eta_ax.set_ylabel(r'$\Omega\mathrm{m(x}10^{-8}\mathrm{)}$')
+            legend = eta_ax.legend(loc='best',fontsize=8)
+            legend.draw_frame(False)
+            eta_ax.set_ylim([0,eta_ax.get_ylim()[1]*1.1])
         cur_ax[0].set_xlim([np.min(a.raw_data['shot_time']),np.max(a.raw_data['shot_time'])])
 
         if count==(len(V_runs)-1) and False:
@@ -225,7 +275,7 @@ for eta in eta_vals:
 for i in ax.flatten():gen_func.setup_axis_publication(i, n_yticks = 4)
 for lab,i in enumerate(ax.flatten()):
     min, max = i.get_ylim()
-    i.text(2000, min + 0.8*(max-min), '({})'.format(chr(lab + ord('a'))))
+    i.text(1950, min + 0.85*(max-min), '({})'.format(chr(lab + ord('a'))))
 for i in ax[-1,:]: i.set_xlabel('Time (ms)')
 ax[-1,-1].set_xlim([1450,2200])
 gen_func.setup_axis_publication(ax[-1,0], n_xticks = 5)
@@ -233,31 +283,33 @@ fig.tight_layout(pad = 0.1)
 for end in ['svg','eps','pdf']:fig.savefig('comparison_oliver_data_allV{}.{}'.format(const_rot,end))
 fig.canvas.draw(); fig.show()
 
+
 #for V in V_runs:
 for eta in eta_vals:
-    fig_harms, ax_harms = pt.subplots(nrows = 2, sharex = True)
+    fig_harms, ax_harms = pt.subplots(nrows = 2, sharex = True, sharey = True)
     #ax_harms = [ax_harms]
     gen_func.setup_publication_image(fig_harms, height_prop = 1./1.618 * 1.75, single_col = True)
-    for const_rot, cur_ax in zip([False, True], ax_harms):
-        if const_rot:
-            V_dict = V_dict_const
-        else:
-            V_dict = V_dict_non_const
-        V = V_dict[eta]
-        if const_rot:
-            if not ideal:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
-            elif spitz:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
-            else:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
-        else:
-            if not ideal:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
-            elif spitz:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
-            else:
-                file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
+    #for const_rot, cur_ax in zip([False, True], ax_harms):
+    for file_name, cur_ax in zip(file_names, ax_harms):
+        # if const_rot:
+        #     V_dict = V_dict_const
+        # else:
+        #     V_dict = V_dict_non_const
+        # V = V_dict[eta]
+        # if const_rot:
+        #     if not ideal:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
+        #     elif spitz:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
+        #     else:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
+        # else:
+        #     if not ideal:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
+        #     elif spitz:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
+        #     else:
+        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_V{}/shot_142614_expt_scan_NC_V{}_post_processing_PEST.pickle'.format(V,V)
         reference_dB_kink = 'plasma'
         a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
@@ -275,18 +327,28 @@ for eta in eta_vals:
         max_shot_time = np.max(a.raw_data['shot_time'])
         max_shot_time = max_time
         range_shot_time = max_shot_time - min_shot_time
-        x_axis = dBres.raw_data['res_m_vals'][0]
         initial = 0
         for i in range(0,tmp_a.shape[0]):
+            x_axis = dBres.raw_data['res_m_vals'][i]
             clr = (a.raw_data['shot_time'][i] - min_shot_time)/float(range_shot_time)
             clr = clr*0.9
             if int(a.raw_data['shot_time'][i])>=min_time and int(a.raw_data['shot_time'][i])<=max_time:
-                cur_ax.plot(x_axis, np.abs(tmp_b[i,:]), color=str(clr), marker = 'x')
+                #cur_ax.plot(x_axis, np.abs(tmp_b[i,:]), color=str(clr), marker = 'x')
+                cur_ax.plot(x_axis, np.abs(tmp_b[i]), color=str(clr), marker = 'x')
+                #cur_ax.plot(x_axis, np.abs(tmp_c[i]), color='b', marker = '.')
+                cur_ax.plot(x_axis, np.abs(tmp_c[i]), color=str(clr), marker = '.')
                 if initial==0:
-                    cur_ax.plot(x_axis, np.abs(tmp_c[i,:]), color='b', marker = '.')
+                    cur_ax.text(13,2.1,'Vacuum')
+                    cur_ax.text(13,1.13,'Vacuum + Plasma')
+                    #cur_ax.plot(x_axis, np.abs(tmp_c[i,:]), color='b', marker = '.')
+                    #cur_ax.plot(x_axis, np.abs(tmp_c[i]), color='b', marker = '.')
                 initial += 1
     #ax_harms[0].set_title('{}-{}ms $\eta=${n}'.format(min_time, max_time, eta))
     ax_harms[-1].set_xlabel('m')
+    ax_harms[-1].set_ylim([0,2.5])
+    tmp_ylim = ax_harms[-1].get_ylim()
+    ax_harms[0].text(6,tmp_ylim[1]*0.85,'(a)')
+    ax_harms[1].text(6,tmp_ylim[1]*0.85,'(b)')
     for i in ax_harms: i.set_ylabel('Resonant harm amp (G/kA)')
     #ax_harms[1].set_ylabel('Resonant harm phase (rad)')
     for i in ax_harms:i.grid(True)

@@ -77,7 +77,8 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None, ret
         if plot_axes == None:
             fig.canvas.draw(); fig.show()
     if return_components:
-        return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3, current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft))
+        return current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), fig
+        #return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3, current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft))
     else:
         return 2.*np.abs(current_fft[n_loc]/len(current_fft))*1.e3
 
