@@ -13,7 +13,7 @@ def perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,
     print directory, 'I0EXP=',I0EXP
 
     #I0EXP = RZfuncs.I0EXP_calc(N,n,I)
-    new_data = results_class.data(directory,Nchi=240,link_RMZM=0, I0EXP=I0EXP)
+    new_data = results_class.data(directory,Nchi=240,link_RMZM=0, I0EXP=I0EXP, spline_B23=1)
     #print 'results_class initialised'
     new_data_R = new_data.R*new_data.R0EXP
     new_data_Z = new_data.Z*new_data.R0EXP

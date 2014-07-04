@@ -22,6 +22,7 @@ I0EXP = results_class.I0EXP_calc_real(n,I)
 facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
 
 file_name = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/shot_142614_rote_res_scan_20x20_kpar1_low_rote_post_processing_PEST.pickle'
+file_name = '/u/haskeysr/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_005/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_005_post_processing_PEST.pickle'
 with file(file_name, 'r') as file_handle: scan_data = pickle.load(file_handle)
 
 def plot(args):
@@ -35,18 +36,22 @@ def plot(args):
     for i in simuls.keys(): simuls[i].get_PEST(facn = facn)
     
 
-clim = [0,6.0]
+clim = [0,2.0]
 base_dir = '/u/haskeysr/tmp_ims/'
+base_dir = '/u/haskeysr/expt_ims/'
 
 keys = np.array(scan_data['sims'].keys())
 #keys = [1,2]
 print keys.shape
+print 'hello world'
 eta_list = []
 rote_list = []
 for i in keys: eta_list.append(scan_data['sims'][i]['MARS_settings']['<<ETA>>'])
 for i in keys: rote_list.append(scan_data['sims'][i]['MARS_settings']['<<ROTE>>'])
+#for i in keys: time_list.append(scan_data['sims'][i]['shot_time']
+#print time_list
 #keys = keys[(np.array(eta_list)==1.1288378916846883e-6) * (np.array(rote_list)==1.e-6)]
-keys = keys[(np.array(eta_list)==1.1288378916846883e-6)]
+#keys = keys[(np.array(eta_list)==1.1288378916846883e-6)]
 #for i in range(len(keys)): keys[i] = 1
 print keys.shape
 
@@ -57,13 +62,15 @@ im_name_list = []
 title_list = []
 for i in keys: valid_sim_list.append(copy.deepcopy(scan_data['sims'][i]))
 for i in keys:
-    im_name_list.append('{}/ROTE_{:010d}_ETA_{:010d}_{}.png'.format(base_dir, int(scan_data['sims'][i]['MARS_settings']['<<ROTE>>']*10**10), int(scan_data['sims'][i]['MARS_settings']['<<ETA>>']*10**10), subplot_plot))
-    title_list.append('ROTE_{:.3e} ETA {:.3e} {}'.format(scan_data['sims'][i]['MARS_settings']['<<ROTE>>'], scan_data['sims'][i]['MARS_settings']['<<ETA>>'], subplot_plot))
+    #im_name_list.append('{}/ROTE_{:010d}_ETA_{:010d}_{}.png'.format(base_dir, int(scan_data['sims'][i]['MARS_settings']['<<ROTE>>']*10**10), int(scan_data['sims'][i]['MARS_settings']['<<ETA>>']*10**10), subplot_plot))
+    im_name_list.append('{}/time_{:05d}.png'.format(base_dir, scan_data['sims'][i]['shot_time']))
+    #title_list.append('ROTE_{:.3e} ETA {:.3e} {}'.format(scan_data['sims'][i]['MARS_settings']['<<ROTE>>'], scan_data['sims'][i]['MARS_settings']['<<ETA>>'], subplot_plot))
+    title_list.append('time {:05d}'.format(scan_data['sims'][i]['shot_time']))
 print im_name_list
 
 input_data = zip(valid_sim_list, im_name_list, itertools.repeat(I0EXP), itertools.repeat(facn), itertools.repeat(subplot_plot), itertools.repeat(n), itertools.repeat(inc_contours), itertools.repeat(clim), title_list)
 
-#map(scan_pics_func.plot_scan, input_data)
+map(scan_pics_func.plot_scan, input_data)
 
 #pool = multiprocessing.Pool(10, maxtasksperchild = 1)
 #pool.map(scan_pics_func.plot_scan, input_data)

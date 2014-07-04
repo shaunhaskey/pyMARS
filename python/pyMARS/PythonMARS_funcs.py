@@ -350,7 +350,8 @@ def extract_aspect(master):
     with file(master['dir_dict']['chease_dir'] + '/log_chease','r') as filehandle:
         lines = filehandle.readlines()
     for i in lines:
-        if i.find('ASPECT RATIO')>=0 and i.find('a/R')>=0:
+        #if i.find('ASPECT RATIO')>=0 and i.find('a/R')>=0:
+        if i.find('ASPECT')>=0 and i[0:3]=='   ' and i.find('CSM')<0:
             print i, (i.lstrip(' ').split(' '))[0]
             master['ASPECT'] = float((i.lstrip(' ').split(' '))[0])
             break
