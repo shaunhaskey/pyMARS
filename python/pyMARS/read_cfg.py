@@ -242,34 +242,39 @@ os.system('cp ' + sys.argv[1] + ' ' + project_dict['details']['base_dir']+tmp_fi
 print 'script file copied across for record keeping'
 
 
-project_dict['details']['template_dir'] = template_directory
-project_dict['details']['efit_master'] = efit_file_location
-project_dict['details']['profile_master'] = profile_file_location
-project_dict['details']['CHEASE_settings'] = CHEASE_settings
-project_dict['details']['CHEASE_settings_PEST'] = CHEASE_settings
-project_dict['details']['MARS_settings'] = MARS_settings
-project_dict['details']['corsica_settings'] = corsica_settings
+project_dict['details'] = {'template_dir':template_directory, 'efit_master':efit_file_location,
+                           'profile_master':profile_file_location,'CHEASE_settings':CHEASE_settings,
+                           'CHEASE_settings_PEST':CHEASE_settings,'MARS_settings':MARS_settings,
+                           'corsica_settings':corsica_settings,'ICOIL_FREQ':I_coil_frequency}
+project_dict['details']['pickup_coils'] = {'probe':probe,'probe_type':probe_type,'Rprobe':Rprobe, 
+                                           'Zprobe':Zprobe, 'tpobe':tprobe,'lprobe':lprobe}
+project_dict['details']['I-coils'] = {'N_Icoils':N_Icoils,'I_coil_current':I_coil_current}
 
-project_dict['details']['pickup_coils']={}
-project_dict['details']['pickup_coils']['probe'] = probe
-project_dict['details']['pickup_coils']['probe_type'] = probe_type
-project_dict['details']['pickup_coils']['Rprobe'] = Rprobe
-project_dict['details']['pickup_coils']['Zprobe'] = Zprobe
-project_dict['details']['pickup_coils']['tprobe'] = tprobe
-project_dict['details']['pickup_coils']['lprobe'] = lprobe
+# project_dict['details']['template_dir'] = template_directory
+# project_dict['details']['efit_master'] = efit_file_location
+# project_dict['details']['profile_master'] = profile_file_location
+# project_dict['details']['CHEASE_settings'] = CHEASE_settings
+# project_dict['details']['CHEASE_settings_PEST'] = CHEASE_settings
+# project_dict['details']['MARS_settings'] = MARS_settings
+# project_dict['details']['corsica_settings'] = corsica_settings
 
-project_dict['details']['I-coils'] = {}
-project_dict['details']['I-coils']['N_Icoils'] = N_Icoils
-project_dict['details']['I-coils']['I_coil_current'] = I_coil_current
+# project_dict['details']['pickup_coils']={}
+# project_dict['details']['pickup_coils']['probe'] = probe
+# project_dict['details']['pickup_coils']['probe_type'] = probe_type
+# project_dict['details']['pickup_coils']['Rprobe'] = Rprobe
+# project_dict['details']['pickup_coils']['Zprobe'] = Zprobe
+# project_dict['details']['pickup_coils']['tprobe'] = tprobe
+# project_dict['details']['pickup_coils']['lprobe'] = lprobe
 
 
+# project_dict['details']['I-coils'] = {}
+# project_dict['details']['I-coils']['N_Icoils'] = N_Icoils
+# project_dict['details']['I-coils']['I_coil_current'] = I_coil_current
+# project_dict['details']['ICOIL_FREQ'] = I_coil_frequency #Icoil frequency
 
-project_dict['details']['ICOIL_FREQ'] = I_coil_frequency #Icoil frequency
-
-corsica_base_dir = project_dict['details']['base_dir']+ '/corsica_temp/' #this is a temporary location for corsica files
+corsica_base_dir = project_dict['details']['base_dir']+ '/corsica/' #this is a temporary location for corsica files
 
 #leftover from attempt to run multiple CORSICA jobs at once...
-corsica_list = [['ml10']] 
 
 
 print '#####################################################################'
@@ -299,7 +304,7 @@ if start_from_step == 1:
                 os.system('cp ' + project_dict['details']['efit_master'] + '/' + efit_file_type + gfile_list[i][1:] + ' ' + project_dict['details']['multiple_efit'][-1])
             #copy across the rotation files
             density_filename = 'dne'+gfile_list[i][1:]+'.dat'
-            rotation_filename = 'dpr' + gfile_list[i].split('.')[0][1:] + '.' + str(time_tmp) + '_Er_RBpol.dat'
+            #rotation_filename = 'dpr' + gfile_list[i].split('.')[0][1:] + '.' + str(time_tmp) + '_Er_RBpol.dat'
             density_filename = density_prefix+gfile_list[i][1:]+'.dat' + density_post
             rotation_filename = rotation_prefix+gfile_list[i][1:]+'.dat' + rotation_post
             te_filename = te_prefix+gfile_list[i][1:]+'.dat' + te_post
@@ -310,16 +315,6 @@ if start_from_step == 1:
             for tmp_file, mars_name in zip([density_filename, rotation_filename, ti_filename, te_filename],['PROFDEN', 'PROFROT', 'PROFTI', 'PROFTE']):
                 shutil.copy('{}/{}'.format(project_dict['details']['profile_master'], tmp_file), project_dict['details']['multiple_efit'][-1])
                 shutil.copy('{}/{}'.format(project_dict['details']['profile_master'], tmp_file), '{}/{}'.format(project_dict['details']['multiple_efit'][-1], mars_name))
-            #os.system('cp ' + project_dict['details']['profile_master'] + '/' + density_filename + ' ' + project_dict['details']['multiple_efit'][-1])
-            #os.system('cp ' + project_dict['details']['profile_master'] + '/' + rotation_filename + ' ' + project_dict['details']['multiple_efit'][-1])
-            #os.system('cp ' + project_dict['details']['profile_master'] + '/' + ti_filename + ' ' + project_dict['details']['multiple_efit'][-1])
-            #os.system('cp ' + project_dict['details']['profile_master'] + '/' + te_filename + ' ' + project_dict['details']['multiple_efit'][-1])
-            #os.system('cp ' + project_dict['details']['profile_master'] + '/' + density_filename + ' ' + project_dict['details']['multiple_efit'][-1] +'/PROFDEN')
-            #os.system('cp ' + project_dict['details']['profile_master'] + '/' + rotation_filename + ' ' + project_dict['details']['multiple_efit'][-1] + '/PROFROT')
-            #inc_ti_te = True
-            #if inc_ti_te:
-            #    os.system('cp ' + project_dict['details']['profile_master'] + '/' + ti_filename + ' ' + project_dict['details']['multiple_efit'][-1] + '/PROFTI')
-            #    os.system('cp ' + project_dict['details']['profile_master'] + '/' + te_filename + ' ' + project_dict['details']['multiple_efit'][-1] + '/PROFTE')
             shot_number = int(gfile_list[i][1:7])
 
         project_dict['details']['shot'] = shot_number
@@ -344,7 +339,6 @@ if start_from_step == 1:
     #Output data structure for the next step
     pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir'] + project_name+'_initial_setup.pickle')
 
-    print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
     #corsica_base_dir = '/scratch/haskeysr/corsica_test9/'
     print 'start corsica setup'
 
@@ -384,19 +378,22 @@ if start_from_step == 1:
         #check everything is finished
         print "waiting for jobs to finish..."
         for i in corsica_directory_list: cont_funcs.check_corsica_finished(corsica_base_dir + '/'+i, "corsica_finished")
-        print "jobs finished, putting everything together"
+        print "jobs finished, putting everything together in the efit dir"
         #combine everything
         cont_funcs.copy_files_combine_stab_setups(corsica_base_dir, corsica_directory_list, project_dict['details']['efit_dir'])
         print "finished corsica runs"
     else:
+        corsica_list = [['ml10']] 
         for i in range(0,len(corsica_list)):
             cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, corsica_list[i], corsica_settings[0])
         print 'finished corsica setup, starting corsica runs'
 
 
-        cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
+        #cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
+        cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1)
         #cont_funcs.corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
 
+    print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 
 print '#####################################################################'
 print '##***************************STEP 2 - Generate Directory Structure ############'

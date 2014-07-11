@@ -108,11 +108,17 @@ def check_corsica_finished(corsica_directory, filename):
     '''check to see if the CORSICA run has finished 
     SH: Feb 18 2013
     '''
-    while not os.path.exists(corsica_directory + '/' + filename):
-        time.sleep(5)
-    
+    while not os.path.exists(corsica_directory + '/' + filename):time.sleep(5)
+
 
 def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
+    '''base_dir: location where all the corsica files will go
+    efit_dir: location of the efit files for the corsica run
+    template_file: location of the corsica template to use
+    input_data: sub_directory in the base_dir where this particular run will go
+
+    SRH: 11July2014
+    '''
     running_dir = base_dir + input_data[0]
     if not os.path.exists(base_dir):
         print 'project directory doesnt exist - creating...',
@@ -120,25 +126,14 @@ def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
         print 'done'
     os.system('mkdir ' + running_dir)
     os.chdir(running_dir)
-
     os.system('cp ' + efit_dir + '* .')
 
-    command_file = open('commands_test.txt','w')
-    command_file.write('read "sspqi_sh_this_dir.bas"\nquit\n')
-    command_file.close()
+    with open('commands_test.txt','w') as command_file:command_file.write('read "sspqi_sh_this_dir.bas"\nquit\n')
 
-    template_file = open(template_file,'r')
-    template_text = template_file.read()
-    template_file.close()
-
-    #make all the changes
-    for i in settings.keys():
-        #print i, settings[i]
-        template_text = template_text.replace(i,str(settings[i]))
-
-    template_file = open('sspqi_sh_this_dir.bas','w')
-    template_file.write(template_text)
-    template_file.close()
+    #open template, modify and write
+    with open(template_file,'r') as template_file:template_text = template_file.read()
+    for i in settings.keys():template_text = template_text.replace(i,str(settings[i]))
+    with open('sspqi_sh_this_dir.bas','w') as template_file:template_file.write(template_text)
     try:
         os.remove('corsica_finished')
     except OSError:
@@ -148,10 +143,7 @@ def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
     corsica_job_string += "rm corsica_finished\n"
     corsica_job_string += "/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt >caltrans_out.log\n"
     corsica_job_string += "touch corsica_finished\n"
-    with file('corsica.job','w') as corsica_job_file:
-        #corsica_job_file = open('corsica.job','w')
-        corsica_job_file.write(corsica_job_string)
-        #corsica_job_file.close()
+    with file('corsica.job','w') as corsica_job_file:corsica_job_file.write(corsica_job_string)
         
 def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1):
     script = 'sleep %d\n'%(sleep_time)
