@@ -585,15 +585,18 @@ def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
     dataq = np.loadtxt(open(file_name,'r'))
     s = dataq[:,0]
     q = dataq[:,1]
+    #mq is the list of m integers in the right range, ceil picks the lowest integer that is larger
     mq = np.arange(np.ceil(np.min(q)*abs(n)),max(mk.flatten())+1)
-    qq = mq/abs(n)
+    #required q value for resonance for each mq
+    qq = mq/abs(float(n))
 
     def FindX(x,y,yy):
         xn = []
         yn = []
-
+        #loop through each qq value which is are the q vals required for resonance
         for k in range(0,len(yy)):
-            I = np.nonzero((y[0:-2]-yy[k])*(y[1:-1]-yy[k]) <= 0);
+            #Look for the locations that a particular q val crosses the q profile
+            I = np.nonzero((y[0:-2]-yy[k])*(y[1:-1]-yy[k]) <= 0)
 
             for m in range(0,len(I)):
                 J = I[m]
@@ -601,10 +604,10 @@ def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
                     xn.append(x[J] + (x[J+1]-x[J])*(yy[k]-y[J])/(y[J+1]-y[J]))
                     yn.append(yy[k])
         return np.array(xn),np.array(yn)
-
+    
     sq, qn = FindX(s,q,qq)
+    1/0
     mq = qn*np.abs(n)
-
     return np.array(qn), np.array(sq), np.array(q), np.array(s),np.array(mq)
 
 

@@ -249,7 +249,7 @@ project_dict['details'] = {'template_dir':template_directory, 'efit_master':efit
                            'corsica_settings':corsica_settings,'ICOIL_FREQ':I_coil_frequency,
                            'base_dir':proj_base_dir}
 project_dict['details']['pickup_coils'] = {'probe':probe,'probe_type':probe_type,'Rprobe':Rprobe, 
-                                           'Zprobe':Zprobe, 'tpobe':tprobe,'lprobe':lprobe}
+                                           'Zprobe':Zprobe, 'tprobe':tprobe,'lprobe':lprobe}
 project_dict['details']['I-coils'] = {'N_Icoils':N_Icoils,'I_coil_current':I_coil_current}
 
 # project_dict['details']['template_dir'] = template_directory
