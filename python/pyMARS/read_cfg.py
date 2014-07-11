@@ -353,7 +353,8 @@ if start_from_step == 1:
         for i in range(0, len(project_dict['details']['shot_time'])):
             cont_funcs.corsica_multiple_efits(str(project_dict['details']['shot_time'][i]), project_dict, corsica_base_dir)
         #elif CORSICA_workers>1:
-    elif CORSICA_workers>1:
+    elif CORSICA_template_name!=CORSICA_template_name2:
+        #elif CORSICA_workers>1:
         #setup the prerun directory
         cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, ['prerun'], corsica_settings[0])
         #run prerun
