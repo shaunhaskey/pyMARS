@@ -218,11 +218,12 @@ project_dir = base_directory + project_name +'/'
 #Create the project dictionary
 project_dict={}
 project_dict['details']={}
-project_dict['details']['base_dir'] = base_directory + project_name +'/'
+proj_base_dir = base_directory + project_name +'/'
+#project_dict['details']['base_dir'] = base_directory + project_name +'/'
 
-if not os.path.exists(project_dict['details']['base_dir']):
+if not os.path.exists(proj_base_dir):
     print 'project directory doesnt exist - creating...',
-    os.system('mkdir ' + project_dict['details']['base_dir'])
+    os.system('mkdir ' + proj_base_dir)
     print 'done'
 else:
     print 'project directory already exists - continuing'
@@ -232,20 +233,21 @@ i = 1
 curr_filename = sys.argv[1].lstrip('.').lstrip('/')
 tmp_filename = '/%d_%s'%(i, curr_filename)
 print tmp_filename
-while os.path.exists(project_dict['details']['base_dir']+tmp_filename):
+while os.path.exists(proj_base_dir+tmp_filename):
     i+=1
     tmp_filename = '/%d_%s'%(i, curr_filename)
     print '%d already exists'%(i)
 print sys.argv[1]
 #os.system('cp ' + os.path.abspath(sys.argv[0]) + ' ' + project_dict['details']['base_dir']+tmp_filename)
-os.system('cp ' + sys.argv[1] + ' ' + project_dict['details']['base_dir']+tmp_filename)
+os.system('cp ' + sys.argv[1] + ' ' + proj_base_dir+tmp_filename)
 print 'script file copied across for record keeping'
 
 
 project_dict['details'] = {'template_dir':template_directory, 'efit_master':efit_file_location,
                            'profile_master':profile_file_location,'CHEASE_settings':CHEASE_settings,
                            'CHEASE_settings_PEST':CHEASE_settings,'MARS_settings':MARS_settings,
-                           'corsica_settings':corsica_settings,'ICOIL_FREQ':I_coil_frequency}
+                           'corsica_settings':corsica_settings,'ICOIL_FREQ':I_coil_frequency,
+                           'base_dir':proj_base_dir}
 project_dict['details']['pickup_coils'] = {'probe':probe,'probe_type':probe_type,'Rprobe':Rprobe, 
                                            'Zprobe':Zprobe, 'tpobe':tprobe,'lprobe':lprobe}
 project_dict['details']['I-coils'] = {'N_Icoils':N_Icoils,'I_coil_current':I_coil_current}
