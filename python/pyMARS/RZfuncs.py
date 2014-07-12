@@ -42,7 +42,7 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None, ret
     current_array = np.array(current_output)
     current_fft = np.fft.fft(current_array)
     current_fft_freq = np.fft.fftfreq(len(current_fft),d=(phi_tmp[1]-phi_tmp[0])/(np.pi*2))
-    print len(current_fft_freq)
+    #print len(current_fft_freq)
     n_loc = np.argmin(np.abs(current_fft_freq - n))
     if produce_plot:
         if plot_axes == None:
@@ -68,7 +68,7 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None, ret
         ax[1].set_ylabel('Current (kA)')
         start_loc = np.argmin(np.abs(current_fft_freq-0))
         end_loc = np.argmin(np.abs(current_fft_freq-100))
-        print start_loc, end_loc
+        #print start_loc, end_loc
         ax[1].stem(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), 'b-')
         #ax[1].plot(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), 'o')
         #ax[1].plot(current_fft_freq, 2.*np.abs(current_fft/len(current_fft)), 'o')
@@ -221,9 +221,9 @@ def ReadVPLASMA(file_name, Ns, Ns1, s, spline_V23=1,VNORM=1.):
     VPLASMA = np.loadtxt(open(file_name))
  
     Nm1 = VPLASMA[0,0]
-    print 'Nm1 ', Nm1
+    #print 'Nm1 ', Nm1
     n = np.round(VPLASMA[0,2])
-    print 'VNORM ', VNORM
+    print ' VNORM ', VNORM
 
     Mm = np.round(VPLASMA[1:Nm1+1,0])
     Mm.resize([len(Mm),1])
@@ -233,22 +233,22 @@ def ReadVPLASMA(file_name, Ns, Ns1, s, spline_V23=1,VNORM=1.):
     VM1 = VPLASMA[Nm1+1+Ns1:,0] + VPLASMA[Nm1+1+Ns1:,1]*1j
     VM2 = VPLASMA[Nm1+1+Ns1:,2] + VPLASMA[Nm1+1+Ns1:,3]*1j
     VM3 = VPLASMA[Nm1+1+Ns1:,4] + VPLASMA[Nm1+1+Ns1:,5]*1j
-    print VM1.shape, VM2.shape, VM3.shape
+    #print VM1.shape, VM2.shape, VM3.shape
     VM1 = np.reshape(VM1,[Ns1,Nm1],order='F')*VNORM
     VM2 = np.reshape(VM2,[Ns1,Nm1],order='F')*VNORM
     VM3 = np.reshape(VM3,[Ns1,Nm1],order='F')*VNORM
-    print VM1.shape, VM2.shape, VM3.shape
-    print VM1[100,30],VM2[100,30],VM3[100,30]
+    #print VM1.shape, VM2.shape, VM3.shape
+    #print VM1[100,30],VM2[100,30],VM3[100,30]
 
     if spline_V23==2:
         'spine_B23 is 2'
         VM2[1:,:] = VM2[0:-1,:]
         VM3[1:,:] = VM3[0:-1,:]
     elif spline_V23==1:
-        print 'spline B23 is 1'
+        print ' spline B23 is 1'
         x = (s[0:Ns1-1]+s[1:Ns1])*0.5
         VM2new = copy.deepcopy(VM2)
-        print x.flatten().shape, VM2[0:-1,:].shape, s[1:Ns1-1].flatten().shape, VM2new[1:-1,:].shape
+        #print x.flatten().shape, VM2[0:-1,:].shape, s[1:Ns1-1].flatten().shape, VM2new[1:-1,:].shape
         #
         VM2new[1:-1,:] = scipy_griddata(x.flatten(),VM2[0:-1,:],s[1:Ns1-1].flatten(),method='cubic')
         VM2new[0,:] = VM2new[1,:]
@@ -282,27 +282,27 @@ def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
     BM1 = BPLASMA[Nm1+1:,0] + BPLASMA[Nm1+1:,1]*1j
     BM2 = BPLASMA[Nm1+1:,2] + BPLASMA[Nm1+1:,3]*1j
     BM3 = BPLASMA[Nm1+1:,4] + BPLASMA[Nm1+1:,5]*1j
-    print BM1.shape, Ns, Nm1
+    #print BM1.shape, Ns, Nm1
     BM1 = np.reshape(BM1,[Ns,Nm1],order='F')
     BM2 = np.reshape(BM2,[Ns,Nm1],order='F')
     BM3 = np.reshape(BM3,[Ns,Nm1],order='F')
 
-    print 'BNORM used in ReadBPLASMA', BNORM
+    print ' BNORM used in ReadBPLASMA', BNORM
     BM1 = BM1[0:Ns,:]*BNORM
     BM2 = BM2[0:Ns,:]*BNORM
     BM3 = BM3[0:Ns,:]*BNORM
     #print BM1[200,10], BM2[200,10], BM3[200,10], Ns, BM1.shape
     #NEED TO KNOW WHY THIS SECTION IS INCLUDED - to do with half grid???!!
     if spline_B23==2:
-        print 'spine_B23 is 2'
+        print ' spine_B23 is 2'
         BM2[1:,:] = BM2[0:-1,:]
         BM3[1:,:] = BM3[0:-1,:]
     elif spline_B23==1:
-        print 'spline B23 is 1'
+        print ' spline B23 is 1'
         x = (s[0:Ns-1]+s[1:Ns])*0.5
         BM2new = copy.deepcopy(BM2)
         BM2new[1:-1,:] = scipy_griddata(x.flatten(),BM2[0:-1,:],s[1:Ns-1].flatten(),method='cubic')
-        print BM2new[1:-1,:].shape
+        #print BM2new[1:-1,:].shape
         BM2new[0,:] = 0
         BM2new[-1,:] = BM2new[-2,:]
         BM2 = copy.deepcopy(BM2new)
@@ -519,7 +519,7 @@ def get_FEEDI(file_name):
     FEEDI_1 = np.sqrt(np.sum(FEEDI_matrix[0,:]**2))
     FEEDI_2 = np.sqrt(np.sum(FEEDI_matrix[1,:]**2))
     FEEDI_float= np.max([FEEDI_1,FEEDI_2])
-    print 'FEEDI :',FEEDI_float
+    print ' FEEDI :',FEEDI_float
     return FEEDI_float
 
 def calc_VNORM(FEEDI, B0EXP, I0EXP=1.0e+3 * 3./np.pi,phas=0.):
@@ -589,7 +589,6 @@ def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
     mq = np.arange(np.ceil(np.min(q)*abs(n)),max(mk.flatten())+1)
     #required q value for resonance for each mq
     qq = mq/abs(float(n))
-
     def FindX(x,y,yy):
         xn = []
         yn = []
@@ -597,16 +596,15 @@ def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
         for k in range(0,len(yy)):
             #Look for the locations that a particular q val crosses the q profile
             I = np.nonzero((y[0:-2]-yy[k])*(y[1:-1]-yy[k]) <= 0)
-
             for m in range(0,len(I)):
-                J = I[m]
-                if len(J)>=1:
+                J_tmp = I[m]
+                #This allows multiple resonances for the same harmonic
+                for J in J_tmp:
                     xn.append(x[J] + (x[J+1]-x[J])*(yy[k]-y[J])/(y[J+1]-y[J]))
                     yn.append(yy[k])
         return np.array(xn),np.array(yn)
     
     sq, qn = FindX(s,q,qq)
-    1/0
     mq = qn*np.abs(n)
     return np.array(qn), np.array(sq), np.array(q), np.array(s),np.array(mq)
 

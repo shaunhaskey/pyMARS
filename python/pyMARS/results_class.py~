@@ -1057,10 +1057,10 @@ class data():
                 tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], tmp_plot_quantity, increase_y = 1, increase_x = 0, new_y_lims = [0,0.99],number=interp_points)
                 tmp_plot_quantity =  ndimage.gaussian_filter(tmp_plot_quantity,gauss_filter)
             else:
-                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_real = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], np.real(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.99],number=interp_points)
-                tmp_plot_quantity_real =  ndimage.gaussian_filter(tmp_plot_quantity_real,gauss_filter)
-                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_imag = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], np.imag(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.99],number=interp_points)
-                tmp_plot_quantity_imag =  ndimage.gaussian_filter(tmp_plot_quantity_imag,gauss_filter)
+                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_real = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], np.real(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.999],number=interp_points)
+                if gauss_filter!=None:tmp_plot_quantity_real =  ndimage.gaussian_filter(tmp_plot_quantity_real,gauss_filter)
+                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_imag = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], np.imag(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.999],number=interp_points)
+                if gauss_filter!=None:tmp_plot_quantity_imag =  ndimage.gaussian_filter(tmp_plot_quantity_imag,gauss_filter)
                 tmp_plot_quantity_complex = tmp_plot_quantity_real + 1j* tmp_plot_quantity_imag
                 tmp_plot_quantity_rgb = complex_array_to_rgb(tmp_plot_quantity_complex, rmax=rmax/np.max(np.abs(tmp_plot_quantity_complex)), theme = 'dark')
             #tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_real = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], np.real(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.99],number=interp_points)
@@ -1072,7 +1072,6 @@ class data():
         else:
             tmp_plot_mk = self.mk.flatten()
             tmp_plot_ss = self.ss[:ss_plas_edge].flatten()
-
 
         #color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap=cmap, rasterized=True)
         if increase_grid_BnPEST:
@@ -1096,7 +1095,7 @@ class data():
         file_name = self.directory + '/PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         ax.plot(q*n,s,'w--') 
-        ax.plot(mq,sq,'b+')
+        ax.plot(mq,sq,'w+',markersize = 15)
         return color_ax
 
 

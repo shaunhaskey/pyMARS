@@ -206,13 +206,13 @@ class data():
 
         file_name = self.directory + '/../../cheaserun/RMZM_F'
         self.RM, self.ZM, self.Ns, self.Ns1, self.Ns2, self.Nm0, self.R0EXP, self.B0EXP, self.s = readRMZM(file_name)
-        print self.Ns, self.Ns1, self.Ns2
+        #print self.Ns, self.Ns1, self.Ns2
         #print 'R0EXP', self.R0EXP
         self.Nm2 = self.Nm0
         self.R, self.Z =  GetRZ(self.RM,self.ZM,self.Nm0,self.Nm2,self.chi,self.phi)
         self.FEEDI = get_FEEDI(self.directory + '/FEEDI')
         self.BNORM = calc_BNORM(self.FEEDI, self.R0EXP, I0EXP = self.I0EXP)
-        print self.directory, self.BNORM, self.FEEDI, self.R0EXP, self.I0EXP
+        print ' ',self.directory, self.BNORM, self.FEEDI, self.R0EXP, self.I0EXP
         file_name = self.directory + '/BPLASMA'
         #Extract geometry related stuff
         self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian = GetUnitVec(self.R, self.Z, self.s, self.chi)
@@ -370,9 +370,9 @@ class data():
         #print '--- in pest calc eqac',  os.getpid(), os.getcwd(), np.sum(np.abs((BnEQAC)))
         import scipy.interpolate as interp
         BnPEST  = interp.griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
-        print '***', np.sum(np.isnan(BnPEST)), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(BnEQAC.flatten())), np.sum(np.isnan(R_Z_PEST)), BnEQAC.shape
+        #print '***', np.sum(np.isnan(BnPEST)), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(BnEQAC.flatten())), np.sum(np.isnan(R_Z_PEST)), BnEQAC.shape
         BnPEST[np.isnan(BnPEST)] = 0
-        print '*** remove NaNs', np.sum(np.isnan(BnPEST)), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(BnEQAC.flatten())), np.sum(np.isnan(R_Z_PEST)), BnEQAC.shape
+        #print '*** remove NaNs', np.sum(np.isnan(BnPEST)), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(BnEQAC.flatten())), np.sum(np.isnan(R_Z_PEST)), BnEQAC.shape
 
         #print '--- in pest calc nan', os.getpid(), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(R_Z_PEST))
         #print '--- in pest calc eqac*',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST))), np.sum(np.isnan((BnPEST))), np.sum(np.isnan((BnPEST))) >0
@@ -383,7 +383,7 @@ class data():
         #np.savetxt('{}_RZEQAC_{}'.format(os.getpid(), if_pass), R_Z_EQAC)
         BnPEST.resize(BnEQAC.shape)
         BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST
-        print '***', np.sum(np.isnan(BnPEST))
+        #print '***', np.sum(np.isnan(BnPEST))
         #print '--- in pest calc eqac**',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST)))
 
 
@@ -404,14 +404,14 @@ class data():
             BMnPEST = np.dot(BnPEST,expmchi)*tmp2
             n_nans = np.sum(np.isnan(BMnPEST))
             if n_nans==0:
-                print 'number of attempts:',i
+                print ' number of attempts to remove nans from BnPEST:',i
                 break
             
-        if n_nans>0:
-            BMnPEST = np.dot(BnPEST,expmchi)*tmp2
-            print 'NANs still exist!'
-            print '*** BMnPEST', np.sum(np.isnan(BMnPEST)), np.sum(np.isnan(expmchi))
-            #1/0
+        #if n_nans>0:
+        #    BMnPEST = np.dot(BnPEST,expmchi)*tmp2
+        #    print 'NANs still exist!'
+        #    print '*** BMnPEST', np.sum(np.isnan(BMnPEST)), np.sum(np.isnan(expmchi))
+        #    #1/0
         mm = np.arange(-29,29+1,dtype=int)
         mm2 = np.arange(-29,29+1,dtype=int)
 
@@ -420,15 +420,15 @@ class data():
 
         self.mk = mk[0,II]
         self.mk.resize(1,len(self.mk))
-        print 'PEST, facn = %.2f'%(facn)
+        #print 'PEST, facn = %.2f'%(facn)
         BnPEST  = BMnPEST[:,II.flatten()]/facn
-        print '*** error finishes here I think...', np.sum(np.isnan(BnPEST))
+        #print '*** error finishes here I think...', np.sum(np.isnan(BnPEST))
 
         BnPEST[0,:] = BnPEST[1,:]
         BnPEST[-1,:] = BnPEST[-2,:]
         self.BnPEST = BnPEST
         #print '--- in pest calc',  os.getcwd(), os.getcwd(), np.sum(np.abs((self.Bn))), np.sum(np.abs((self.BnPEST)))
-        print '***', np.sum(np.isnan(self.BnPEST))
+        print ' *** number of nans in BnPEST', np.sum(np.isnan(self.BnPEST))
 
         new_area = []
         for i in range(0, self.R.shape[0]):
@@ -466,7 +466,7 @@ class data():
         #print s.shape,len(s), temp_qn.shape, len(temp_qn)
         total_integral = 0
         min_location = np.argmin(np.abs(self.q_profile_s-min_s))
-        print min_s, min_location, self.q_profile_s[min_location]
+        #print min_s, min_location, self.q_profile_s[min_location]
         for i in range(min_location,len(self.q_profile_s)-1):
             total_integral += temp_qn[i]*((self.q_profile_s[i+1]-self.q_profile_s[i])**power)
 
@@ -510,16 +510,16 @@ class data():
 
         #q value at the relevant surface
         relevant_q = self.q_profile[s_loc]
-        print np.max(self.mk), q_range[0]*relevant_q, q_range[1]*relevant_q
+        #print np.max(self.mk), q_range[0]*relevant_q, q_range[1]*relevant_q
 
         #indices of the minimum m and maximum m that we are interested in
         lower_bound = np.argmin(np.abs(self.mk.flatten() - q_range[0]*relevant_q))
         upper_bound = np.argmin(np.abs(self.mk.flatten() - q_range[1]*relevant_q))
-        print 'kink_amp: s_loc: %d, self.ss_val: %.2f, self.q_profile_s: %.2f'%(s_loc, self.ss[s_loc], self.q_profile[s_loc])
+        #print 'kink_amp: s_loc: %d, self.ss_val: %.2f, self.q_profile_s: %.2f'%(s_loc, self.ss[s_loc], self.q_profile[s_loc])
         #make sure upper bound isn't larger than the values available
         upper_bound_new = np.min([upper_bound, len(self.mk.flatten())-1])
-        print lower_bound, upper_bound, upper_bound_new
-        print 'relevant_q: %.2f, bounds: %d %d, values: %d, %d'%(relevant_q, lower_bound, upper_bound_new, self.mk.flatten()[lower_bound], self.mk.flatten()[upper_bound_new])
+        #print lower_bound, upper_bound, upper_bound_new
+        #print 'relevant_q: %.2f, bounds: %d %d, values: %d, %d'%(relevant_q, lower_bound, upper_bound_new, self.mk.flatten()[lower_bound], self.mk.flatten()[upper_bound_new])
 
         #extract the relevant values
         if SURFMN_coords:
@@ -527,8 +527,8 @@ class data():
         else:
             relevant_values = self.BnPEST[s_loc,lower_bound:upper_bound_new]
 
-        print relevant_values
-        print 'sum', np.abs(np.sum(np.abs(relevant_values)))
+        #print relevant_values
+        #print 'sum', np.abs(np.sum(np.abs(relevant_values)))
         return self.mk.flatten()[lower_bound:upper_bound_new], self.ss[s_loc], relevant_values, relevant_q
 
 
@@ -701,7 +701,7 @@ class data():
             tmp, xdat, ydat, zdat  = pyMARS_funcs.extract_surfmn_data(surfmn_file, n)
         #min_loc = np.argmin(np.abs(xdat[:,0]-(-30.)))
         #max_loc = np.argmin(np.abs(xdat[:,0]-(30.)))
-        print 'ss, mk values :', min(self.ss), max(self.ss), min(self.mk), max(self.mk)
+        #print 'ss, mk values :', min(self.ss), max(self.ss), min(self.mk), max(self.mk)
         #max_mk = np.argmin(np.abs(self.mk.flatten()-30))
         #min_mk = np.argmin(np.abs(self.mk.flatten()+30))
         #calculate flux area for conversion to SURFMN
