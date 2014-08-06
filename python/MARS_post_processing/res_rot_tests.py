@@ -31,6 +31,9 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kp
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res_post_processing_PEST.pickle'
 
+
+file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_res_rot/shot158115_04780_res_rot_post_processing_PEST.pickle'
+
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_25x20_kpar1_med_rote/shot_142614_rote_res_scan_25x20_kpar1_med_rote_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1/shot_142614_rote_scan_100_kpar1_post_processing_PEST.pickle'
@@ -42,7 +45,7 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kp
 
 
 phasing = 0
-n = 3
+n = 2
 phase_machine_ntor = 0
 s_surface = 0.92
 fixed_harmonic = 3
@@ -173,6 +176,7 @@ clims = [[0,2.5],[0,2],[0,1.5]]
 clims = [[0,5],[0,5],[0,15]]
 clims = [[0,1.5],[0,0.8],[0,1.05]]
 clims = [[0,1.5],[0,0.4],[0,1.05],[-np.pi,np.pi]]
+clims = [[0,0.5],[0,1.5],[0,1.05],[-np.pi,np.pi]]
 #clims = [[0,1.25],[0,0.3],[0,1.05]]
 #clims = [[-np.pi, np.pi],[-np.pi,np.pi],[-np.pi,np.pi]]
 data =  [dBres, dBkink, probe, probe]

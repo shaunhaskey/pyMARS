@@ -1035,7 +1035,7 @@ class data():
 
         self.plot_BnPEST_phase(inc_phase, BnPEST, mk, ss, tmp_cmap, phase_correction, clim_value, title, temp_qn, mk_grid, ss_grid, ss_squared, n, suptitle, fig_show, fig_name)
 
-    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100, gauss_filter = [0,0.5], cmap = 'hot', n_contours = 5, phase_ref=None, rmax = 3, phase_ref_array = None):
+    def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100, gauss_filter = [0,0.5], cmap = 'hot', n_contours = 5, phase_ref=None, rmax = 3, phase_ref_array = None, sqrt_flux = True):
         ss_plas_edge = np.argmin(np.abs(self.ss-max_ss))
         if phase_ref!=None:
             #tmp_phase_ref = (np.angle(self.BnPEST[:ss_plas_edge,:], deg = True) - np.angle(phase_ref[:ss_plas_edge,:], deg = True))%(360)
@@ -1052,14 +1052,16 @@ class data():
             tmp_plot_quantity[tmp_plot_quantity<min_phase] += 360
         else:
             tmp_plot_quantity = np.abs((np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose())
+        s_ax = self.ss.flatten()[:ss_plas_edge]
+        if not sqrt_flux:s_ax=s_ax**2
         if increase_grid_BnPEST:
             if not phase_ref:
-                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], tmp_plot_quantity, increase_y = 1, increase_x = 0, new_y_lims = [0,0.99],number=interp_points)
+                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity = RZfuncs.increase_grid(self.mk.flatten(), s_ax, tmp_plot_quantity, increase_y = 1, increase_x = 0, new_y_lims = [0,0.999],number=interp_points)
                 tmp_plot_quantity =  ndimage.gaussian_filter(tmp_plot_quantity,gauss_filter)
             else:
-                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_real = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], np.real(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.999],number=interp_points)
+                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_real = RZfuncs.increase_grid(self.mk.flatten(), s_ax, np.real(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.999],number=interp_points)
                 if gauss_filter!=None:tmp_plot_quantity_real =  ndimage.gaussian_filter(tmp_plot_quantity_real,gauss_filter)
-                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_imag = RZfuncs.increase_grid(self.mk.flatten(), self.ss.flatten()[:ss_plas_edge], np.imag(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.999],number=interp_points)
+                tmp_plot_mk, tmp_plot_ss, tmp_plot_quantity_imag = RZfuncs.increase_grid(self.mk.flatten(), s_ax, np.imag(tmp_plot_quantity), increase_y = 1, increase_x = 0, new_y_lims = [0,0.999],number=interp_points)
                 if gauss_filter!=None:tmp_plot_quantity_imag =  ndimage.gaussian_filter(tmp_plot_quantity_imag,gauss_filter)
                 tmp_plot_quantity_complex = tmp_plot_quantity_real + 1j* tmp_plot_quantity_imag
                 tmp_plot_quantity_rgb = complex_array_to_rgb(tmp_plot_quantity_complex, rmax=rmax/np.max(np.abs(tmp_plot_quantity_complex)), theme = 'dark')
@@ -1071,7 +1073,8 @@ class data():
 
         else:
             tmp_plot_mk = self.mk.flatten()
-            tmp_plot_ss = self.ss[:ss_plas_edge].flatten()
+            tmp_plot_ss = s_ax
+            #self.ss[:ss_plas_edge].flatten()
 
         #color_ax = ax.pcolor(self.mk.flatten(),self.ss[:ss_plas_edge].flatten(), tmp_plot_quantity, cmap=cmap, rasterized=True)
         if increase_grid_BnPEST:
@@ -1094,6 +1097,8 @@ class data():
         #color_ax = ax.pcolor(self.mk,self.ss,np.abs(self.BnPEST),cmap=cmap)
         file_name = self.directory + '/PROFEQ.OUT'
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
+        if not sqrt_flux: s = s**2
+        if not sqrt_flux: sq = sq**2
         ax.plot(q*n,s,'w--') 
         ax.plot(mq,sq,'w+',markersize = 15)
         return color_ax

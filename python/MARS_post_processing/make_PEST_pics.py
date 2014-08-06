@@ -66,6 +66,7 @@ if single:
 
 #various simulation directories to get the components
 base_dir = '/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/'
+base_dir = '/home/srh112/NAMP_datafiles/mars/shot158115_04780/qmult1.000/exp1.000/RES-100000000.0000_ROTE-100.0000/'
 #base_dir = '/home/srh112/NAMP_datafiles/mars/single_run_through_test_142614_V2/qmult1.000/exp1.000/marsrun/'
 dir_loc_lower_t =base_dir + '/RUN_rfa_lower.p'
 dir_loc_upper_t =base_dir + '/RUN_rfa_upper.p'
@@ -184,8 +185,11 @@ if animation_phasings:
         ax[0].set_xlim([0,15])
         ax[0].set_ylim([0.4,0.995])
 
-        ax[1].annotate('kink-\nresonant', xy=(8, 0.9), xytext=(8.9, 0.6),arrowprops=dict(facecolor='black', shrink=0.05,ec='white'),color='white')
-        ax[1].annotate('pitch-\nresonant', xy=(6.93, 0.952), xytext=(0.3, 0.7),arrowprops=dict(facecolor='black', shrink=0.05,ec='white'),color='white')
+        ax[0].set_xlim([6,12])
+        ax[0].set_ylim([0.90,0.995])
+
+        #ax[1].annotate('kink-\nresonant', xy=(8, 0.9), xytext=(8.9, 0.6),arrowprops=dict(facecolor='black', shrink=0.05,ec='white'),color='white')
+        #ax[1].annotate('pitch-\nresonant', xy=(6.93, 0.952), xytext=(0.3, 0.7),arrowprops=dict(facecolor='black', shrink=0.05,ec='white'),color='white')
         #ax[1].text(3.5,0.95,"kink-resonant response",rotation=70,fontsize=15,horizontalalignment='left')
         #fig.set_size_inches([ 17. ,   4.])
         hue_sat = True

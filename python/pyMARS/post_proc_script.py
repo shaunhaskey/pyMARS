@@ -32,7 +32,11 @@ def coil_outputs_B(project_dict, upper_and_lower=0):
     link_RMZM = 0
     #Nchi = 240
     for i in project_dict['sims'].keys():
-        project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
+        #project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
+        n = num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>'])
+        project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
+
+
         Nchi = project_dict['sims'][i]['CHEASE_settings']['<<NCHI>>']
         print 'working on serial : ', i
         locs = ['upper','lower'] if upper_and_lower else ['']
