@@ -152,7 +152,8 @@ for eta in eta_vals:
         reference_dB_kink = 'plasma'
         a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
 
-        dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'sum')
+        #dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'sum')
+        dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'mean')
         dBkink = dBres_dBkink.dBkink_calculations(a)
         probe = dBres_dBkink.magnetic_probe(a,' 66M')
         xpoint = dBres_dBkink.x_point_displacement_calcs(a, phasing)
@@ -248,6 +249,7 @@ for eta in eta_vals:
                 #probe_plas_ax.plot(tmp_time, tmp_probe,'b-', rasterized = True)
             probe_phase_ax.set_ylim([-np.pi, np.pi])
         if dBkink_plas_ax!=None:
+            print 'dBkink {}'.format(multiplier)
             dBkink.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = True, ax = dBkink_plas_ax, multiplier = multiplier)
             dBkink_plas_ax.set_ylabel(r'$\delta B_{\mathrm{RFA}}$ (G)')
         if q95_ax!=None:
@@ -273,6 +275,7 @@ for eta in eta_vals:
         for i in cur_ax: i.grid(True)
         count+=1
 for i in ax.flatten():gen_func.setup_axis_publication(i, n_yticks = 4)
+dBkink_plas_ax.set_ylim(dBres_tot_ax.get_ylim())
 for lab,i in enumerate(ax.flatten()):
     min, max = i.get_ylim()
     i.text(1950, min + 0.85*(max-min), '({})'.format(chr(lab + ord('a'))))
@@ -347,8 +350,8 @@ for eta in eta_vals:
     ax_harms[-1].set_xlabel('m')
     ax_harms[-1].set_ylim([0,2.5])
     tmp_ylim = ax_harms[-1].get_ylim()
-    ax_harms[0].text(6,tmp_ylim[1]*0.85,'(a)')
-    ax_harms[1].text(6,tmp_ylim[1]*0.85,'(b)')
+    ax_harms[0].text(6,tmp_ylim[1]*0.85,'(a) Scaled profiles')
+    ax_harms[1].text(6,tmp_ylim[1]*0.85,'(b) Experiment')
     for i in ax_harms: i.set_ylabel('Resonant harm amp (G/kA)')
     #ax_harms[1].set_ylabel('Resonant harm phase (rad)')
     for i in ax_harms:i.grid(True)

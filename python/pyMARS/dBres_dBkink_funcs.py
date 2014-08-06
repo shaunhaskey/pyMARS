@@ -17,12 +17,10 @@ class generic_calculation():
         SRH : 12Mar2014
         '''
         if self.calc_ul:
-            self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)]
+            #print field, self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)]
             return apply_phasing(self.raw_data['{}_{}_upper'.format(field, self.calc_type)], self.raw_data['{}_{}_lower'.format(field, self.calc_type)], np.deg2rad(phasing), self.parent.n, phase_machine_ntor = self.parent.phase_machine_ntor)
         else:
             return self.raw_data['{}_{}_{}'.format(field, self.calc_type, '')]
-
-
 
     def phasing_scan(self, n_phases = 360, phasing_array = None, field = 'total', filter_key = None):
         '''Perform a phasing scan for the  dBkink calculations
@@ -107,7 +105,6 @@ class generic_calculation():
         self.cur_phasing_scan_x = rel_axis_grid
         self.cur_phasing_scan_y = phase_grid
         return color_ax
-
 
     def plot_single_phasing(self, phasing, xaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, multiplier = 1):
         '''Plot  a calculation versus a particular attribute
@@ -278,6 +275,8 @@ class dBres_calculations(generic_calculation):
             for tot, vac in zip(self.raw_data['total_res_{}'.format(coil)], self.raw_data['vacuum_res_{}'.format(coil)]):
                 self.raw_data['plasma_res_{}'.format(coil)].append(tot - vac)
         self.raw_data['res_m_vals'] = data_from_dict('responses/resonant_response_mq', self.parent.project_dict)
+        self.raw_data['res_s_vals'] = data_from_dict('responses/resonant_response_sq', self.parent.project_dict)
+        self.raw_data['res_q_vals'] = data_from_dict('responses/resonant_response_qn', self.parent.project_dict)
 
 
     def single_phasing(self,curr_phase, field = 'plasma'):
@@ -461,6 +460,7 @@ class post_processing_results():
         self.project_dict = pickle.load(file(file_name,'r'))
         self.s_surface = s_surface
         self.phase_machine_ntor = phase_machine_ntor
+        self.n_sims = len(self.project_dict['sims'].keys())
         self.n = np.abs(self.project_dict['details']['MARS_settings']['<<RNTOR>>'])
         self.calc_ul = ul
         self.reference_dB_kink = reference_dB_kink

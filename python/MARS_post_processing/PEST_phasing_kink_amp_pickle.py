@@ -250,7 +250,7 @@ if show_single_cuts:
 
 #Show the phase for vac, plas, tot on a color plot
 if show_phasings_color_plots:
-    fig,ax = pt.subplots(nrows = 2,sharex = 1, sharey = 1)
+    fig,ax = pt.subplots(nrows = 2,sharex = True, sharey = True)
     dBkink_plas_single_phase_interp[dBkink_plas_single_phase_interp<=-40]+=360
     color_fig = ax[0].pcolor(xnew, ynew, np.ma.array(dBkink_plas_single_phase_interp, mask=np.isnan(mode_data)))
     color_fig.set_clim([-40,-40+360])
@@ -298,7 +298,7 @@ if show_max_mode_number:
 #plot db_res and db_res_ave as a function of bn/li and q95
 #This is in the paper
 if show_db_res_db_res_ave:
-    fig_JAW, ax_JAW = pt.subplots(nrows=2, sharex =1, sharey=1)
+    fig_JAW, ax_JAW = pt.subplots(nrows=2, sharex =True, sharey=True)
     color_fig_plas_JAW = ax_JAW[0].pcolor(xnew, ynew, np.ma.array(dBres_ave_vac_single_interp, mask=mask),cmap=color_map, rasterized=True)
     cbar = pt.colorbar(color_fig_plas_JAW, ax = ax_JAW[0])
     cbar.ax.set_ylabel(r'$\overline{\delta B}_{res}^{n=%d}$ G/kA'%(n),fontsize=20)
@@ -348,7 +348,7 @@ if show_dB_kink:
 
 #plot dB_kink, amplitude of the vacuum harmonic chosen, and the amplification
 if show_db_kink_vac_amp_amplification:
-    fig,ax = pt.subplots(nrows = 3,sharex = 1, sharey = 1)
+    fig,ax = pt.subplots(nrows = 3,sharex = True, sharey = True)
     color_fig_plas = ax[0].pcolor(xnew, ynew, np.ma.array(dBkink_tot_single_interp, mask=np.isnan(dBkink_tot_single_interp)),cmap=color_map)#, cmap = cmap)
     cbar = pt.colorbar(color_fig_plas, ax = ax[0])
     cbar.ax.set_ylabel('G/kA')
@@ -388,7 +388,7 @@ if show_db_kink_vac_amp_amplification:
 #plot dBkink vs q95 and phasing for a fixed bn/li with the strength of the 
 #vacuum harmonic also shown
 if dB_kink_phasing_q95:
-    fig, ax = pt.subplots(nrows =2 , sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows =2 , sharex = True, sharey = True)
     color_plot = ax[0].pcolor(q95_single, phasing_array, dBkink_totn_phasing, cmap='hot', rasterized=True)
     color_plot2 = ax[1].pcolor(q95_single, phasing_array, dBkink_vac_phasing, cmap='hot', rasterized=True)
     ax[0].plot(q95_single, phasing_array[np.argmax(dBkink_plas_phasing,axis=0)],'k.')
@@ -413,7 +413,7 @@ if dB_kink_phasing_q95:
 #plot dBkink vs q95 and phasing for a fixed bn/li with the strength of the 
 #vacuum harmonic also shown
 if dB_kink_phasing_q95_fixed_vac:
-    fig, ax = pt.subplots(nrows=2,sharex = 1, sharey=1)
+    fig, ax = pt.subplots(nrows=2,sharex = True, sharey=True)
     color_plot = ax[0].pcolor(q95_single, phasing_array, dBkink_tot_phasing, cmap='hot', rasterized=True)
     cb = pt.colorbar(color_plot, ax = ax[0])
     ax[0].set_ylabel(r'$\Delta \phi_{ul}$ (deg)',fontsize = 14)
@@ -444,7 +444,7 @@ if dB_kink_phasing_q95_fixed_vac:
 #Plot showing dBres and dBres_ave vs phasing and q95
 #This plot is in the paper
 if show_dBres_dBres_ave_phasing_q95:
-    fig, ax = pt.subplots(nrows = 2, sharex = 1, sharey = 1)
+    fig, ax = pt.subplots(nrows = 2, sharex = True, sharey = True)
     color_plot = ax[0].pcolor(q95_single, phasing_array, dBres_vac_phasing, cmap='hot', rasterized=True)
     ax[0].contour(q95_single,phasing_array, dBres_vac_phasing, colors='white')
     color_plot2 = ax[1].pcolor(q95_single, phasing_array, dBres_ave_vac_phasing, cmap='hot', rasterized=True)

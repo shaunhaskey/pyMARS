@@ -102,16 +102,25 @@ cbar.set_label('$\delta B_{res}^{\mathrm{' + res_field + '}}$ (G/kA)')
 
 
 #gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*1.5, single_col = True)
-labels = ['$\delta B_{res}^{total}$', '$\delta B_{\mathrm{RFA}}$']
+labels = ['$\delta B_{res}^{total}$, $\omega_0=10^{-2}$', '$\delta B_{\mathrm{RFA}}$, $\omega_0=10^{-2}$']
 for i, label in zip([dBres, dBkink], labels):
     min_loc = np.argmin(np.abs((i.cur_phasing_scan_x[0,:]) - 0.01))
     rote_val = i.cur_phasing_scan_x[0,min_loc]
     print 'max phasing : ', i.cur_phasing_scan_y[np.argmax(i.cur_phasing_scan_z[:,min_loc]),0]
     ax[2].axvline(i.cur_phasing_scan_y[np.argmax(i.cur_phasing_scan_z[:,min_loc]),0],color='k')
     ax[2].plot(i.cur_phasing_scan_y[:,min_loc], i.cur_phasing_scan_z[:,min_loc], label = label)
+
+# res_field = 'vacuum'
+# dBres.plot_phasing_scan('ROTE', xaxis_log = True, field = res_field, n_contours = 10, contour_kwargs = {'colors':'w'}, plot_ridge = True, clim = clim_res)
+# rote_val = dBres.cur_phasing_scan_x[0,min_loc]
+# ax[2].plot(dBres.cur_phasing_scan_y[:,min_loc], dBres.cur_phasing_scan_z[:,min_loc], label = 'blah')
+
+
 for i in [0,90,180,270]: ax[2].axvline(i, linestyle='--')
 ax[2].grid(True)
-ax[2].legend(loc='best', fontsize = 7)
+#leg = ax[2].legend(loc='best', fontsize = 7)
+leg = ax[2].legend(loc='lower right', fontsize = 7)
+#leg.draw_frame(False)
 ax[2].set_xlabel('$\Delta \phi_{ul}$')
 ax[2].set_ylabel('Amplitude (G/kA)')
 ax[2].set_xlim([-10,360])
