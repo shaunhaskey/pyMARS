@@ -8,7 +8,7 @@ styles = [{'color':'k'},{'color':'b'},{'color':'r'},{'color':'g'}]
 
 #profeq = np.loadtxt('/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/qmult1.000/exp1.000/RES112.8838_ROTE1.0000/RUN_rfa_lower.p/PROFEQ.OUT',skiprows = 1)
 
-def plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = '', figname = None, modifier = None, scale = 1., scaled = False, ax = None, inc_text = True, log_y = False, apply_func = None, apply_func_kwargs = None,legend = False):
+def plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = '', figname = None, modifier = None, scale = 1., scaled = False, ax = None, inc_text = True, log_y = False, apply_func = None, apply_func_kwargs = None,legend = False, inc_m_label = False, m_lab_y = 0):
     if apply_func_kwargs == None: apply_func_kwargs = {}
     profeq = np.loadtxt(profeq_loc)
     s = profeq[:,0]
@@ -20,9 +20,12 @@ def plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = '', figname =
     if tmp_max>(np.max(q) * 3): tmp_max -= 1
     print tmp_min, tmp_max
     vert_lines = []
+    count = 0
     for i in range(tmp_min,tmp_max):
         vert_lines.append(s[np.argmin(np.abs(3*q - i))])
         ax.axvline(vert_lines[-1], linestyle = '-')
+        if count<=3 and inc_m_label: ax.text(vert_lines[-1],m_lab_y,'m={}'.format(i),rotation = 'vertical')
+        count+=1
     print vert_lines
     for count,(i, style) in enumerate(zip(select_times, styles)):
         a = np.loadtxt(base_directory + '{}{}.dat'.format(prof_prefix, i), skiprows = 1)
@@ -82,14 +85,18 @@ base_directory = '/u/haskeysr/efit/142614/1795/orig_matt/profiles129-omegaNC/'
 profeq_loc = '/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/qmult1.000/exp1.000/RES112.8838_ROTE1.0000/RUN_rfa_lower.p/PROFEQ.OUT'
 fig, ax = pt.subplots(nrows = 3, sharex = True, sharey = False)
 gen_funcs.setup_publication_image(fig, height_prop = 1./1.618*2.5, single_col = True)
-plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = ylabel, figname= figname, scaled = False, scale = 1./1000, ax = ax[0])
+plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = ylabel, figname= figname, scaled = False, scale = 1./1000, ax = ax[0], inc_m_label = True, m_lab_y = 35)
 plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = ylabel, figname= figname, scaled = True, scale = 1./1000, ax = ax[1])
 prof_prefix = 'dte142614.0'
 plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = ylabel, figname= figname, scaled = False, scale = 1., ax = ax[2], apply_func = pyM.spitz_eta_func, log_y = True, legend = True, inc_text = False)
 for i in ax:i.grid()
 ax[-1].set_xlabel(r'$\sqrt{\Psi_N}$')
 for i in range(2): ax[i].set_ylabel('Toroidal Rotation (krad/s)')
+ax[0].text(0.3,50,'(a) Experiment')
+ax[1].text(0.3,50,'(b) Scaled')
+ax[2].text(0.3,1e-6,'(c) Experiment')
 ax[2].set_ylabel('$\eta$ (Ohm-m)')
 fig.tight_layout(pad = 0.1)
-if figname!=None: fig.savefig(figname)
+if figname!=None: 
+    for i in ['pdf','eps','svg']:fig.savefig(figname.rstrip('pdf')+i)
 fig.canvas.draw(); fig.show()

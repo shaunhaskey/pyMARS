@@ -1,24 +1,24 @@
 #!/usr/bin/env Python
 import pyMARS.results_class as results_class
 import pickle,sys
-import numpy as num
+import numpy as np
 import pyMARS.PythonMARS_funcs as pyMARS_funcs
 import pyMARS.RZfuncs as RZfuncs
 
 project_name = sys.argv[1]
 upper_and_lower = int(sys.argv[2])
 
-def perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP= 1.0e+3 * 3./num.pi):
+def perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP= 1.0e+3 * 3./np.pi):
     #print 'in perform_calcs'
     print directory, 'I0EXP=',I0EXP
 
     #I0EXP = RZfuncs.I0EXP_calc(N,n,I)
-    new_data = results_class.data(directory,Nchi=240,link_RMZM=0, I0EXP=I0EXP, spline_B23=1)
+    new_data = results_class.data(directory,Nchi=240,link_RMZM=0, I0EXP=I0EXP, spline_B23=2)
     #print 'results_class initialised'
     new_data_R = new_data.R*new_data.R0EXP
     new_data_Z = new_data.Z*new_data.R0EXP
     #print 'R and Z data obtained'
-    new_answer = num.array(pyMARS_funcs.coil_responses6(new_data_R,new_data_Z,new_data.Br,new_data.Bz,new_data.Bphi,probe, probe_type, Rprobe,Zprobe,tprobe,lprobe))
+    new_answer = np.array(pyMARS_funcs.coil_responses6(new_data_R,new_data_Z,new_data.Br,new_data.Bz,new_data.Bphi,probe, probe_type, Rprobe,Zprobe,tprobe,lprobe))
     #print 'finished calculation'
     return new_answer
 
@@ -32,7 +32,10 @@ def coil_outputs_B(project_dict, upper_and_lower=0):
     link_RMZM = 0
     #Nchi = 240
     for i in project_dict['sims'].keys():
-        project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],num.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
+        n = np.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>'])
+        #q_range = [0, n+4]
+        project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
+        #project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],np.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
         Nchi = project_dict['sims'][i]['CHEASE_settings']['<<NCHI>>']
         print 'working on serial : ', i
         locs = ['upper','lower'] if upper_and_lower else ['']
@@ -63,7 +66,7 @@ def coil_outputs_B(project_dict, upper_and_lower=0):
 
 #N = 6
 #n = 2
-#I = num.array([1.,-1.,0.,1,-1.,0.])
+#I = np.array([1.,-1.,0.,1,-1.,0.])
 
 pickle_file = open(project_name,'r')
 project_dict = pickle.load(pickle_file)
