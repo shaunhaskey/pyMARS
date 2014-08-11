@@ -80,13 +80,17 @@ print rot_scan_list
 #directory details
 project_name = parser.get('directory_details', 'project_name')
 base_directory = parser.get('directory_details', 'base_directory')
+if base_directory[-1]!='/':base_directory+='/'
 efit_file_location = parser.get('directory_details', 'efit_file_location')
+if efit_file_location[-1]!='/':efit_file_location+='/'
 template_directory = parser.get('directory_details', 'template_directory')
+if template_directory[-1]!='/':template_directory+='/'
 post_proc_script = parser.get('directory_details', 'post_proc_script')
 post_proc_script_PEST = parser.get('directory_details', 'post_proc_script_PEST')
 
 try:
     profile_file_location = parser.get('directory_details', 'profile_file_location')
+    if profile_file_location[-1]!='/':profile_file_location+='/'
 except ConfigParser.NoOptionError, e:
     print 'Couldnt find profile_file_location - setting it to same dir as efit', e
     profile_file_location = efit_file_location

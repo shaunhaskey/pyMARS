@@ -736,8 +736,8 @@ def generate_job_file(master,MARS_execution_script, id_string = 'MARS', rm_files
 #         execution_txt += MARS_execution_script + ' > log_runmars\n'
 #         execution_txt += 'rm ' + rm_files +'\n'
 
-#     execution_txt += 'cd '+ master['dir_dict']['chease_dir'] + '\n'
-#     execution_txt += 'rm ' + rm_files2 +'\n'
+    execution_txt += 'cd '+ master['dir_dict']['chease_dir'] + '\n'
+    if rm_files2!='':execution_txt += 'rm ' + rm_files2 +'\n'
 
     job_string = '#!/bin/bash\n'
     job_string = job_string + '#$ -N ' + id_string + '_p%d_q%d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))

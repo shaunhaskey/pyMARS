@@ -561,7 +561,7 @@ def post_processing(master_pickle, post_proc_workers, python_file, directory = '
         job_string = '#!/bin/bash\n#$ -N '+ 'PostProc'+str(i)+'\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\nexport PATH=$PATH:/f/python/linux64/bin\nsource ~/.bashrc\n'
         log_file_name = master_pickle['details']['base_dir']+directory + '/log_test' + str(i) + '.log'
         #execute_command = python_file + ' ' + pickle_file_name + ' '  ' &> ' + log_file_name + '\n'
-        execute_command = '%s %s %d > %s\n'%(python_file,pickle_file_name, upper_and_lower,log_file_name)
+        execute_command = '%s %s %d &> %s\n'%(python_file,pickle_file_name, upper_and_lower,log_file_name)
         job_string += execute_command
 
         job_name = master_pickle['details']['base_dir'] + directory+'/step9_'+str(i)+'.job'
