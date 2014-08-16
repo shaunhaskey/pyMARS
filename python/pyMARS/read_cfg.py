@@ -209,6 +209,12 @@ MARS_rm_files = parser.get('clean_up_settings', 'MARS_rm_files')
 MARS_rm_files2 = parser.get('clean_up_settings', 'MARS_rm_files2')
 CHEASE_rm_files = parser.get('clean_up_settings', 'CHEASE_rm_files')
 CHEASE_PEST_rm_files = parser.get('clean_up_settings', 'CHEASE_PEST_rm_files')
+try:
+    CORSICA_rm_files = parser.get('clean_up_settings', 'CORSICA_rm_files')
+except ConfigParser.NoOptionError, e:
+    print 'CORSICA rm files not set'
+    CORSICA_rm_files = ''
+
 
 
 
@@ -355,14 +361,14 @@ if start_from_step == 1:
     #CORSICA_workers_tmp=10
     if multiple_efits == 1:
         for i in range(0, len(project_dict['details']['shot_time'])):
-            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['multiple_efit'][i], project_dict['details']['template_dir'] + CORSICA_template_name, [str(project_dict['details']['shot_time'][i])], corsica_settings[0])
+            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['multiple_efit'][i], project_dict['details']['template_dir'] + CORSICA_template_name, [str(project_dict['details']['shot_time'][i])], corsica_settings[0], rm_files = CORSICA_rm_files)
         for i in range(0, len(project_dict['details']['shot_time'])):
-            cont_funcs.corsica_multiple_efits(str(project_dict['details']['shot_time'][i]), project_dict, corsica_base_dir)
+            cont_funcs.corsica_multiple_efits(str(project_dict['details']['shot_time'][i]), project_dict, corsica_base_dir, rm_files = CORSICA_rm_files)
         #elif CORSICA_workers>1:
     elif CORSICA_template_name!=CORSICA_template_name2:
         #elif CORSICA_workers>1:
         #setup the prerun directory
-        cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, ['prerun'], corsica_settings[0])
+        cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, ['prerun'], corsica_settings[0], rm_files = CORSICA_rm_files)
         #run prerun
         print "submitting scaling job"
         cont_funcs.corsica_qsub(corsica_base_dir + '/prerun/', 'corsica.job')
@@ -375,7 +381,7 @@ if start_from_step == 1:
         corsica_directory_list = []
         for i in range(0,CORSICA_workers): 
             corsica_directory_list.append("worker"+str(i))
-            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name2, [corsica_directory_list[-1]], corsica_settings[0])
+            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name2, [corsica_directory_list[-1]], corsica_settings[0], rm_files = CORSICA_rm_files)
         print "runs have been setup pt1"
         cont_funcs.read_qmult_pmult_values(corsica_base_dir + '/prerun/', corsica_base_dir, corsica_directory_list)
         print "runs have been setup pt2"
@@ -392,12 +398,10 @@ if start_from_step == 1:
     else:
         corsica_list = [['ml10']] 
         for i in range(0,len(corsica_list)):
-            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, corsica_list[i], corsica_settings[0])
+            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, corsica_list[i], corsica_settings[0], rm_files = CORSICA_rm_files)
         print 'finished corsica setup, starting corsica runs'
-
-
         #cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
-        cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1)
+        cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1, rm_files = CORSICA_rm_files)
         #cont_funcs.corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
 
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)

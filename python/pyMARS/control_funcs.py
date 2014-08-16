@@ -111,7 +111,7 @@ def check_corsica_finished(corsica_directory, filename):
     while not os.path.exists(corsica_directory + '/' + filename):time.sleep(5)
 
 
-def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
+def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings, rm_files = ''):
     '''base_dir: location where all the corsica files will go
     efit_dir: location of the efit files for the corsica run
     template_file: location of the corsica template to use
@@ -143,9 +143,10 @@ def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings):
     corsica_job_string += "rm corsica_finished\n"
     corsica_job_string += "/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt >caltrans_out.log\n"
     corsica_job_string += "touch corsica_finished\n"
+    if rm_files != '': corsica_job_string += 'rm {}\n'.format(rm_files)
     with file('corsica.job','w') as corsica_job_file:corsica_job_file.write(corsica_job_string)
         
-def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1):
+def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1, rm_files = ''):
     script = 'sleep %d\n'%(sleep_time)
     for input_data in input_list:#len(list)):
         running_dir = base_dir + input_data[0]
@@ -156,6 +157,7 @@ def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1):
         script += command + '\n'
         script += 'sleep %d\n'%(sleep_time)
     script += 'sleep %d\n'%(sleep_time)
+    if rm_files != '': script += 'rm {}\n'.format(rm_files)
     script += 'exit\nexit\n'
     file_name = open(base_dir + script_name,'w')
     file_name.write(script)
@@ -164,7 +166,7 @@ def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1):
 def corsica_batch_qrsh_func(command):
     os.system(command)
             
-def corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers = 1):
+def corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers = 1, rm_files = ''):
     worker_list = []
     proportion = int(round(len(corsica_list)/workers))
     print proportion
@@ -176,7 +178,7 @@ def corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers
             send_list = corsica_list[proportion*i:proportion*(i+1)]
         print i
         print send_list
-        run_corsica_file(corsica_base_dir, send_list, 'corsica_script'+str(i)+'.sh', sleep_time = 30)
+        run_corsica_file(corsica_base_dir, send_list, 'corsica_script'+str(i)+'.sh', sleep_time = 30, rm_files = rm_files)
         script_file_list.append('corsica_script' + str(i)+'.sh')
     process_list = []
     for i in script_file_list:
@@ -201,7 +203,7 @@ def corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers
 
 
 
-def corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1):
+def corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1, rm_files = ''):
     worker_list = []
     proportion = int(round(len(corsica_list)/workers))
     print proportion
@@ -213,7 +215,7 @@ def corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1)
             send_list = corsica_list[proportion*i:proportion*(i+1)]
         print i
         print send_list
-        run_corsica_file(corsica_base_dir, send_list, 'corsica_script'+str(i)+'.sh', sleep_time = 1)
+        run_corsica_file(corsica_base_dir, send_list, 'corsica_script'+str(i)+'.sh', sleep_time = 1, rm_files = rm_files)
         script_file_list.append('corsica_script' + str(i)+'.sh')
     for i in script_file_list:
         print 'running ' + i + ' script'
@@ -224,9 +226,9 @@ def corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1)
     #os.system('rm -r ' +corsica_base_dir)
 
 
-def corsica_multiple_efits(efit_time, project_dict, corsica_base_dir):
+def corsica_multiple_efits(efit_time, project_dict, corsica_base_dir, rm_files = ''):
     script_file = 'corsica_script'+str(efit_time)+'.sh'
-    run_corsica_file(corsica_base_dir, [[efit_time]], script_file, sleep_time = 1)
+    run_corsica_file(corsica_base_dir, [[efit_time]], script_file, sleep_time = 1, rm_files = rm_files)
     os.system('source ' + corsica_base_dir + script_file)
     os.system('cp ' + corsica_base_dir + '/'+str(efit_time) + '/EXPEQ* ' + project_dict['details']['efit_dir']+'/'+efit_time+'/')
     os.system('cp ' + corsica_base_dir + '/'+str(efit_time) + '/stab_setup_results.dat ' + project_dict['details']['efit_dir']+'/'+efit_time+'/')

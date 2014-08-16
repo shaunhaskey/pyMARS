@@ -337,12 +337,13 @@ class magnetic_probe(generic_calculation):
         SRH : 12Mar2014
         '''
         self.parent = parent
-        self.probe = probe
+        self.probe = probe.lstrip(' ').rstrip(' ')
         self.raw_data = {}
         self.calc_type = 'probe'
         self.calc_ul = self.parent.calc_ul
         locs = ['upper', 'lower'] if self.calc_ul else ['']
-        self.probe_ind = (self.parent.project_dict['details']['pickup_coils']['probe']).index(probe)
+        self.probe_ind = ([i.strip(' ').lstrip(' ') for i in self.parent.project_dict['details']['pickup_coils']['probe']]).index(self.probe)
+        #self.probe_ind = (self.parent.project_dict['details']['pickup_coils']['probe']).index(probe)
         for coil in locs:
             tmp = data_from_dict('vacuum_{}_response4'.format(coil), self.parent.project_dict)
             self.raw_data['vacuum_{}_{}'.format(self.calc_type, coil)] = np.array([i[self.probe_ind] for i in tmp])
