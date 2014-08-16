@@ -36,7 +36,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, s_surfac
         for loc in locs:
             for type1, type2 in zip(['plasma', 'vacuum'], ['total','vacuum']):
                 directory = project_dict['sims'][i]['dir_dict']['mars_{}_{}_dir'.format(loc, type1)]
-                curr_data = results_class.data(directory, I0EXP=I0EXP, spline_B23=1)
+                curr_data = results_class.data(directory, I0EXP=I0EXP, spline_B23=2)
                 curr_data.get_PEST(facn = facn)
                 res_integral, res_discrete = curr_data.resonant_strength(n = n, SURFMN_coords=SURFMN_coords)
                 project_dict['sims'][i]['responses']['{}_resonant_response_{}'.format(type2, loc)] = copy.deepcopy(res_discrete)

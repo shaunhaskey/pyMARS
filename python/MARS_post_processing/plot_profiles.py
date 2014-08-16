@@ -8,6 +8,9 @@ styles = [{'color':'k'},{'color':'b'},{'color':'r'},{'color':'g'}]
 
 #profeq = np.loadtxt('/u/haskeysr/mars/shot_142614_rote_res_scan_20x20_kpar1_low_rote/qmult1.000/exp1.000/RES112.8838_ROTE1.0000/RUN_rfa_lower.p/PROFEQ.OUT',skiprows = 1)
 
+
+#def plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = '', figname = None, modifier = None, scale = 1., scaled = False, ax = None, inc_text = True, log_y = False, apply_func = None, apply_func_kwargs = None,legend = False, inc_m_label = False, m_lab_y = 0):
+
 def plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = '', figname = None, modifier = None, scale = 1., scaled = False, ax = None, inc_text = True, log_y = False, apply_func = None, apply_func_kwargs = None,legend = False, n = 3):
     if apply_func_kwargs == None: apply_func_kwargs = {}
     profeq = np.loadtxt(profeq_loc)
@@ -19,10 +22,12 @@ def plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = '', figname =
     if tmp_max>(np.max(q) * n): tmp_max -= 1
     print tmp_min, tmp_max
     vert_lines = []
+    count = 0
     for i in range(tmp_min,tmp_max):
         vert_lines.append(s[np.argmin(np.abs(n*q - i))])
         ax.axvline(vert_lines[-1], linestyle = '-')
-        ax.text()
+        if count<=3 and inc_m_label: ax.text(vert_lines[-1],m_lab_y,'m={}'.format(i),rotation = 'vertical')
+        count+=1
     print vert_lines
     for count,(i, style) in enumerate(zip(select_times, styles)):
         a = np.loadtxt(base_directory + '{}{}.dat'.format(prof_prefix, i), skiprows = 1)
@@ -89,8 +94,13 @@ plot_profile(base_directory, profeq_loc, prof_prefix, ylabel = ylabel, figname= 
 for i in ax:i.grid()
 ax[-1].set_xlabel(r'$\sqrt{\Psi_N}$')
 for i in range(2): ax[i].set_ylabel('Toroidal Rotation (krad/s)')
+ax[0].text(0.3,50,'(a) Experiment')
+ax[1].text(0.3,50,'(b) Scaled')
+ax[2].text(0.3,1e-6,'(c) Experiment')
 ax[2].set_ylabel('$\eta$ (Ohm-m)')
 fig.tight_layout(pad = 0.1)
-if figname!=None: fig.savefig(figname)
-if figname!=None: fig.savefig(figname.rstrip('pdf')+'svg')
+
+if figname!=None: 
+    for i in ['pdf','eps','svg']:fig.savefig(figname.rstrip('pdf')+i)
+
 fig.canvas.draw(); fig.show()
