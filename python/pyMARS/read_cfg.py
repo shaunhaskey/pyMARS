@@ -143,7 +143,7 @@ I_coil_current = num.array(map(float, parser.get('i_coil_details', 'I_coil_curre
 
 
 #pickup details
-probe = parser.get('pickup_probe_details', 'probe').split(',')
+probe = [i.rstrip(' ').lstrip(' ') for i in parser.get('pickup_probe_details', 'probe').split(',')]
 probe_type = map(int, parser.get('pickup_probe_details', 'probe_type').split(','))
 Rprobe = num.array(map(float, parser.get('pickup_probe_details', 'Rprobe').split(',')))
 Zprobe = num.array(map(float, parser.get('pickup_probe_details', 'Zprobe').split(',')))
