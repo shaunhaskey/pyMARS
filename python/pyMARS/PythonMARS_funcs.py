@@ -281,15 +281,17 @@ def generate_directories(master, base_dir, multiple_efits = 0):
     dir_dict['chease_dir_PEST'] = dir_dict['exp_dir'] + 'cheaserun_PEST'
     dir_dict['mars_vac_dir'] =  dir_dict['mars_dir'] + 'RUNrfa.vac/'
     dir_dict['mars_plasma_dir'] =  dir_dict['mars_dir'] + 'RUNrfa.p/'
-    print dir_dict['chease_dir']
-    os.chdir(base_dir)
-    os.system('mkdir -p ' + dir_dict['chease_dir'])
-    print dir_dict['chease_dir_PEST']
-    os.system('mkdir -p ' + dir_dict['chease_dir_PEST'])
-    print dir_dict['mars_vac_dir']
-    os.system('mkdir -p ' + dir_dict['mars_vac_dir'])
-    print dir_dict['mars_plasma_dir']
-    os.system('mkdir -p ' + dir_dict['mars_plasma_dir'])
+    #print dir_dict['chease_dir']
+    #os.chdir(base_dir)
+    for i in ['chease_dir', 'chease_dir_PEST', 'mars_vac_dir', 'mars_plasma_dir']:
+        os.system('mkdir -p {}/{}'.format(base_dir, dir_dict[i]))
+        #os.system('mkdir -p {}/{}'.format(base_dir, dir_dict['chease_dir']))
+    # print dir_dict['chease_dir_PEST']
+    # os.system('mkdir -p {}/{}'.format(base_dir, dir_dict['chease_dir_PEST']))
+    # print dir_dict['mars_vac_dir']
+    # os.system('mkdir -p ' + dir_dict['mars_vac_dir'])
+    # print dir_dict['mars_plasma_dir']
+    # os.system('mkdir -p ' + dir_dict['mars_plasma_dir'])
     master['dir_dict']=dir_dict
     return master
 
@@ -297,26 +299,33 @@ def generate_directories(master, base_dir, multiple_efits = 0):
 #---------- Chease : Copy files required--------------
 def copy_chease_files(master, PEST=0):
     if PEST==1:
-        os.chdir(master['dir_dict']['chease_dir_PEST'])
+        #os.chdir(master['dir_dict']['chease_dir_PEST'])
+        work_dir = master['dir_dict']['chease_dir_PEST']
     else:
-        os.chdir(master['dir_dict']['chease_dir'])
-    issue_command('cp ', master['dir_dict']['efit_dir'] + master['EXPEQ_name'] + ' .')
-    issue_command('ln -sf ', master['EXPEQ_name'] + ' EXPEQ')
+        #os.chdir(master['dir_dict']['chease_dir'])
+        work_dir = master['dir_dict']['chease_dir']
+    if work_dir[-1]!='/':work_dir+=r'/'
+    #issue_command('cp ', master['dir_dict']['efit_dir'] + master['EXPEQ_name'] + ' .')
+    issue_command('cp {}{} {}'.format(master['dir_dict']['efit_dir'], master['EXPEQ_name'], work_dir))
+    issue_command('ln -sf {} {}{}'.format(master['EXPEQ_name'], work_dir, 'EXPEQ'))
 
 
 def modify_datain(master,template_dir, replace_values,CHEASE_template = 'datain_template',PEST=0):
     print 'Modifying CHEASE datain file'
     if PEST==1:
-        os.chdir(master['dir_dict']['chease_dir_PEST'])
+        write_dir = master['dir_dict']['chease_dir_PEST']
+        #os.chdir(master['dir_dict']['chease_dir_PEST'])
         dict_key = 'CHEASE_settings_PEST'
         master[dict_key]['<<NEGP>>'] = 0
         master[dict_key]['<<NER>>'] = 2
     else:
-        os.chdir(master['dir_dict']['chease_dir'])
+        write_dir = master['dir_dict']['chease_dir']
+        #os.chdir(master['dir_dict']['chease_dir'])
         dict_key = 'CHEASE_settings'
         master[dict_key]['<<NEGP>>'] = -1
         master[dict_key]['<<NER>>'] = 1
-        
+
+    if write_dir[-1]!='/':write_dir+=r'/'
     master[dict_key]['<<QSPEC>>'] = master['QMAX']
     master[dict_key]['<<B0EXP>>'] = master['B0EXP']
     master[dict_key]['<<R0EXP>>'] = master['R0EXP']
@@ -332,7 +341,7 @@ def modify_datain(master,template_dir, replace_values,CHEASE_template = 'datain_
         #print current, master[dict_key][current]
         datain_text = datain_text.replace(current,str(master[dict_key][current]))
 
-    datain_file = open('datain','w')
+    datain_file = open(write_dir + 'datain','w')
     datain_file.write(datain_text)
     datain_file.close()
     return master
@@ -362,8 +371,8 @@ def extract_aspect(master):
 #def fxin_create(master,M1,M2,R0EXP,B0EXP, PEST=0):
 def fxin_create(dir, M1, M2,R0EXP,B0EXP):
     print 'creating fxin'
-    os.chdir(dir)
-    fxin = open('fxin','w')
+    #os.chdir(dir)
+    fxin = open(r'{}/fxin'.format(dir),'w')
     fxin.write('%d\n%.8f\n%.8f\n'%(abs(M1)+abs(M2)+1,R0EXP,B0EXP))
     fxin.close()
 
@@ -417,21 +426,21 @@ def RMZM_post_matlab(master):
 
 def mars_link_files(directory, special_dir = '', link_PROFTI = False, link_PROFTE = False):
     start_directory = os.getcwd()
-    os.chdir(directory)
+    #os.chdir(directory)
     #if special_dir == '':
-    os.system('ln -sf ../../../../efit/' + special_dir + '/PROFDEN PROFDEN')
-    os.system('ln -sf ../../../../efit/' + special_dir + '/PROFROT PROFROT')
-    if link_PROFTI: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTI PROFTI')
-    if link_PROFTE: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTE PROFTE')
+    os.system('ln -sf ../../../../efit/' + special_dir + r'/PROFDEN {}/PROFDEN'.format(directory))
+    os.system('ln -sf ../../../../efit/' + special_dir + '/PROFROT {}/PROFROT'.format(directory))
+    if link_PROFTI: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTI {}/PROFTI'.format(directory))
+    if link_PROFTE: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTE {}/PROFTE'.format(directory))
 
     #else:
     #os.system('ln -sf ../../../efit/' + special_dir + '/PROFDEN PROFDEN')
     #os.system('ln -sf ../../../efit/' + special_dir + '/PROFROT PROFROT')
-    os.system('ln -sf ../../cheaserun/OUTRMAR OUTRMAR')
-    os.system('ln -sf ../../cheaserun/OUTVMAR OUTVMAR')
-    os.system('ln -sf ../../cheaserun/RMZM_F RMZM_F')
-    os.system('ln -sf ../../cheaserun/log_chease log_chease')
-    os.chdir(start_directory)
+    os.system('ln -sf ../../cheaserun/OUTRMAR {}/OUTRMAR'.format(directory))
+    os.system('ln -sf ../../cheaserun/OUTVMAR {}/OUTVMAR'.format(directory))
+    os.system('ln -sf ../../cheaserun/RMZM_F {}/RMZM_F'.format(directory))
+    os.system('ln -sf ../../cheaserun/log_chease {}/log_chease'.format(directory))
+    #os.chdir(start_directory)
 
 #--------- Mars Vacuum : setup -------------------
 #Link the PROFDEN, PROFROT, and chease outputs into the mars directory
@@ -662,7 +671,7 @@ def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
     master[dict_key]['<<TAUW>>'] = master['TAUWM']
 
     if master[dict_key]['<<ROTE>>'] == -1:master[dict_key]['<<ROTE>>']=master['ROTE']
-    print master[dict_key]['<<ETA>>'], master['ETA']
+    print master[dict_key]['<<ROTE>>'], master['ROTE']
     if master[dict_key]['<<ETA>>'] == -1:master[dict_key]['<<ETA>>']=master['ETA']
     print master[dict_key]['<<ETA>>'], master['ETA']
 #master[dict_key]['<<FEEDI>>'] = master['FEEDI']
@@ -755,10 +764,12 @@ def generate_job_file(master,MARS_execution_script, id_string = 'MARS', rm_files
 #------------ Generate job file for Chease batch run ----------
 def generate_chease_job_file(master,CHEASE_execution_script, PEST=0, fxrun = 0, id_string = 'Chease_', rm_files = ''):
     if PEST==1:
-        os.chdir(master['dir_dict']['chease_dir_PEST'])
+        #os.chdir(master['dir_dict']['chease_dir_PEST'])
+        working_dir = master['dir_dict']['chease_dir_PEST']
     else:
-        os.chdir(master['dir_dict']['chease_dir'])
-        
+        #os.chdir(master['dir_dict']['chease_dir'])
+        working_dir = master['dir_dict']['chease_dir']
+    if working_dir[-1]!='/':working_dir+='/'
     job_string = '#!/bin/bash\n'
     job_string = job_string + '#$ -N ' + id_string + 'p%.3d_q%.3d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
     job_string = job_string + '#$ -q all.q\n'
@@ -776,7 +787,7 @@ def generate_chease_job_file(master,CHEASE_execution_script, PEST=0, fxrun = 0, 
         #job_string += 'fxrun > fxrun_log.log\n'
 
     job_string += 'rm '+ rm_files +'\n'
-    file_name = open('chease.job','w')
+    file_name = open(r'{}/chease.job'.format(working_dir),'w')
     file_name.write(job_string)
     file_name.close()
 
