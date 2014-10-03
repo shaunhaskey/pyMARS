@@ -127,7 +127,7 @@ def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings, r
     os.system('mkdir ' + running_dir)
     os.chdir(running_dir)
     os.system('cp ' + efit_dir + '* .')
-
+    os.system("rm corsica_finished")
     with open('commands_test.txt','w') as command_file:command_file.write('read "sspqi_sh_this_dir.bas"\nquit\n')
 
     #open template, modify and write
