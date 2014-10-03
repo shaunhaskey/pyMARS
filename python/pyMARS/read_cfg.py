@@ -397,12 +397,16 @@ if start_from_step == 1:
         print "finished corsica runs"
     else:
         corsica_list = [['ml10']] 
-        for i in range(0,len(corsica_list)):
-            cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, corsica_list[i], corsica_settings[0], rm_files = CORSICA_rm_files)
+        #for i in range(0,len(corsica_list)):
+        cont_funcs.corsica_run_setup(corsica_base_dir, project_dict['details']['efit_dir'],project_dict['details']['template_dir'] + CORSICA_template_name, ['run_dir'], corsica_settings[0], rm_files = CORSICA_rm_files)
         print 'finished corsica setup, starting corsica runs'
-        #cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
-        cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1, rm_files = CORSICA_rm_files)
-        #cont_funcs.corsica_batch_run_qrsh(corsica_list, project_dict, corsica_base_dir, workers = CORSICA_workers)
+
+        #Cluster way of doing it
+        cont_funcs.corsica_qsub(corsica_base_dir + '/run_dir/', 'corsica.job')
+        cont_funcs.check_corsica_finished(corsica_base_dir + '/run_dir/', "corsica_finished")
+
+        #Old way of doing it
+        #cont_funcs.corsica_batch_run(corsica_list, project_dict, corsica_base_dir, workers = 1, rm_files = CORSICA_rm_files)
 
     print 'Total Time for this step : %.2f'%((time.time()-overall_start)/60)
 

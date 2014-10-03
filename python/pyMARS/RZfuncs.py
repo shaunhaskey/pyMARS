@@ -22,7 +22,7 @@ def I0EXP_calc(N,n,I):
     print 'I0EXP :', I0EXP
     return I0EXP
 
-def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None, return_components =0):
+def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None, return_components =0, inc_phase = False):
     '''
     SH : 19Nov2012
     For given coil currents described by list I, and coil geometry described in
@@ -47,7 +47,10 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None, ret
     if produce_plot:
         if plot_axes == None:
             import matplotlib.pyplot as pt
-            fig, ax = pt.subplots(nrows = 2)
+            if inc_phase == False:
+                fig, ax = pt.subplots(nrows = 2)
+            else:
+                fig, ax = pt.subplots(nrows = 3)
         else:
             ax = plot_axes
         ax[0].plot(phi_tmp*180./np.pi, current_array)
@@ -70,6 +73,10 @@ def I0EXP_calc_real(n,I,discrete_pts=1000, produce_plot=0, plot_axes = None, ret
         end_loc = np.argmin(np.abs(current_fft_freq-100))
         #print start_loc, end_loc
         ax[1].stem(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), 'b-')
+        if inc_phase:
+            ax[2].stem(current_fft_freq[start_loc:end_loc], np.angle(current_fft[start_loc:end_loc]/len(current_fft)), 'b-')
+            ax[2].set_ylim([-np.pi,np.pi])
+            ax[2].set_xlim([0,11])
         #ax[1].plot(current_fft_freq[start_loc:end_loc], 2.*np.abs(current_fft[start_loc:end_loc]/len(current_fft)), 'o')
         #ax[1].plot(current_fft_freq, 2.*np.abs(current_fft/len(current_fft)), 'o')
         ax[1].set_xlim([0,11])
