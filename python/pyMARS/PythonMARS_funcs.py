@@ -283,8 +283,10 @@ def generate_directories(master, base_dir, multiple_efits = 0):
     dir_dict['mars_plasma_dir'] =  dir_dict['mars_dir'] + 'RUNrfa.p/'
     #print dir_dict['chease_dir']
     #os.chdir(base_dir)
+
     for i in ['chease_dir', 'chease_dir_PEST', 'mars_vac_dir', 'mars_plasma_dir']:
-        os.system('mkdir -p {}/{}'.format(base_dir, dir_dict[i]))
+        print 'mkdir -p {}'.format(dir_dict[i])
+        os.system('mkdir -p {}'.format(dir_dict[i]))
         #os.system('mkdir -p {}/{}'.format(base_dir, dir_dict['chease_dir']))
     # print dir_dict['chease_dir_PEST']
     # os.system('mkdir -p {}/{}'.format(base_dir, dir_dict['chease_dir_PEST']))
@@ -306,8 +308,10 @@ def copy_chease_files(master, PEST=0):
         work_dir = master['dir_dict']['chease_dir']
     if work_dir[-1]!='/':work_dir+=r'/'
     #issue_command('cp ', master['dir_dict']['efit_dir'] + master['EXPEQ_name'] + ' .')
-    issue_command('cp {}{} {}'.format(master['dir_dict']['efit_dir'], master['EXPEQ_name'], work_dir))
-    issue_command('ln -sf {} {}{}'.format(master['EXPEQ_name'], work_dir, 'EXPEQ'))
+    #issue_command('cp {}{} {}'.format(master['dir_dict']['efit_dir'], master['EXPEQ_name'], work_dir))
+    #issue_command('ln -sf {} {}{}'.format(master['EXPEQ_name'], work_dir, 'EXPEQ'))
+    os.system('cp {}{} {}'.format(master['dir_dict']['efit_dir'], master['EXPEQ_name'], work_dir))
+    os.system('ln -sf {} {}{}'.format(master['EXPEQ_name'], work_dir, 'EXPEQ'))
 
 
 def modify_datain(master,template_dir, replace_values,CHEASE_template = 'datain_template',PEST=0):

@@ -35,20 +35,8 @@ eta_val = -1; rote_val = -1
 
 single_run = 1 if simul == 'single' else 0
 start_dir = os.getcwd()
-#shot = 157312
-#time = 4575
-#shot = 156746
-#time = 4617
-#shot = 158115
-#time = 4780
-#n = -2
-#suffix = 'raffi2_ideal'
-#original_dir = '/u/nazikian/CARLOS_2014/158115/shot158115_kinetic_RN/'
-#original_dir = '/u/paz-soldan/efit/156746/'
-#original_dir = '/u/nazikian/CARLOS_2014/158115_rn02/shot158115_kinetic_RN_2/'
 if original_dir[-1]!='/': original_dir +='/'
 mars_ind_dir = 'shot{}_{:05d}_{}_{}'.format(shot, time, simul, suffix)
-#efit_dir = '/u/haskeysr/efit/shot158115_04780/'
 efit_dir = '/u/haskeysr/efit/shot{}_{:05d}/'.format(shot, time)
 efit_dir = '/u/haskeysr/efit/{}/'.format(mars_ind_dir,)
 mars_dir = '/u/haskeysr/mars/{}/'.format(mars_ind_dir)
@@ -106,8 +94,6 @@ for fname, s_term, fname_link, mult, form in zip(final_names, search_terms, fina
         os.system('ln -sf {} {}'.format(fname, fname_link))
 os.system('mkdir {}'.format(mars_dir))
 input_template = '/u/haskeysr/mars/templates/BetaRampTemplate.cfg'
-
-#input_template = '/u/haskeysr/mars/raffi_157312_n3RMP/input.cfg'
 with file(input_template,'r') as file_handle: inp_temp = file_handle.readlines()
 mods = [['project_name','project_name = {}\n'.format(mars_ind_dir)],
         ['efit_file_location','efit_file_location = {}\n'.format(efit_dir)],
@@ -117,6 +103,19 @@ mods = [['project_name','project_name = {}\n'.format(mars_ind_dir)],
         ['<<ETA>>', '<<ETA>> : {}\n'.format(args['eta'])],
         ['I_coil_frequency', 'I_coil_frequency = {}\n'.format(args['freq'])],
         ['single_runthrough','single_runthrough = {}\n'.format(single_run)]]
+        
+
+if simul=='betaN_ramp':
+    print 'Adding new mods for betaN_ramp'
+    mods.append(['CORSICA_template_name', 'CORSICA_template_name = equal_spacing_pt1.bas\n'])
+    mods.append(['CORSICA_template_name2', 'CORSICA_template_name2 = equal_spacing_pt2.bas\n'])
+    mods.append(['q_mult_min', 'q_mult_min = 1\n'])
+    mods.append(['q_mult_max', 'q_mult_max = 1\n'])
+    mods.append(['q_mult_number', 'q_mult_number = 1\n'])
+    mods.append(['p_mult_number', 'p_mult_number = 20\n'])
+    mods.append(['<<stab_mode>>', '<<stab_mode>> : {}\n'.format(abs(n))])
+    mods.append(['<<call_dcon>>', '<<call_dcon>> : 1\n'])
+    mods.append(['CORSICA_workers','CORSICA_workers = 5\n'])
 
 for i in mods:
     print i
@@ -124,7 +123,7 @@ for i in mods:
         if inp_temp[j].find(i[0])>=0:
             print 'found', inp_temp[j], i[0]
             inp_temp[j] = i[1]
-
+            break
 with file(mars_dir + 'input.cfg','w') as file_handle: file_handle.writelines(inp_temp)
 print mars_dir
 print mars_dir + 'input.cfg'
