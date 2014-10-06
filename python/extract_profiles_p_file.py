@@ -10,7 +10,7 @@ parser.add_argument('--name', type=str, help = 'identifier in mars dir', require
 parser.add_argument('--n', type=int, help = 'mode number')
 parser.add_argument('--rote', type=float, help = 'rotation, 0 no rotation, 1 rotation', )
 parser.add_argument('--eta', type=float, help = 'resistivity, 0 no resist, 1 resist', )
-parser.add_argument('--simul', type=str, help = 'Type of simulation - single or betaN_ramp', )
+parser.add_argument('--simul', type=str, help = 'Type of simulation - single, betaN_ramp, q95_scan', )
 parser.add_argument('--freq', type=float, help = 'I-coil freq (Hz)', )
 
 args = vars(parser.parse_args())
@@ -104,7 +104,6 @@ mods = [['project_name','project_name = {}\n'.format(mars_ind_dir)],
         ['I_coil_frequency', 'I_coil_frequency = {}\n'.format(args['freq'])],
         ['single_runthrough','single_runthrough = {}\n'.format(single_run)]]
         
-
 if simul=='betaN_ramp':
     print 'Adding new mods for betaN_ramp'
     mods.append(['CORSICA_template_name', 'CORSICA_template_name = equal_spacing_pt1.bas\n'])
@@ -116,6 +115,12 @@ if simul=='betaN_ramp':
     mods.append(['<<stab_mode>>', '<<stab_mode>> : {}\n'.format(abs(n))])
     mods.append(['<<call_dcon>>', '<<call_dcon>> : 1\n'])
     mods.append(['CORSICA_workers','CORSICA_workers = 5\n'])
+elif simul=='q95_scan':
+    mods.append(['CORSICA_template_name', 'CORSICA_template_name = q95_scan.bas\n'])
+    mods.append(['q_mult_number', 'q_mult_number = 10\n'])
+    mods.append(['<<q95_min>>', '<<q95_min>> : 3.\n'])
+    mods.append(['<<q95_max>>', '<<q95_max>> : 5.\n'])
+    mods.append(['<<min_bn_li>>', '<<min_bn_li>> : 0\n'])
 
 for i in mods:
     print i
