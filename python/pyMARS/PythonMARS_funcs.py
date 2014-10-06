@@ -362,6 +362,7 @@ def extract_aspect(master):
     master['NW'] = int(round(float(extract_value(master['dir_dict']['chease_dir'] + '/log_chease','NW',' '))))
     with file(master['dir_dict']['chease_dir'] + '/log_chease','r') as filehandle:
         lines = filehandle.readlines()
+    lines = ''.join(lines).replace('FORTRAN STOP\n','').split('\n')
     for i in lines:
         #if i.find('ASPECT RATIO')>=0 and i.find('a/R')>=0:
         if i.find('ASPECT')>=0 and i[0:3]=='   ' and i.find('CSM')<0:
