@@ -69,8 +69,6 @@ multipliers = [10**20,1,1,1]
 format = ['{:.4e}','{:.4f}','{:.4f}','{:.4f}']
 final_names = ['{}{}.{:05d}.dat'.format(i, shot, time) for i in final_names]
 search_terms = ['ne','te','ti','omeg']
-with file(filename,'r') as handle:lines = handle.readlines()
-os.chdir(efit_dir)
 def mod_data(in_list, mult, form):
     out_list = [' {}        {}\n'.format(len(in_list), '2')]
     for i in in_list:
@@ -80,18 +78,38 @@ def mod_data(in_list, mult, form):
         out_list.append('{:.4f}        {}\n'.format((float(tmp[0]))**0.5, val))
     return out_list
 
-for fname, s_term, fname_link, mult, form in zip(final_names, search_terms, final_names_link, multipliers, format):
-    print fname, s_term
-    success = 0
-    for i in range(len(lines)):
-        if lines[i].find(s_term)>=0:
-            success = 1
-            break
-    if success:
-        n_terms = int(lines[i].split(' ')[0])
-        data = mod_data(lines[i+1:i+1+n_terms], mult, form)
-        with file(efit_dir + fname,'w') as handle:handle.writelines(data)
-        os.system('ln -sf {} {}'.format(fname, fname_link))
+if os.path.exists(filename): 
+    print 'using p file'
+    use_p_file = True
+else:
+    print 'using profile files'
+    for i in final_names_link:
+        if os.path.exists('{}/{}'.format(original_dir, i)):
+            pass
+        else:
+            print 'profile file: {} does not exist'.format(i)
+            raise ValueError()
+    use_p_file = False
+
+if use_p_file: 
+    with file(filename,'r') as handle:lines = handle.readlines()
+    os.chdir(efit_dir)
+    for fname, s_term, fname_link, mult, form in zip(final_names, search_terms, final_names_link, multipliers, format):
+        print fname, s_term
+        success = 0
+        for i in range(len(lines)):
+            if lines[i].find(s_term)>=0:
+                success = 1
+                break
+        if success:
+            n_terms = int(lines[i].split(' ')[0])
+            data = mod_data(lines[i+1:i+1+n_terms], mult, form)
+            with file(efit_dir + fname,'w') as handle:handle.writelines(data)
+            os.system('ln -sf {} {}'.format(fname, fname_link))
+else:
+    for i in final_names_link:
+        os.system('cp {}/{} {}/'.format(original_dir, i, efit_dir))
+
 os.system('mkdir {}'.format(mars_dir))
 input_template = '/u/haskeysr/mars/templates/BetaRampTemplate.cfg'
 with file(input_template,'r') as file_handle: inp_temp = file_handle.readlines()

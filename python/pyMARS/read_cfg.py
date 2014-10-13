@@ -337,7 +337,7 @@ if start_from_step == 1:
 
         #get shot number and time from the efit filename
         for i in range(0,len(dir_list)):
-            if dir_list[i].find('.') == 7 and dir_list[i][0]=='g':
+            if dir_list[i].find('.') == 7 and dir_list[i][0]=='g' and dir_list[i][-1]!='~':
                 shot_number = int(dir_list[i][1:7])
                 if dir_list[i].find('_')== -1:
                     shot_time = int(dir_list[i][8:])
