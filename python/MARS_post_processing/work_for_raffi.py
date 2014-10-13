@@ -250,6 +250,65 @@ for i in ax:
 #for i in ax:i.set_lim([-180,180])
 fig.canvas.draw(); fig.show()
 
+############Raffi n=1 C-coil 14Oct2014####
+
+dirs = ['shot158115_04702_single_raffi3_C-coil','shot158115_04780_single_raffi3_C-coil']
+for dir in dirs:
+    print ''
+    print dir
+    file_name = '/home/srh112/NAMP_datafiles/mars/{}/{}_post_processing_PEST.pickle'.format(dir,dir)
+    a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+    plas_only = a.project_dict['sims'][1]['plasma_upper_response4'] - a.project_dict['sims'][1]['vacuum_upper_response4']
+    vac_only = a.project_dict['sims'][1]['vacuum_upper_response4']
+    total = a.project_dict['sims'][1]['plasma_upper_response4']
+    probe_names = ['66M', 'MPID1A', 'MPID1B']
+    vals = plas_only
+    for probe in probe_names:
+        tmp = a.project_dict['details']['pickup_coils']['probe'].index(probe)
+        if tmp!=-1:
+            print '{}:{:.4f}G/kA, {:.4f}deg'.format(probe, np.abs(vals)[tmp], np.angle(vals,deg=True)[tmp])
+        else :
+            print '{}:error'.format(probe)
+colour = ['b','r','k']
+markers = ['x','o','.']
+labels = ['4702ideal', '4780ideal']
+dirs = ['shot158115_04702_single_raffi3_C-coil','shot158115_04780_single_raffi3_C-coil']
+file_names = []
+base_dir = r'/home/srh112/NAMP_datafiles/mars/'
+for dir_tmp in dirs:
+    file_names.append('{}/{}/{}_post_processing_PEST.pickle'.format(base_dir, dir_tmp, dir_tmp))
+inc_phase = True
+inc_opt_phasing = False
+ax1 = True; ax2=False; ax3 = False
+fig, ax = pt.subplots(nrows = ax1 + ax2 + ax3, sharex = True); #ax = [ax]
+if (ax1 + ax2 + ax3) ==1: ax = [ax]
+for file_name, label, marker in zip(file_names, labels, markers):
+    results, phases, betaN_li, foo = extract_useful(file_name, m = 10, probe_names = probe_names)
+    forced_phase = 0
+    keys = probe_names#keys = ['66M', ' MPID1B']
+    #keys = results1['probe'].keys()
+    #marker = ['o']
+    ax1 = ax[0]
+    ax2 = ax[1] if ax2 else None 
+    ax3 = ax[2] if ax3 else None
+    for i, clr in zip(keys, colour):
+        plot_kwargs = {'marker': marker, 'color': clr, 'label' :'{} - {}'.format(i, label)}
+        #plot_kwargs = {'marker': 'o', 'color':clr, 'label' :'{}'.format(i.replace('_','\_'))}
+        max_phases, max_amps, max_angs = max_amp_max_phase(results['probe'], i, 'plasma', phases, ax1 = ax[0], ax2 = ax2, ax3 = ax3, x_ax = betaN_li, plot_kwargs = plot_kwargs, forced_phase = forced_phase)
+        #lab = '{} - {}'.format(i,'ideal MHD')
+        #max_phases, max_amps, max_angs = max_amp_max_phase(results['probe'], i, 'plasma', phases, ax1 = ax[0], ax2 = ax2, ax3 = ax3, x_ax = betaN_li2, plot_kwargs = plot_kwargs, forced_phase = forced_phase)
+    #ax[0].set_xlim([0.5,3.177])
+ax[0].set_xlim([2.,5])
+ax[0].set_ylim([0,4.5])
+ax[0].set_ylim([0,18.])
+ax[-1].set_xlabel('BetaN/Li')
+ax[0].set_ylabel('G/kA')
+if ax2!=None: ax[1].set_ylabel('Signal Phase (deg)')
+if ax3!=None: ax[2].set_ylabel('Optimum UL phasing (deg)')
+for i in ax: ax[0].set_ylabel('G/kA')
+leg = ax[0].legend(loc = 'best', fontsize=8)
+fig.canvas.draw(); fig.show()
+
 1/0
 
 max_phases, max_amps_rfa, max_angs = max_amp_max_phase(results1, 'rfa', 'plasma', phases, ax1 = ax[0], ax2=ax[1], x_ax = betaN_li, plot_kwargs = plot_kwargs)
