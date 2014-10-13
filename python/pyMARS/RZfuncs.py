@@ -523,9 +523,12 @@ def get_FEEDI(file_name):
     #print imp_line, FEEDI_float
 
     FEEDI_matrix = np.loadtxt(file_name)
-    FEEDI_1 = np.sqrt(np.sum(FEEDI_matrix[0,:]**2))
-    FEEDI_2 = np.sqrt(np.sum(FEEDI_matrix[1,:]**2))
-    FEEDI_float= np.max([FEEDI_1,FEEDI_2])
+    if len(FEEDI_matrix.shape)==1:
+        FEEDI_float = np.sqrt(np.sum(FEEDI_matrix[:]**2))
+    else:
+        FEEDI_1 = np.sqrt(np.sum(FEEDI_matrix[0,:]**2))
+        FEEDI_2 = np.sqrt(np.sum(FEEDI_matrix[1,:]**2))
+        FEEDI_float= np.max([FEEDI_1,FEEDI_2])
     print ' FEEDI :',FEEDI_float
     return FEEDI_float
 
