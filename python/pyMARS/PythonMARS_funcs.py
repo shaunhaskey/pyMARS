@@ -461,29 +461,6 @@ def mars_setup_files(master, special_dir = '', upper_and_lower = 0, link_PROFTI 
             os.system('mkdir -p ' + master['dir_dict']['mars_{}_{}_dir'.format(loc, type)])
             mars_link_files(master['dir_dict']['mars_{}_{}_dir'.format(loc, type)], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
 
-        #master['dir_dict']['mars_upper_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.p'
-        #master['dir_dict']['mars_lower_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.p'
-        ##master['dir_dict']['mars_upper_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_upper.vac'
-        #master['dir_dict']['mars_lower_vacuum_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_lower.vac'
-#         os.system('mkdir -p ' + master['dir_dict']['mars_upper_plasma_dir'])
-#         os.system('mkdir -p ' + master['dir_dict']['mars_lower_plasma_dir'])
-#         os.system('mkdir -p ' + master['dir_dict']['mars_lower_vacuum_dir'])
-#         os.system('mkdir -p ' + master['dir_dict']['mars_upper_vacuum_dir'])
-#         mars_link_files(master['dir_dict']['mars_upper_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-#         mars_link_files(master['dir_dict']['mars_lower_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-#         mars_link_files(master['dir_dict']['mars_lower_vacuum_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-#         mars_link_files(master['dir_dict']['mars_upper_vacuum_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-#     else:
-#         for type, folder in zip(['plasma','vacuum'],['p','vac']):
-#             master['dir_dict']['mars_{}_{}_dir'.format(loc, type)]=master['dir_dict']['mars_dir']+'RUN_rfa_{}.{}'.format(loc,folder)
-#             os.system('mkdir -p ' + master['dir_dict']['mars_{}_{}_dir'.format(type, loc)])
-#             mars_link_files(master['dir_dict']['mars_{}_{}_dir'.format(type, loc)], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-
-#         master['dir_dict']['mars_plasma_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.4f}_ROTE{:.4f}.p'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
-#         master['dir_dict']['mars_vac_dir']=master['dir_dict']['mars_dir']+'RUN_rfa_RES{:.4f}_ROTE{:.4f}.vac'.format(master['MARS_settings']['<<ETA>>']*1e8,master['MARS_settings']['<<ROTE>>']*100)
-#         mars_link_files(master['dir_dict']['mars_plasma_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-#         mars_link_files(master['dir_dict']['mars_vac_dir'], special_dir = special_dir, link_PROFTI = link_PROFTI, link_PROFTE = link_PROFTE)
-
 
 
 #--------- Calculate Alvfen velociy  -------------------
@@ -674,6 +651,7 @@ def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
     master[dict_key]['<<ISENS>>'] = master['IFEED']
     master[dict_key]['<<IWALL>>'] = master['NW']
     master[dict_key]['<<TAUW>>'] = master['TAUWM']
+    master[dict_key]['<<NCOIL>>'] = 2
 
     if master[dict_key]['<<ROTE>>'] == -1:master[dict_key]['<<ROTE>>']=master['ROTE']
     print master[dict_key]['<<ROTE>>'], master['ROTE']
@@ -696,13 +674,21 @@ def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
     if upper_and_lower == 1:
         master[dict_key]['<<INCFEED>>'] = 4
         master[dict_key]['<<FEEDI>>'] = '(1.0,0.0),(0.0, 0.0)'
+        master[dict_key]['<<FEEDI>>'] = '(1.0,0.0)'
+        master[dict_key]['<<NCOIL>>'] = 1
+        master[dict_key]['<<FCCHI>>'] = str(master['FCCHI'][0])
+        master[dict_key]['<<FWCHI>>'] = str(master['FWCHI'][0])
         mars_edit_run_file(master['dir_dict']['mars_upper_vacuum_dir'], master[dict_key], template_file)
         master[dict_key]['<<INCFEED>>'] = 8
         mars_edit_run_file(master['dir_dict']['mars_upper_plasma_dir'], master[dict_key], template_file)
-        master[dict_key]['<<FEEDI>>'] = '(0.0,0.0),(1.0, 0.0)'
+        #master[dict_key]['<<FEEDI>>'] = '(0.0,0.0),(1.0, 0.0)'
+        master[dict_key]['<<FCCHI>>'] = str(master['FCCHI'][1])
+        master[dict_key]['<<FWCHI>>'] = str(master['FWCHI'][1])
         mars_edit_run_file(master['dir_dict']['mars_lower_plasma_dir'], master[dict_key], template_file)
         master[dict_key]['<<INCFEED>>'] = 4
         mars_edit_run_file(master['dir_dict']['mars_lower_vacuum_dir'], master[dict_key], template_file)
+        #master[dict_key]['<<FCCHI>>'] = str(master['FCCHI'][0]) + ', ' + str(master['FCCHI'][1])
+        #master[dict_key]['<<FWCHI>>'] = str(master['FWCHI'][0]) + ', ' + str(master['FWCHI'][1])
     else:
         for incfeed, type in zip([4,8],['vacuum','plasma']):
             master[dict_key]['<<INCFEED>>'] = incfeed
