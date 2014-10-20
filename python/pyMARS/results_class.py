@@ -386,8 +386,8 @@ class data():
             BnPEST = real_pt + 1j*imag_pt
             BMnPEST = np.dot(BnPEST,expmchi)*tmp2
             n_nans = np.sum(np.isnan(BMnPEST))
-            if n_nans==0 and i!=0:
-                print ' number of attempts to remove nans from BnPEST:',i
+            if n_nans==0:
+                if i!=0: print ' number of attempts to remove nans from BnPEST:',i
                 break
         mm = np.arange(-29,29+1,dtype=int)
         mm2 = np.arange(-29,29+1,dtype=int)
