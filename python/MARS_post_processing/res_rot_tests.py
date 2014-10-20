@@ -220,8 +220,10 @@ for calc_type, cur_clim, title, fname, field, cmap, amp in zip(data, clims, labe
     cbar = pt.colorbar(cax, ax = ax.flatten().tolist())
     #cbar.set_label('{}-{}'.format(title, field))
     cbar.set_label('{}'.format(title))
-    fig.savefig(fname+'-'+field+'2x2.pdf', bbox_inches = 'tight',pad = 0.1)
-    fig.savefig(fname+'-'+field+'2x2.svg', bbox_inches = 'tight',pad = 0.1)
+    #fig.savefig(fname+'-'+field+'2x2.pdf', bbox_inches = 'tight',pad = 0.1)
+    #fig.savefig(fname+'-'+field+'2x2.svg', bbox_inches = 'tight',pad = 0.1)
+    fig.savefig(fname+'-'+field+'2x2.pdf', pad = 0.1)
+    fig.savefig(fname+'-'+field+'2x2.svg', pad = 0.1)
     fig.canvas.draw(); fig.show()
 
 

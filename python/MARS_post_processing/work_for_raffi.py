@@ -250,8 +250,90 @@ for i in ax:
 #for i in ax:i.set_lim([-180,180])
 fig.canvas.draw(); fig.show()
 
-############Raffi n=1 C-coil 14Oct2014####
+############Raffi n=1 I-coil 16Oct2014####
+labels = ['4702', '4780']
+dirs = ['shot158115_0{}_n1_V2'.format(i) for i in labels]
+probe_names = ['66M', 'MPID1A', 'MPID1B']
+fig, ax = pt.subplots(nrows = len(probe_names), ncols = 3, sharex = True, sharey = True)
+fig2, ax2 = pt.subplots(nrows = 3, ncols = 2, sharex = True, sharey = True)
+fields = ['vacuum','plasma','total']
+for i, field in enumerate(fields):
+    dBres_dBkink.probe_phasing_single_eq(dirs, probe_names = probe_names, ax = ax[i,:], labels = labels, field = field)
+    dBres_dBkink.metrics_phasing_single_eq(dirs, ax = ax2[i,:], labels = labels, field = field)
+for field, tmp_ax in zip(fields, ax[:,0]):tmp_ax.set_ylabel(field + ' G/ka')
+for field, tmp_ax in zip(fields, ax2[:,0]):tmp_ax.set_ylabel(field + ' G/ka')
+for name, tmp_ax in zip(probe_names, ax[0,:]):tmp_ax.set_title(name)
+for name, tmp_ax in zip(['Resonant metric','Kink Metric'], ax2[0,:]):tmp_ax.set_title(name)
+for tmp_ax in ax[-1,:]:tmp_ax.set_xlabel('UL phasing (deg)')
+for tmp_ax in ax2[-1,:]:tmp_ax.set_xlabel('UL phasing (deg)')
+for i in ax.flatten(): i.grid()
+for i in ax2.flatten(): i.grid()
+ax[0,0].legend(loc='best')
+ax2[0,0].legend(loc='best')
+fig.canvas.draw(); fig.show()
+fig2.canvas.draw(); fig2.show()
 
+
+probe_names = ['66M', 'MPID1A', 'MPID1B']
+fig_probes, ax_probes = pt.subplots(nrows = len(probe_names), sharex = True)
+for dir in dirs:
+    print ''
+    print dir
+    file_name = '/home/srh112/NAMP_datafiles/mars/{}/{}_post_processing_PEST.pickle'.format(dir,dir)
+    a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+    plas_only = a.project_dict['sims'][1]['plasma_upper_response4'] - a.project_dict['sims'][1]['vacuum_upper_response4']
+    vac_only = a.project_dict['sims'][1]['vacuum_upper_response4']
+    total = a.project_dict['sims'][1]['plasma_upper_response4']
+    vals = plas_only
+    for probe, ax_tmp in zip(probe_names, ax_probes):
+        tmp = a.project_dict['details']['pickup_coils']['probe'].index(probe)
+        if tmp!=-1:
+            print '{}:{:.4f}G/kA, {:.4f}deg'.format(probe, np.abs(vals)[tmp], np.angle(vals,deg=True)[tmp])
+        else :
+            print '{}:error'.format(probe)
+        x_ax = np.linspace(0, 2.*np.pi)
+        ax_tmp.set_title(probe)
+        ax_tmp.plot(x_ax, np.abs(a.project_dict['sims'][1]['plasma_upper_response4'][tmp] - np.exp(1j*x_ax)*a.project_dict['sims'][1]['vacuum_upper_response4'][tmp]))
+fig_probes.canvas.draw(); fig_probes.show()
+
+colour = ['b','r','k']
+markers = ['x','o','.']
+labels = ['4702ideal', '4780ideal']
+#dirs = ['shot158115_04702_single_raffi3_C-coil','shot158115_04780_single_raffi3_C-coil']
+file_names = []
+base_dir = r'/home/srh112/NAMP_datafiles/mars/'
+for dir_tmp in dirs:
+    file_names.append('{}/{}/{}_post_processing_PEST.pickle'.format(base_dir, dir_tmp, dir_tmp))
+inc_phase = True
+inc_opt_phasing = False
+ax1 = True; ax2=False; ax3 = False
+fig, ax = pt.subplots(nrows = ax1 + ax2 + ax3, sharex = True); #ax = [ax]
+if (ax1 + ax2 + ax3) ==1: ax = [ax]
+for file_name, label, marker in zip(file_names, labels, markers):
+    results, phases, betaN_li, foo = extract_useful(file_name, m = 10, probe_names = probe_names)
+    forced_phase = 0
+    keys = probe_names#keys = ['66M', ' MPID1B']
+    #keys = results1['probe'].keys()
+    #marker = ['o']
+    ax1 = ax[0]
+    ax2 = ax[1] if ax2 else None 
+    ax3 = ax[2] if ax3 else None
+    for i, clr in zip(keys, colour):
+        plot_kwargs = {'marker': marker, 'color': clr, 'label' :'{} - {}'.format(i, label)}
+        max_phases, max_amps, max_angs = max_amp_max_phase(results['probe'], i, 'plasma', phases, ax1 = ax[0], ax2 = ax2, ax3 = ax3, x_ax = betaN_li, plot_kwargs = plot_kwargs, forced_phase = forced_phase)
+ax[0].set_xlim([2.,5])
+ax[0].set_ylim([0,4.5])
+ax[0].set_ylim([0,18.])
+ax[-1].set_xlabel('BetaN/Li')
+ax[0].set_ylabel('G/kA')
+if ax2!=None: ax[1].set_ylabel('Signal Phase (deg)')
+if ax3!=None: ax[2].set_ylabel('Optimum UL phasing (deg)')
+for i in ax: ax[0].set_ylabel('G/kA')
+leg = ax[0].legend(loc = 'best', fontsize=8)
+fig.canvas.draw(); fig.show()
+
+
+############Raffi n=1 C-coil 14Oct2014####
 dirs = ['shot158115_04702_single_raffi3_C-coil','shot158115_04780_single_raffi3_C-coil']
 for dir in dirs:
     print ''

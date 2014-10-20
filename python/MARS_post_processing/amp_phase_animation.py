@@ -14,16 +14,21 @@ import copy
 N = 6; n = 2
 I = np.array([1.,-1.,0.,1,-1.,0.])
 I = np.array([1.,-0.5,-0.5,1,-0.5,-0.5])
+
+#I = np.array([1.,0.5,-0.5,1,0.5,-0.5])
 I0EXP = I0EXP_calc(N,n,I); facn = 1.0
 
 I0EXP = I0EXP_calc_real(n,I)
 facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?
 
 #various simulation directories to get the components
-base_dir = '/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/'
+#base_dir = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_single_raffi3_C-coil/qmult1.000/exp1.000/RES-100000000.0000_ROTE-100.0000/'
+#base_dir = '/home/srh112/NAMP_datafiles/mars/shot158115_04702_single_raffi3_C-coil/qmult1.000/exp1.000/RES-100000000.0000_ROTE-100.0000/'
+#base_dir = '/home/srh112/NAMP_datafiles/mars/shot146382_single_ul/qmult1.000/exp1.000/marsrun/'
 base_dir = '/home/srh112/NAMP_datafiles/mars/shot158115_04780/qmult1.000/exp1.000/RES-100000000.0000_ROTE-100.0000/'
 #base_dir = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_n4/qmult1.000/exp1.000/RES-100000000.0000_ROTE-100.0000/'
 #base_dir = '/home/srh112/NAMP_datafiles/mars/single_run_through_test_142614_V2/qmult1.000/exp1.000/marsrun/'
+base_dir = '/home/srh112/NAMP_datafiles/mars/shot158115_04702_single_raffi_test/qmult1.000/exp1.000/RES-100000000.0000_ROTE-100.0000/'
 dir_loc_lower_t = base_dir + '/RUN_rfa_lower.p'
 dir_loc_upper_t = base_dir + '/RUN_rfa_upper.p'
 dir_loc_lower_v = base_dir + '/RUN_rfa_lower.vac'
@@ -46,7 +51,7 @@ annotate_plots = False
 
 plots = ['v','p','t']
 if animation_phasings:
-    phasings = range(0,360,15)
+    phasings = range(0,360,120)
     #phasings = [0]
     #phasings = range(0,360,120)
     for i, phasing in enumerate(phasings):
@@ -103,6 +108,7 @@ if animation_phasings:
                 color_plots[tmp_loc].set_clim([-np.pi,np.pi])
             else:
                 color_plots[tmp_loc].set_clim([0,3])
+                #color_plots[tmp_loc].set_clim([0,0.3])
             ax[tmp_loc].set_xlabel('m')
             ax[tmp_loc].set_title(titles[tmp_loc].format(phasing))
         if sqrt_flux:

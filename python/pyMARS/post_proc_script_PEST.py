@@ -23,9 +23,9 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, s_surfac
             I0EXP = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
             #project_dict['sims'][i]['I0EXP'] = RZfuncs.I0EXP_calc(project_dict['sims'][i]['I-coils']['N_Icoils'],np.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>']),project_dict['sims'][i]['I-coils']['I_coil_current'])
             Nchi = project_dict['sims'][i]['CHEASE_settings']['<<NCHI>>']
-            project_dict['sims'][i]['I0EXP'] = I0EXP
+            project_dict['sims'][i]['I0EXP'] = +I0EXP
             #I0EXP = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
-
+            #print ' I0EXP:{}'.format(I0EXP)
 
             locs = ['upper', 'lower'] if upper_and_lower else ['']
             project_dict['sims'][i]['responses']={}
@@ -63,7 +63,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, s_surfac
                     disp_run_list = [results_classes['_plasma'], results_classes['_vacuum']]
                     phasing_vals = [0]
                 for tmp_cur in disp_run_list: tmp_cur.get_VPLASMA()
-                print 'got VPLASMA, calculating displacements'
+                #print 'got VPLASMA, calculating displacements'
 
                 out = results_class.disp_calcs(disp_run_list, n_zones = 20, phasing_vals = phasing_vals, ul = upper_and_lower)
                 project_dict['sims'][i]['displacement_responses'] = copy.deepcopy(out)

@@ -10,7 +10,7 @@ upper_and_lower = int(sys.argv[2])
 
 def perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,tprobe,lprobe, I0EXP= 1.0e+3 * 3./np.pi):
     #print 'in perform_calcs'
-    print directory, 'I0EXP=',I0EXP
+    #print directory, 'I0EXP=',I0EXP
 
     #I0EXP = RZfuncs.I0EXP_calc(N,n,I)
     new_data = results_class.data(directory,Nchi=240,link_RMZM=0, I0EXP=I0EXP, spline_B23=2)

@@ -18,7 +18,7 @@ def combine_fields_displacement(input_data, attr_name, theta = 0, field_type='pl
     input_data = [total_lower, vacuum_lower, total_upper, vacuum_upper]
     SRH: 31Jan2014
     '''
-    print 'combining property : ', attr_name
+    #print ' combining property : ', attr_name
     if len(input_data)==2:
         if field_type=='plas':
             answer = getattr(input_data[0], attr_name) - getattr(input_data[1], attr_name)
@@ -38,7 +38,7 @@ def combine_fields_displacement(input_data, attr_name, theta = 0, field_type='pl
             lower_data = getattr(input_data[1], attr_name)
             upper_data = getattr(input_data[3], attr_name)
         answer = upper_data + lower_data*(np.cos(theta)+1j*np.sin(theta))
-        print 'combine %s, theta : %.2f'%(field_type, theta)
+        #print 'combine %s, theta : %.2f'%(field_type, theta)
     return answer
 
 def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
@@ -76,7 +76,7 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
     angle = np.arctan2(plas_z[-1,:], plas_r[-1,:]-run_data[0].R0EXP)
     z_vals_red = z_vals[:-1]
     r_vals_red = r_vals[:-1]
-    print 'Disp mean calc'
+    #print 'Disp mean calc'
     def disp_int(plot_quantity_red, truth, dl, angle):
         return np.sum(np.abs(plot_quantity_red[truth])*dl[truth])/np.sum(dl[truth]), np.mean(angle[truth])
 
@@ -86,7 +86,7 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
             for ab in ['above','below']:
                 cur_dict['disp_{}_{}'.format(ab,side)] = []
                 cur_dict['ang_{}_{}'.format(ab,side)] = []
-        print '===== %d ====='%(theta_deg)
+        #print '===== %d ====='%(theta_deg)
         theta = float(theta_deg)/180*np.pi;
         if len(run_data)>2:
             plot_quantity = combine_fields_displacement(run_data, plot_field, theta=theta, field_type=field_type)
@@ -114,18 +114,11 @@ def disp_calcs(run_data, n_zones = 20, phasing_vals = None, ul= True):
             truth = (z_vals_red<lower_values[i-1])*(z_vals_red>=lower_values[i])*(dz<0)
             disp, ang = disp_int(plot_quantity_red, truth, dl, angle)
             cur_dict['disp_below_HFS'].append(+disp); cur_dict['ang_below_HFS'].append(+ang)
-            #print upper_values[i-1], upper_values[i], np.sum(truth)
-            #cur_dict['disp_below_HFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
-            #cur_dict['ang_below_HFS'].append(np.mean(angle[truth]))
-            #ax.plot(r_vals_red[truth1], z_vals_red[truth1],'--')
 
             truth = (z_vals_red<lower_values[i-1])*(z_vals_red>=lower_values[i])*(dz>0)
             disp, ang = disp_int(plot_quantity_red, truth, dl, angle)
             cur_dict['disp_below_LFS'].append(+disp); cur_dict['ang_below_LFS'].append(+ang)
 
-            #cur_dict['disp_below_LFS'].append(np.sum(np.abs(plot_quantity_red[truth]))/np.sum(truth))
-            #cur_dict['ang_below_LFS'].append(np.mean(angle[truth]))
-            #ax.plot(r_vals_red[truth2], z_vals_red[truth],'-')
         output_dict[theta_deg]=copy.deepcopy(cur_dict)
     #print output_dict[0]['disp_below_HFS'], output_dict[45]['disp_below_HFS']
     return output_dict
@@ -212,7 +205,8 @@ class data():
         self.R, self.Z =  GetRZ(self.RM,self.ZM,self.Nm0,self.Nm2,self.chi,self.phi)
         self.FEEDI = get_FEEDI(self.directory + '/FEEDI')
         self.BNORM = calc_BNORM(self.FEEDI, self.R0EXP, I0EXP = self.I0EXP)
-        print ' ',self.directory, self.BNORM, self.FEEDI, self.R0EXP, self.I0EXP
+        print ' ', self.directory
+        print ' BNORM:{}, FEEDI:{}, R0EXP:{}, I0EXP:{} '.format(self.BNORM, self.FEEDI, self.R0EXP, self.I0EXP)
         file_name = self.directory + '/BPLASMA'
         #Extract geometry related stuff
         self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian = GetUnitVec(self.R, self.Z, self.s, self.chi)
@@ -372,19 +366,8 @@ class data():
         BnPEST  = interp.griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
         #print '***', np.sum(np.isnan(BnPEST)), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(BnEQAC.flatten())), np.sum(np.isnan(R_Z_PEST)), BnEQAC.shape
         BnPEST[np.isnan(BnPEST)] = 0
-        #print '*** remove NaNs', np.sum(np.isnan(BnPEST)), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(BnEQAC.flatten())), np.sum(np.isnan(R_Z_PEST)), BnEQAC.shape
-
-        #print '--- in pest calc nan', os.getpid(), np.sum(np.isnan(R_Z_EQAC)), np.sum(np.isnan(R_Z_PEST))
-        #print '--- in pest calc eqac*',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST))), np.sum(np.isnan((BnPEST))), np.sum(np.isnan((BnPEST))) >0
-
-        #if_pass = 'fail' if np.sum(np.isnan((BnPEST))) > 0 else 'pass'
-        #np.savetxt('{}_RZPEST_{}'.format(os.getpid(), if_pass), R_Z_PEST)
-        #np.savetxt('{}_BnPEST_{}'.format(os.getpid(), if_pass), BnPEST)
-        #np.savetxt('{}_RZEQAC_{}'.format(os.getpid(), if_pass), R_Z_EQAC)
         BnPEST.resize(BnEQAC.shape)
         BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST
-        #print '***', np.sum(np.isnan(BnPEST))
-        #print '--- in pest calc eqac**',  os.getpid(), os.getcwd(), np.sum(np.abs((BnPEST)))
 
 
         mk = np.arange(-29,29+1,dtype=int)
@@ -403,15 +386,9 @@ class data():
             BnPEST = real_pt + 1j*imag_pt
             BMnPEST = np.dot(BnPEST,expmchi)*tmp2
             n_nans = np.sum(np.isnan(BMnPEST))
-            if n_nans==0:
+            if n_nans==0 and i!=0:
                 print ' number of attempts to remove nans from BnPEST:',i
                 break
-            
-        #if n_nans>0:
-        #    BMnPEST = np.dot(BnPEST,expmchi)*tmp2
-        #    print 'NANs still exist!'
-        #    print '*** BMnPEST', np.sum(np.isnan(BMnPEST)), np.sum(np.isnan(expmchi))
-        #    #1/0
         mm = np.arange(-29,29+1,dtype=int)
         mm2 = np.arange(-29,29+1,dtype=int)
 
@@ -428,7 +405,8 @@ class data():
         BnPEST[-1,:] = BnPEST[-2,:]
         self.BnPEST = BnPEST
         #print '--- in pest calc',  os.getcwd(), os.getcwd(), np.sum(np.abs((self.Bn))), np.sum(np.abs((self.BnPEST)))
-        print ' *** number of nans in BnPEST', np.sum(np.isnan(self.BnPEST))
+        nans = np.sum(np.isnan(self.BnPEST))
+        if nans!=0: print ' *** number of nans in BnPEST', nans
 
         new_area = []
         for i in range(0, self.R.shape[0]):

@@ -294,7 +294,7 @@ def ReadBPLASMA(file_name,BNORM,Ns,s, spline_B23=2):
     BM2 = np.reshape(BM2,[Ns,Nm1],order='F')
     BM3 = np.reshape(BM3,[Ns,Nm1],order='F')
 
-    print ' BNORM used in ReadBPLASMA', BNORM
+    #print ' BNORM used in ReadBPLASMA', BNORM
     BM1 = BM1[0:Ns,:]*BNORM
     BM2 = BM2[0:Ns,:]*BNORM
     BM3 = BM3[0:Ns,:]*BNORM
@@ -369,7 +369,7 @@ def GetV123(VM1,VM2,VM3,R, chi, dRds, dZds, dRdchi, dZdchi, jacobian, Mm, Nchi, 
 
 
 def MacGetVphys(R,Z,dRds,dZds,dRdchi,dZdchi,jacobian,V1,V2,V3, Ns1):
-    print '!!!!!!!!! new MacGetVphys !!!!!!!!'
+    #print '!!!!!!!!! new MacGetVphys !!!!!!!!'
     N = Ns1
     R0 = R[0:N,:]
     Z0 = Z[0:N,:]
@@ -529,7 +529,7 @@ def get_FEEDI(file_name):
         FEEDI_1 = np.sqrt(np.sum(FEEDI_matrix[0,:]**2))
         FEEDI_2 = np.sqrt(np.sum(FEEDI_matrix[1,:]**2))
         FEEDI_float= np.max([FEEDI_1,FEEDI_2])
-    print ' FEEDI :',FEEDI_float
+    #print ' FEEDI :',FEEDI_float
     return FEEDI_float
 
 def calc_VNORM(FEEDI, B0EXP, I0EXP=1.0e+3 * 3./np.pi,phas=0.):

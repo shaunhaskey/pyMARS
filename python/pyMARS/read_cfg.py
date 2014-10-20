@@ -139,7 +139,7 @@ coilN2 = map(float, parser.get('i_coil_details', 'coilN2').split(','))
 coilN = num.array([coilN1, coilN2])
 I_coil_frequency = float(parser.get('i_coil_details', 'I_coil_frequency'))
 N_Icoils = int(parser.get('i_coil_details', 'N_Icoils'))
-I_coil_current = num.array(map(float, parser.get('i_coil_details', 'I_coil_current').split(',')))
+I_coil_raw_data = parser.get('i_coil_details', 'I_coil_current')
 
 
 #pickup details
@@ -204,6 +204,7 @@ for i,j in parser.items('MARS_settings2'):
         MARS_settings[i] = float(j)
 
 print MARS_settings
+
 #cleaning up to save space
 MARS_rm_files = parser.get('clean_up_settings', 'MARS_rm_files')
 MARS_rm_files2 = parser.get('clean_up_settings', 'MARS_rm_files2')
@@ -216,8 +217,13 @@ except ConfigParser.NoOptionError, e:
     CORSICA_rm_files = ''
 
 
-
-
+if I_coil_raw_data == '':
+    tmp_n = np.abs(MARS_settings['<<RNTOR>>'])
+    I_coil_current = num.cos(tmp_n * num.deg2rad(num.arange(0, 360, 60)))
+    print "I_coil_current in input is '', setting to:{}".format(I_coil_current)
+else:
+    I_coil_current = num.array(map(float, I_coil_raw_data.split(',')))
+    print "I_coil_current read from input: {}".format(I_coil_current)
 
 #=================End read in config file===============================
 #========================================================================
@@ -258,36 +264,15 @@ project_dict['details'] = {'template_dir':template_directory, 'efit_master':efit
                            'CHEASE_settings_PEST':CHEASE_settings,'MARS_settings':MARS_settings,
                            'corsica_settings':corsica_settings,'ICOIL_FREQ':I_coil_frequency,
                            'base_dir':proj_base_dir}
-project_dict['details']['pickup_coils'] = {'probe':probe,'probe_type':probe_type,'Rprobe':Rprobe, 
-                                           'Zprobe':Zprobe, 'tprobe':tprobe,'lprobe':lprobe}
-project_dict['details']['I-coils'] = {'N_Icoils':N_Icoils,'I_coil_current':I_coil_current}
 
-# project_dict['details']['template_dir'] = template_directory
-# project_dict['details']['efit_master'] = efit_file_location
-# project_dict['details']['profile_master'] = profile_file_location
-# project_dict['details']['CHEASE_settings'] = CHEASE_settings
-# project_dict['details']['CHEASE_settings_PEST'] = CHEASE_settings
-# project_dict['details']['MARS_settings'] = MARS_settings
-# project_dict['details']['corsica_settings'] = corsica_settings
+pickup_coils_details =  {'probe':probe,'probe_type':probe_type,'Rprobe':Rprobe, 
+                         'Zprobe':Zprobe, 'tprobe':tprobe,'lprobe':lprobe}
+I_coil_details = {'N_Icoils': N_Icoils, 'I_coil_current': I_coil_current}
 
-# project_dict['details']['pickup_coils']={}
-# project_dict['details']['pickup_coils']['probe'] = probe
-# project_dict['details']['pickup_coils']['probe_type'] = probe_type
-# project_dict['details']['pickup_coils']['Rprobe'] = Rprobe
-# project_dict['details']['pickup_coils']['Zprobe'] = Zprobe
-# project_dict['details']['pickup_coils']['tprobe'] = tprobe
-# project_dict['details']['pickup_coils']['lprobe'] = lprobe
-
-
-# project_dict['details']['I-coils'] = {}
-# project_dict['details']['I-coils']['N_Icoils'] = N_Icoils
-# project_dict['details']['I-coils']['I_coil_current'] = I_coil_current
-# project_dict['details']['ICOIL_FREQ'] = I_coil_frequency #Icoil frequency
+project_dict['details']['pickup_coils'] = copy.deepcopy(pickup_coils_details)
+project_dict['details']['I-coils'] = copy.deepcopy(I_coil_details)
 
 corsica_base_dir = project_dict['details']['base_dir']+ '/corsica/' #this is a temporary location for corsica files
-
-#leftover from attempt to run multiple CORSICA jobs at once...
-
 
 print '#####################################################################'
 print '##*****STEP 1 - Copy EFIT files + CORSICA(??) ********************###'
@@ -550,7 +535,8 @@ if start_from_step <=7 and end_at_step>=7:
     if start_from_step == 7:
         print 'reading pickle_file'
         project_dict = pyMARS_funcs.read_data(project_dir + project_name + '_post_mars_run.pickle')
-
+        project_dict['details']['pickup_coils'] = copy.deepcopy(pickup_coils_details)
+        project_dict['details']['I-coils'] = copy.deepcopy(I_coil_details)
     serial_list = project_dict['sims'].keys()
     project_dict = cont_funcs.post_processing(project_dict, post_proc_simultaneous_jobs, post_proc_script, directory = 'post_proc_tmp/', upper_and_lower = upper_and_lower, cluster_job = cluster_job)
 
@@ -572,6 +558,8 @@ if start_from_step <=8 and end_at_step>=8:
         tmp_filename = project_dir + project_name + '_post_processing.pickle'
         print tmp_filename
         project_dict = pyMARS_funcs.read_data(project_dir + project_name + '_post_processing.pickle')
+        project_dict['details']['pickup_coils'] = copy.deepcopy(pickup_coils_details)
+        project_dict['details']['I-coils'] = copy.deepcopy(I_coil_details)
 
     #serial_list = project_dict['sims'].keys()
     #post_proc_script = '/u/haskeysr/code/NAMP_analysis/python/pyMARS/post_proc_script_PEST.py'

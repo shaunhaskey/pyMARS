@@ -1,4 +1,4 @@
-import copy, itertools
+import copy, itertools, os
 import numpy as np
 import cPickle as pickle
 import matplotlib.pyplot as pt
@@ -463,6 +463,7 @@ class post_processing_results():
         self.phase_machine_ntor = phase_machine_ntor
         self.n_sims = len(self.project_dict['sims'].keys())
         self.n = np.abs(self.project_dict['details']['MARS_settings']['<<RNTOR>>'])
+        print 'self.n={}'.format(self.n)
         self.calc_ul = ul
         self.reference_dB_kink = reference_dB_kink
         self.reference_offset = [2,0] if reference_offset == None else reference_offset
@@ -2017,3 +2018,48 @@ def no_wall_limit(q95_list, beta_n_list):
     yaxis2 = [tmp3 for (tmp,tmp2,tmp3) in tmp1]
 
     return xaxis, yaxis, yaxis2
+
+
+def probe_phasing_single_eq(dirs, s_surface = 0.94, phasing = 0, phase_machine_ntor = 0, fixed_harmonic = 3, reference_offset = None, reference_dB_kink = 'plasma', sort_name = 'time_list', probe_names = None, labels = None, ax = None, field = 'plasma'):
+    if labels == None: labels = dirs
+    if probe_names == None: probe_names = ['66M', 'MPID1A', 'MPID1B']
+    if reference_offset == None: reference_offset = [4, 0]
+    draw = False
+    if ax == None:
+        fig, ax = pt.subplots(nrows = len(probe_names), sharex = True)
+        draw = True
+    for dir_tmp, lab in zip(dirs,labels):
+        print ''
+        file_name = '{}/{}/{}_post_processing_PEST.pickle'.format(os.environ['mars_data'], dir_tmp,dir_tmp)
+        print file_name
+        a = post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+        dBres = dBres_calculations(a, mean_sum = 'mean')
+        dBkink = dBkink_calculations(a)
+        for probe, ax_tmp in zip(probe_names, ax):
+            probe = magnetic_probe(a, probe)
+            phasing_array, output_array = probe.phasing_scan(field = field)
+            ax_tmp.plot(phasing_array, np.abs(output_array), label = lab)
+    if draw == True:
+        fig.canvas.draw(); fig.show()
+
+def metrics_phasing_single_eq(dirs, s_surface = 0.94, phasing = 0, phase_machine_ntor = 0, fixed_harmonic = 3, reference_offset = None, reference_dB_kink = 'plasma', sort_name = 'time_list', labels = None, ax = None, field = 'plasma'):
+    if labels == None: labels = dirs
+    if reference_offset == None: reference_offset = [4, 0]
+    draw = False
+    if ax == None:
+        fig, ax = pt.subplots(nrows = len(probe_names), sharex = True)
+        draw = True
+    for dir_tmp, lab in zip(dirs,labels):
+        print ''
+        file_name = '{}/{}/{}_post_processing_PEST.pickle'.format(os.environ['mars_data'], dir_tmp,dir_tmp)
+        print file_name
+        a = post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+        dBres = dBres_calculations(a, mean_sum = 'mean')
+        dBkink = dBkink_calculations(a)
+        #probe = magnetic_probe(a, probe)
+        phasing_array, output_array = dBres.phasing_scan(field = field)
+        ax[0].plot(phasing_array, np.abs(output_array), label = lab)
+        phasing_array, output_array = dBkink.phasing_scan(field = field)
+        ax[1].plot(phasing_array, np.abs(output_array), label = lab)
+    if draw == True:
+        fig.canvas.draw(); fig.show()
