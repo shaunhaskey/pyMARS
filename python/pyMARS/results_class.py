@@ -261,14 +261,13 @@ class data():
         if no_ax: fig.canvas.draw(); fig.show()
 
     
-    def plot_Bn(self, plot_quantity, axis, start_surface = 0, end_surface = 300, skip = 1,cmap='spectral', wall_grid = 23, plot_coils_switch=0, plot_boundaries = 0):
+    def plot_Bn(self, plot_quantity, axis = None, start_surface = 0, end_surface = 300, skip = 1,cmap='spectral', wall_grid = 23, plot_coils_switch=0, plot_boundaries = 0):
         #print self.R.shape, self.Z.shape, self.Bn.shape
         import matplotlib.pyplot as pt
-
         grid_R = self.R*self.R0EXP
         grid_Z = self.Z*self.R0EXP
         print 'sh_mod', np.max(grid_R), np.min(grid_R), np.max(grid_Z), np.min(grid_Z)
-        color_plot = axis.pcolor(grid_R[start_surface:end_surface:skip,:], grid_Z[start_surface:end_surface:skip,:], plot_quantity[start_surface:end_surface:skip,:],cmap = cmap)
+        color_plot = axis.pcolormesh(grid_R[start_surface:end_surface:skip,:], grid_Z[start_surface:end_surface:skip,:], plot_quantity[start_surface:end_surface:skip,:],cmap = cmap)
         #self.phase_plot = ax2.pcolor(grid_R[start_surface:end_surface:skip,:], grid_Z[start_surface:end_surface:skip,:], np.angle(plot_quantity[start_surface:end_surface:skip,:],deg=True),cmap = cmap)
         
         def plot_coils(ax1, grid_R, grid_Z, plot_list = range(0,13)):
@@ -409,6 +408,8 @@ class data():
         if nans!=0: print ' *** number of nans in BnPEST', nans
 
         new_area = []
+        #Calculate the area of each surface, Note this is excluding self.R0EXP
+        #To get to m**2 need to multiply by self.R0EXP**2
         for i in range(0, self.R.shape[0]):
             dR = (self.R[i,1:]-self.R[i,:-1])#*self.R0EXP
             dZ = (self.Z[i,1:]-self.Z[i,:-1])#*self.R0EXP
@@ -433,6 +434,9 @@ class data():
         #os.chdir(self.directory) 
 
         self.extract_q_profile_information(n=n, file_name=self.directory + '/PROFEQ.OUT')
+
+        #Get the area at the rational surface - note in MARS-F coords, need to * R0EXP**2 to go to m2
+        self.A_res = [self.A[np.argmin(np.abs(self.q_profile_s - i))] for i in self.sq]
         mk_grid, ss_grid = np.meshgrid(self.mk.flatten(), self.ss.flatten())
         #qn_grid, s_grid = np.meshgrid(self.q_profile*n, self.s.flatten())
         if SURFMN_coords:
@@ -464,12 +468,15 @@ class data():
         '''
         #os.chdir(self.directory) 
         qn, sq, q, s, mq = return_q_profile(self.mk, file_name=file_name, n=n)
-        self.qn = qn
-        self.sq = sq
-        self.q_profile = q
-        self.q_profile_s = s
-        self.mq = mq
-        
+        self.qn = +qn
+        self.sq = +sq
+        self.q_profile = +q
+        self.q_profile_s = +s
+        self.mq = +mq
+        self.dqdpsiN = self.q_profile_s * 0
+        self.dqdpsiN[1:] = np.diff(self.q_profile) / np.diff(self.q_profile_s ** 2)
+        self.dqdpsiN_res = [self.dqdpsiN[np.argmin(np.abs(self.q_profile_s - i))] for i in self.sq]
+
 
     def kink_amp(self, s_surface, q_range, n = 2, SURFMN_coords = 0):
         '''Calculate dBkink

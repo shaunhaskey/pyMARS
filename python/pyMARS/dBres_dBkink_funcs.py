@@ -106,7 +106,7 @@ class generic_calculation():
         self.cur_phasing_scan_y = phase_grid
         return color_ax
 
-    def plot_single_phasing(self, phasing, xaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, multiplier = 1):
+    def plot_single_phasing(self, phasing, xaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, multiplier = 1, plot_data = True):
         '''Plot  a calculation versus a particular attribute
 
         SRH : 12Mar2014
@@ -117,18 +117,21 @@ class generic_calculation():
         calc_val = self.single_phasing(phasing, field = field)
         indices = return_sort_indices(self.parent.raw_data[xaxis])
         no_ax = True if ax==None else False 
-        if no_ax: fig,ax = pt.subplots()
-        ax.plot([self.parent.raw_data[xaxis][i] for i in indices], np.array([comp_func(calc_val[i]) for i in indices])*np.array(multiplier), **plot_kwargs)
-        if no_ax: fig.canvas.draw();fig.show()
+        if no_ax and plot_data: fig,ax = pt.subplots()
+        x_dat = np.array([self.parent.raw_data[xaxis][i] for i in indices])
+        y_dat = np.array([comp_func(calc_val[i]) for i in indices])*np.array(multiplier)
+        if plot_data: ax.plot(x_dat, y_dat, **plot_kwargs)
+        if no_ax and plot_data: fig.canvas.draw();fig.show()
+        return x_dat, y_dat
 
-    def plot_slice_through_2D_data(self, phasing, xaxis, yaxis, y_const, slice_vals_x, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, yaxis_log = True, xaxis_log = True):
+    def plot_slice_through_2D_data(self, phasing, xaxis, yaxis, y_const, slice_vals_x, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, yaxis_log = True, xaxis_log = True, plot_data = True):
         '''plot a 1D slice through 2D data
         phasing in degrees
         xaxis : key for xaxis 
         yaxis : key for yaxis 
         ycont : fixed y value for slice
         slice_vals_x : interpolation points
-
+        plot_data : Whether or not to plot, or just return the data
         SRH : 12Mar2014
         '''
         no_ax = True if ax==None else False 
@@ -152,12 +155,13 @@ class generic_calculation():
         #current_data = self.single_phasing(phasing, field = field) if self.calc_ul == True else self.raw_data['{}_{}_'.format(field, self.calc_type)]
         current_data = self.single_phasing(phasing, field = field)
         interp_data = interp.griddata(input_coords, comp_func(current_data), output_coords, method = 'linear')
-        ax.plot(slice_vals_x, interp_data, '-o', **plot_kwargs)
-        if xaxis_log: ax.set_xscale('log')
-        if yaxis_log: ax.set_yscale('log')
+        if plot_data:
+            ax.plot(slice_vals_x, interp_data, '-o', **plot_kwargs)
+            if xaxis_log: ax.set_xscale('log')
+            if yaxis_log: ax.set_yscale('log')
+        return interp_data
 
-
-    def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None, multiplier = 1):
+    def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None, multiplier = 1, plot_dots = False):
         '''Plot  a calculation versus a particular attribute
 
         SRH : 12Mar2014
@@ -192,7 +196,7 @@ class generic_calculation():
         color_ax = ax.pcolormesh(x_mesh, y_mesh, tmp, cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
         if n_contours != 0: color_ax2 = ax.contour(x_mesh, y_mesh, tmp, np.linspace(clim[0],clim[1], n_contours), **contour_kwargs)
         print color_ax.get_clim()
-
+        if plot_dots: ax.plot(x_mesh, y_mesh, '.')
         if clim!=None: color_ax.set_clim(clim)
         if xaxis_log: ax.set_xscale('log')
         if yaxis_log: ax.set_yscale('log')

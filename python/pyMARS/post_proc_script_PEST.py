@@ -42,7 +42,7 @@ def kink_resonant_response(project_dict, upper_and_lower=0, facn = 1.0, s_surfac
                     res_integral, res_discrete = curr_data.resonant_strength(n = n, SURFMN_coords=SURFMN_coords)
                     project_dict['sims'][i]['responses']['{}_resonant_response_{}'.format(type2, loc)] = copy.deepcopy(res_discrete)
                     project_dict['sims'][i]['responses']['{}_resonant_response_{}_integral'.format(type2, loc)] = copy.deepcopy(res_integral)
-                    for tmp_type in ['mq','qn','sq']:  project_dict['sims'][i]['responses']['resonant_response_{}'.format(tmp_type)] = copy.deepcopy(getattr(curr_data, tmp_type))
+                    for tmp_type in ['mq','qn','sq','dqdpsiN_res', 'A_res']:  project_dict['sims'][i]['responses']['resonant_response_{}'.format(tmp_type)] = copy.deepcopy(getattr(curr_data, tmp_type))
                     for s_surface in s_surface_list:
                         current_label = str(s_surface)
                         #print 'getting kink data'

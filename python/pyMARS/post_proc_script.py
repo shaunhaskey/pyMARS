@@ -22,6 +22,8 @@ def perform_calcs(directory, Nchi, link_RMZM, probe, probe_type, Rprobe, Zprobe,
     #print 'finished calculation'
     return new_answer
 
+
+
 def coil_outputs_B(project_dict, upper_and_lower=0):
     probe = project_dict['details']['pickup_coils']['probe']
     probe_type = project_dict['details']['pickup_coils']['probe_type']

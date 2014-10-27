@@ -138,9 +138,12 @@ dirs = ['shot156746_02113_betaN_ramp_carlos_prl2', '156746_02113_betaNramp']
 labels = ['2113', '3322']
 dirs = ['shot156746_0{}_betaN_ramp_carlos_prlV2', 'shot156746_0{}_betaN_ramp_carlos_prlV2']
 labels = ['2113']#, '3322']
+labels = ['2113','2113-2']#, '3322']
 dirs = ['shot156746_0{}_betaN_ramp_carlos_prlV2']#, 'shot156746_0{}_betaN_ramp_carlos_prlV2']
 for i in range(len(dirs)):
     dirs[i]= dirs[i].format(labels[i])
+dirs = ['shot156746_02113_betaN_ramp_carlos_prl_n1','shot156746_02113_betaN_ramp_carlos_prl_n1_pos']
+dirs = ['shot156746_04617_betaN_ramp_carlos_prlV2_n1']
 print dirs
 #file_names = ['/home/srh112/NAMP_datafiles/mars/shot156746_02113_betaN_ramp_carlos_prl2']
 file_names = []

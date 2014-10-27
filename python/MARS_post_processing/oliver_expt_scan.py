@@ -228,7 +228,7 @@ for eta in eta_vals:
             probe.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = False, ax = probe_phase_ax, multiplier = multiplier*0+1)
             probe_expt = np.loadtxt('142614mpp.003', skiprows = 2)
             probe_expt_n1 = np.loadtxt('142614mpp.001', skiprows = 2)
-            min_max = [np.argmin(np.abs(probe_expt[:,0] - i)) for i in [1605,2200]]
+            min_max = [np.argmin(np.abs(probe_expt[:,0] - i)) for i in [1645,2200]]
             probe_phase_ax.set_ylabel('Probe (rad)')
             icoil_cur = 1 #kA
             if count == 0: 
@@ -248,6 +248,7 @@ for eta in eta_vals:
                 #tmp_probe[tmp_time>1860]+=2
                 #probe_plas_ax.plot(tmp_time, tmp_probe,'b-', rasterized = True)
             probe_phase_ax.set_ylim([-np.pi, np.pi])
+            probe_phase_ax.set_ylim([0, 2.5])
         if dBkink_plas_ax!=None:
             print 'dBkink {}'.format(multiplier)
             dBkink.plot_single_phasing(phasing, 'shot_time', field = 'plasma', plot_kwargs = plot_style, amplitude = True, ax = dBkink_plas_ax, multiplier = multiplier)

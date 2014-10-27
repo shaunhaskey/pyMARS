@@ -713,29 +713,6 @@ def generate_job_file(master,MARS_execution_script, id_string = 'MARS', rm_files
             execution_txt += MARS_execution_script + ' > log_runmars\n'
             execution_txt += 'rm ' + rm_files +'\n'
             
-#     if upper_and_lower == 1:
-#         execution_txt = 'cd '+ master['dir_dict']['mars_upper_vacuum_dir'] + '\n'
-#         execution_txt += MARS_execution_script + ' > log_runmars\n'
-#         execution_txt += 'rm ' + rm_files +'\n'
-#         execution_txt += 'cd '+ master['dir_dict']['mars_lower_vacuum_dir'] + '\n'
-#         execution_txt += MARS_execution_script + ' > log_runmars\n'
-#         execution_txt += 'rm ' + rm_files +'\n'
-
-#         execution_txt += 'cd '+ master['dir_dict']['mars_upper_plasma_dir'] + '\n'
-#         execution_txt += MARS_execution_script + ' > log_runmars\n'
-#         execution_txt += 'rm ' + rm_files +'\n'
-#         execution_txt += 'cd '+ master['dir_dict']['mars_lower_plasma_dir'] + '\n'
-#         execution_txt += MARS_execution_script+ ' > log_runmars\n'
-#         execution_txt += 'rm ' + rm_files +'\n'
-#     else:
-#         execution_txt = 'cd '+ master['dir_dict']['mars_vac_dir'] + '\n'
-#         execution_txt += MARS_execution_script +' > log_runmars\n'
-#         execution_txt += 'rm ' + rm_files +'\n'
-
-#         execution_txt += 'cd '+ master['dir_dict']['mars_plasma_dir'] + '\n'
-#         execution_txt += MARS_execution_script + ' > log_runmars\n'
-#         execution_txt += 'rm ' + rm_files +'\n'
-
     execution_txt += 'cd '+ master['dir_dict']['chease_dir'] + '\n'
     if rm_files2!='':execution_txt += 'rm ' + rm_files2 +'\n'
 
