@@ -126,10 +126,11 @@ def max_amp_max_phase(inp_dict, name, field,phases, ax1 = None, ax2 = None, ax3 
 
 
 probe_names = ['66M', 'MPID1A', 'MPID1B']
+probe_names = ['66M']#, 'MPID1A', 'MPID1B']
 #probe_names = ['66M', 'Inner_pol']# ' MPID1A', ' MPID1B']
 labels = ['ideal MHD', 'resistive MHD']
-colour = ['b','r','k']
-markers = ['x','o','.']
+colour = ['b','r','k','y']
+markers = ['x','o','.','s','d']
 file_names = ['/home/srh112/NAMP_datafiles/mars/shot158115_04701_betaN_ramp_raffi_prl/shot158115_04701_betaN_ramp_raffi_prl_post_processing_PEST.pickle','/home/srh112/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_raffi_prl/shot158115_04780_betaN_ramp_raffi_prl_post_processing_PEST.pickle']
 dirs = ['shot158115_04701_betaN_ramp_raffi_prl', 'shot158115_04780_betaN_ramp_raffi_prl', 'shot158115_04780_betaN_ramp_raffi_prl']
 
@@ -142,8 +143,24 @@ labels = ['2113','2113-2']#, '3322']
 dirs = ['shot156746_0{}_betaN_ramp_carlos_prlV2']#, 'shot156746_0{}_betaN_ramp_carlos_prlV2']
 for i in range(len(dirs)):
     dirs[i]= dirs[i].format(labels[i])
-dirs = ['shot156746_02113_betaN_ramp_carlos_prl_n1','shot156746_02113_betaN_ramp_carlos_prl_n1_pos']
-dirs = ['shot156746_04617_betaN_ramp_carlos_prlV2_n1']
+#dirs = ['shot156746_02113_betaN_ramp_carlos_prl_n1','shot156746_02113_betaN_ramp_carlos_prl_n1_pos']
+#dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1', 'shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz']
+#dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1', 'shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz','shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
+#dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz','shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
+#dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz','shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz_ideal_PVISC1']
+#dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1','shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
+dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2', 'shot156746_02113_betaN_ramp_carlos_prlV2_n2_5Hz_res_PVISC0']
+
+#n=2 options
+labels = ['res20PVISC1','res5PVISC0','ideal5PVISC1','ideal5PVISC0','res5PVISC1']
+dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2', 'shot156746_02113_betaN_ramp_carlos_prlV2_n2_5Hz_res_PVISC0', 'shot156746_02113_betaN_ramp_carlos_prlV2_n2_5Hz_ideal_PVISC1','shot156746_02113_betaN_ramp_carlos_prlV2_n2_5Hz_ideal_PVISC0','shot156746_02113_betaN_ramp_carlos_prlV2_n2_5Hz_res_PVISC1']
+
+labels = ['res20PVISC1','res20PVISC0','ideal20PVISC0','ideal20PVISC1']
+dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2',
+        'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_res_PVISC0',
+        'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_ideal_PVISC0',
+        'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_ideal_PVISC1']
+#dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1','shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
 print dirs
 #file_names = ['/home/srh112/NAMP_datafiles/mars/shot156746_02113_betaN_ramp_carlos_prl2']
 file_names = []
@@ -151,7 +168,7 @@ base_dir = r'/home/srh112/NAMP_datafiles/mars/'
 for dir_tmp in dirs:
     file_names.append('{}/{}/{}_post_processing_PEST.pickle'.format(base_dir, dir_tmp, dir_tmp))
 
-fig, ax = pt.subplots(nrows = 3, sharex = True); #ax = [ax]
+fig, ax = pt.subplots(nrows = 3, sharex = True) #ax = [ax]
 for file_name, label, marker in zip(file_names, labels, markers):
     results, phases, betaN_li = extract_useful(file_name, m = 10, probe_names = probe_names)
     forced_phase = 0
@@ -180,7 +197,17 @@ for i in ax: ax[0].set_ylabel('G/kA')
 leg = ax[0].legend(loc = 'best', fontsize = 8)
 fig.canvas.draw(); fig.show()
 
+flux = 10
+for i in a.project_dict['sims'].keys():
+    A = a.project_dict['sims'][i]['responses']['resonant_response_A_res']
+    qn = a.project_dict['sims'][i]['responses']['resonant_response_qn']
+    sq = a.project_dict['sims'][i]['responses']['resonant_response_sq']
+    mq = a.project_dict['sims'][i]['responses']['resonant_response_mq']
+    dqdpsi = a.project_dict['sims'][i]['responses']['resonant_response_dqdpsiN_res']
 
+    Bmn = np.abs(a.project_dict['sims'][i]['responses']['total_resonant_response_upper'] + a.project_dict['sims'][i]['responses']['total_resonant_response_lower'])
+    island_width = np.sqrt(16./(mq*flux) * qn/np.abs(dqdpsi) * A/(4.*np.pi**2) * Bmn)
+    print island_width
 1/0
 fig, ax = pt.subplots(nrows = 3, sharex = True)
 for i, clr in zip(['res','rfa'], colour):

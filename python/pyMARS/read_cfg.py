@@ -244,6 +244,8 @@ if not os.path.exists(proj_base_dir):
 else:
     print 'project directory already exists - continuing'
 
+if os.path.normpath(proj_base_dir) != os.path.normpath(os.getcwd()):
+    raise ValueError("Current working directory is not the same as project base directory - Aborting!!")
 i = 1
 #curr_filename = sys.argv[0].lstrip('.').lstrip('/')
 curr_filename = sys.argv[1].lstrip('.').lstrip('/')
