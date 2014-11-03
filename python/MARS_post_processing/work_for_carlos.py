@@ -148,7 +148,10 @@ for i in range(len(dirs)):
 #dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1', 'shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz','shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
 #dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz','shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
 #dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz','shot156746_02113_betaN_ramp_carlos_prlV2_n1_5Hz_ideal_PVISC1']
-#dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1','shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
+
+dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1',
+        'shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
+labels = ['']
 dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2', 'shot156746_02113_betaN_ramp_carlos_prlV2_n2_5Hz_res_PVISC0']
 
 #n=2 options
@@ -160,6 +163,14 @@ dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2',
         'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_res_PVISC0',
         'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_ideal_PVISC0',
         'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_ideal_PVISC1']
+
+labels = ['res20PVISC1','res20PVISC0','ideal20PVISC0','ideal20PVISC1', 'rote20PVISC0']
+dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2',
+        'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_res_PVISC0',
+        'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_ideal_PVISC0',
+        'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_ideal_PVISC1',
+        'shot156746_02113_betaN_ramp_carlos_prlV2_n2_20Hz_rote_PVISC0']
+
 #dirs = ['shot156746_02113_betaN_ramp_carlos_prlV2_n1','shot156746_02113_betaN_ramp_carlos_prlV2_n1_20Hz_ideal_PVISC0']
 print dirs
 #file_names = ['/home/srh112/NAMP_datafiles/mars/shot156746_02113_betaN_ramp_carlos_prl2']

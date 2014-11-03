@@ -261,7 +261,7 @@ class generic_calculation():
 
 
 class dBres_calculations(generic_calculation):
-    def __init__(self, parent, mean_sum = 'sum',):
+    def __init__(self, parent, mean_sum = 'sum', s_bounds = None):
         '''This class does all the dBres calculations
         SRH : 12Mar2014
         '''
@@ -281,8 +281,14 @@ class dBres_calculations(generic_calculation):
         self.raw_data['res_m_vals'] = data_from_dict('responses/resonant_response_mq', self.parent.project_dict)
         self.raw_data['res_s_vals'] = data_from_dict('responses/resonant_response_sq', self.parent.project_dict)
         self.raw_data['res_q_vals'] = data_from_dict('responses/resonant_response_qn', self.parent.project_dict)
-
-
+        if s_bounds!=None:
+            for i in range(len(self.raw_data['res_s_vals'])):
+                valid = (self.raw_data['res_s_vals'][i]>=s_bounds[0]) * (self.raw_data['res_s_vals'][i]<=s_bounds[1])
+                for j in ['res_m_vals','res_s_vals','res_q_vals']: self.raw_data[j][i] = +self.raw_data[j][i][valid]
+                for field in ['total', 'vacuum']:
+                    for coil in locs:
+                        self.raw_data['{}_res_{}'.format(field, coil)][i] = self.raw_data['{}_res_{}'.format(field, coil)][i][valid]
+            
     def single_phasing(self,curr_phase, field = 'plasma'):
         '''Find the dB_res values using a single phasing
         curr_phase is in degrees
@@ -2067,3 +2073,9 @@ def metrics_phasing_single_eq(dirs, s_surface = 0.94, phasing = 0, phase_machine
         ax[1].plot(phasing_array, np.abs(output_array), label = lab)
     if draw == True:
         fig.canvas.draw(); fig.show()
+
+
+def get_surfmn_islands(directory):
+    filename = '/home/srh112/NAMP_datafiles/SURFMN/'+ directory + '/surfmn.out.isltable'
+    dat = np.loadtxt(filename,skiprows = 18)
+    return dat

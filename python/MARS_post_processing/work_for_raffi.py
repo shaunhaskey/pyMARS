@@ -14,7 +14,7 @@ reference_offset = [4,0]
 #reference_offset = [2,0]
 sort_name = 'time_list'
 
-file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780/shot158115_04780_post_processing_PEST.pickle'
+dBrfile_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780/shot158115_04780_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_imp_grid/shot158115_04780_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04272_imp_grid/shot158115_04272_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_inc_MPID/shot158115_04780_post_processing_PEST.pickle'
@@ -390,6 +390,26 @@ if ax3!=None: ax[2].set_ylabel('Optimum UL phasing (deg)')
 for i in ax: ax[0].set_ylabel('G/kA')
 leg = ax[0].legend(loc = 'best', fontsize=8)
 fig.canvas.draw(); fig.show()
+
+
+######Raffi Oct29 q95 scan to show field penetration#########
+file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04702_n2_q95_scan/shot158115_04702_n2_q95_scan_post_processing_PEST.pickle'
+s_bounds = [0.92,0.96]
+s_bounds = [0.96,1]
+s_bounds = [np.sqrt(0.92),np.sqrt(0.96)]
+a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
+dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'mean')
+dBres2 = dBres_dBkink.dBres_calculations(a, mean_sum = 'mean', s_bounds=s_bounds)
+fig, ax = pt.subplots(ncols = 2)
+im1 = dBres2.plot_phasing_scan('Q95',field='vacuum', ax = ax[0], plot_ridge = True)
+pt.colorbar(im1,ax = ax[0])
+im2 = dBres2.plot_phasing_scan('Q95',field='total', plot_ridge = True, clim = [0,0.2], ax = ax[1])
+pt.colorbar(im2,ax = ax[1])
+for i in ax: i.set_xlabel('q95')
+for i in ax: i.set_ylabel('UL phasing (deg)')
+for i, title in zip(ax,['Vac strength pitch-res {}<s<{}'.format(s_bounds[0], s_bounds[1]), 'Plas+Vac pitchd-res {}<s<{}'.format(s_bounds[0], s_bounds[1])]): i.set_title(title)
+fig.canvas.draw(); fig.show()
+#dBkink = dBres_dBkink.dBkink_calculations(a)
 
 1/0
 

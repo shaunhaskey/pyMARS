@@ -117,37 +117,6 @@ for eta in eta_vals:
         #I_coil_ax, rote_ax, x_point_ax, probe_plas_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
         #I_coil_ax, rote_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
         I_coil_ax, rote_ax, edge_rot_ax, eta_ax, probe_plas_ax, probe_phase_ax, x_point_ax, dBres_tot_ax, dBkink_plas_ax = cur_ax
-        #V = V_dict[eta]
-        # if const_rot:
-        #     if vary_pvisc:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar0_post_processing_PEST.pickle'
-        #     elif vary_expt:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_post_processing_PEST.pickle'
-        #         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_006/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_thetac_006_post_processing_PEST.pickle'
-        #         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_PVISC0/shot_142614_expt_scan_NC_dif_eq_const_rot_prof_spitz_rem_res_PVISC0_post_processing_PEST.pickle'
-        #     elif ideal:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_no_rot_prof_ideal_post_processing_PEST.pickle'
-        #     elif spitz:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
-        #     else:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
-        # else:
-        #     if vary_pvisc:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar2-0/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_kpar2-0_post_processing_PEST.pickle'
-        #     elif vary_expt:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_post_processing_PEST.pickle'
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_post_processing_PEST.pickle'
-        #         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_006/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_thetac_006_post_processing_PEST.pickle'
-        #         #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_PVISC0/shot_142614_expt_scan_NC_dif_eq_dif_rot_prof_spitz_rem_res_PVISC0_post_processing_PEST.pickle'
-        #     elif ideal:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
-        #     elif spitz:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
-        #     else:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
-        # #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_V{}/shot_142614_expt_scan_NC_V{}_post_processing_PEST.pickle'.format(V,V)
         print file_name
         reference_dB_kink = 'plasma'
         a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
@@ -289,32 +258,91 @@ fig.canvas.draw(); fig.show()
 
 
 #for V in V_runs:
+dat = dBres_dBkink.get_surfmn_islands('SURF142612.01795.ph000.n3')
+
+
+def island_size_calc(dat, n_val, x_axis, vac_vals, tot_vals, field_amp_factor=1):
+    '''Calculate the island size by comparing the vacuum Bmn from
+    MARS-F and SURFMN and then applying this factor the the
+    plasma+vacuum component from MARS-F.
+
+    dat: data from the surfmn.isltables file_name
+    n_val: the n value that we are interested in
+    x_axis: pitch-resonant m values from MARS-F
+    vac_vals: Bmn_vac from MARS-F
+    tot_vals: Bmn_plas+vac from MARS-F
+    field_amp_factor: Factor to multiply the SURFMN field by
+
+    SRH: 30 Oct 2014
+    '''
+    #Get n and m values from the SURFMN data, and filter out the correct n
+    m = +dat[:,0]
+    n = +dat[:,1]
+    valid_tmp = (n==n_val)
+    m_tmp = m[valid_tmp]
+
+    #Find the common range of m in both sets of data
+    min_m = np.max([np.min(np.abs(m_tmp)),np.min(x_axis)])
+    max_m = np.min([np.max(np.abs(m_tmp)),np.max(x_axis)])
+
+    #valid rows for the SURFMN data
+    valid_SURFMN = valid_tmp * (np.abs(m) <= max_m) * (np.abs(m) >= min_m)
+    m = m[valid_SURFMN]
+    ordering = np.argsort(np.abs(m))
+    #print ordering
+    m = m[ordering]
+    q = +dat[:,2][valid_SURFMN][ordering]
+    psi_N = +dat[:,3][valid_SURFMN][ordering]
+    Bmn_SURFMN = +np.abs(dat[:,4][valid_SURFMN][ordering])
+    isl_w = +dat[:,5][valid_SURFMN][ordering]
+
+    #valid m numbers in the MARS-F data
+    valid_MARS = (np.abs(x_axis) <= max_m) * (np.abs(x_axis) >= min_m)
+
+    Bmn_MARS_vac = np.abs(vac_vals)[valid_MARS]
+    dat_tot = np.abs(vac_vals)[valid_MARS]
+    ratio = Bmn_SURFMN / Bmn_MARS_vac
+    ratio = np.mean(ratio[(ratio > 0.8) * (ratio < 1.5)])
+    final_filt = np.abs(Bmn_SURFMN) > 0
+
+    final_m_vals = m[final_filt]
+    isl_MARS_total = (np.sqrt(field_amp_factor * ratio * np.abs(tot_vals)[valid_MARS] / np.abs(Bmn_SURFMN)) * isl_w)[final_filt]
+    isl_SURFMN_vac = np.sqrt(field_amp_factor) * isl_w[final_filt]
+    isl_MARS_vac = (np.sqrt(ratio * field_amp_factor * np.abs(vac_vals)[valid_MARS] / np.abs(Bmn_SURFMN)) * isl_w)[final_filt]
+    psi_N_final = psi_N[final_filt]
+    chiri_total = []
+    chiri_vac = []
+    chiri_psi_N = []
+    for i in range(1, len(isl_MARS_total)):
+        chiri_total.append((isl_MARS_total[i-1]/2 + isl_MARS_total[i]/1) / (psi_N_final[i] - psi_N_final[i-1]))
+        chiri_vac.append((isl_MARS_vac[i-1]/2 + isl_MARS_vac[i]/1) / (psi_N_final[i] - psi_N_final[i-1]))
+        chiri_psi_N.append((psi_N_final[i] + psi_N_final[i-1])/2.)
+    #Calculate the Chirikov parameter
+    return final_m_vals, isl_MARS_total, isl_SURFMN_vac, isl_MARS_vac, np.array(chiri_vac), np.array(chiri_total), np.array(chiri_psi_N)
+
+    #m[final_filt], (np.sqrt(ratio * np.abs(tot_vals)[val2]/np.abs(dat2)) * isl_w)[final_filt], isl_w[final_filt], (np.sqrt(ratio * np.abs(vac_vals)[val2]/np.abs(dat2)) * isl_w)[final_filt]
+
+    #fig, ax = pt.subplots()
+    #ax.plot(m,isl_w)
+    #ax.plot(np.abs(m),isl_w)
+    #ax.plot(np.abs(m),Bmn)
+    #print 
+    #ax.plot(np.abs(x_axis[val2]),np.abs(tmp_a[-1])[val2])
+
+    #fig.canvas.draw(); fig.show()
+
+
 for eta in eta_vals:
     fig_harms, ax_harms = pt.subplots(nrows = 2, sharex = True, sharey = True)
+    fig_isl, ax_isl = pt.subplots(nrows = 4,)
+    ax_chiri = ax_isl[2:]
+    ax_isl = ax_isl[:2]
+    #fig_chiri, ax_chiri = pt.subplots(nrows = 2, sharex = True, sharey = True)
     #ax_harms = [ax_harms]
     gen_func.setup_publication_image(fig_harms, height_prop = 1./1.618 * 1.75, single_col = True)
+    gen_func.setup_publication_image(fig_isl, height_prop = 1./1.618 * 1.75*2, single_col = True)
     #for const_rot, cur_ax in zip([False, True], ax_harms):
-    for file_name, cur_ax in zip(file_names, ax_harms):
-        # if const_rot:
-        #     V_dict = V_dict_const
-        # else:
-        #     V_dict = V_dict_non_const
-        # V = V_dict[eta]
-        # if const_rot:
-        #     if not ideal:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}/shot_142614_expt_scan_NC_const_eq_const_rot_prof_V{}_post_processing_PEST.pickle'.format(V,V)
-        #     elif spitz:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz/shot_142614_expt_scan_NC_const_eq_const_rot_prof_spitz_post_processing_PEST.pickle'
-        #     else:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal/shot_142614_expt_scan_NC_const_eq_const_rot_prof_ideal_post_processing_PEST.pickle'
-        # else:
-        #     if not ideal:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eqV{}/shot_142614_expt_scan_NC_const_eqV{}_post_processing_PEST.pickle'.format(V,V)
-        #     elif spitz:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_spitz/shot_142614_expt_scan_NC_const_eq_spitz_post_processing_PEST.pickle'
-        #     else:
-        #         file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_const_eq_ideal/shot_142614_expt_scan_NC_const_eq_ideal_post_processing_PEST.pickle'
-        #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_expt_scan_NC_V{}/shot_142614_expt_scan_NC_V{}_post_processing_PEST.pickle'.format(V,V)
+    for file_name, cur_ax, cur_isl, cur_chiri in zip(file_names, ax_harms, ax_isl, ax_chiri):
         reference_dB_kink = 'plasma'
         a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
 
@@ -337,6 +365,13 @@ for eta in eta_vals:
             clr = (a.raw_data['shot_time'][i] - min_shot_time)/float(range_shot_time)
             clr = clr*0.9
             if int(a.raw_data['shot_time'][i])>=min_time and int(a.raw_data['shot_time'][i])<=max_time:
+                isl_x_ax, widths_tot, widths_vac, widths_vac_mars, chiri_vac, chiri_tot, chiri_psiN = island_size_calc(dat, 3, x_axis, tmp_c[i], tmp_b[i], field_amp_factor=5)
+                cur_isl.plot(np.abs(isl_x_ax), widths_tot, color=str(clr), marker = 'x')
+                #cur_isl.plot(np.abs(isl_x_ax), widths_vac, color=str(clr), marker = 's')
+                cur_isl.plot(np.abs(isl_x_ax), widths_vac_mars, color=str(clr), marker = '.')
+
+                cur_chiri.plot(np.abs(chiri_psiN), chiri_vac, color=str(clr), marker = '.')
+                cur_chiri.plot(np.abs(chiri_psiN), chiri_tot, color=str(clr), marker = 'x')
                 #cur_ax.plot(x_axis, np.abs(tmp_b[i,:]), color=str(clr), marker = 'x')
                 cur_ax.plot(x_axis, np.abs(tmp_b[i]), color=str(clr), marker = 'x')
                 #cur_ax.plot(x_axis, np.abs(tmp_c[i]), color='b', marker = '.')
@@ -344,22 +379,55 @@ for eta in eta_vals:
                 if initial==0:
                     cur_ax.text(13,2.1,'Vacuum')
                     cur_ax.text(13,1.13,'Vacuum + Plasma')
+
+                    cur_isl.text(11,0.035,'Vacuum')
+                    cur_isl.text(5,0.015,'Vacuum + Plasma')
+                    #cur_chiri.text(13,2.1,'Vacuum')
+                    #cur_chiri.text(13,1.13,'Vacuum + Plasma')
                     #cur_ax.plot(x_axis, np.abs(tmp_c[i,:]), color='b', marker = '.')
                     #cur_ax.plot(x_axis, np.abs(tmp_c[i]), color='b', marker = '.')
                 initial += 1
     #ax_harms[0].set_title('{}-{}ms $\eta=${n}'.format(min_time, max_time, eta))
     ax_harms[-1].set_xlabel('m')
     ax_harms[-1].set_ylim([0,2.5])
+    ax_isl[-1].set_xlabel('m')
+    for i in ax_isl: i.set_xlim([4,15])
+    ax_harms[-1].set_xlim([4,15])
+    #ax_isl[-1].set_ylim([0,0.028])
     tmp_ylim = ax_harms[-1].get_ylim()
-    ax_harms[0].text(6,tmp_ylim[1]*0.85,'(a) Scaled profiles')
-    ax_harms[1].text(6,tmp_ylim[1]*0.85,'(b) Experiment')
+    ax_harms[0].text(6,tmp_ylim[1]*0.85,'(a) Experiment')
+    ax_harms[1].text(6,tmp_ylim[1]*0.85,'(b) Scaled profiles')
+    tmp_ylim = ax_isl[-1].get_ylim()
+
+    tmp_xlim = ax_isl[-1].get_xlim(); diff = tmp_xlim[1] - tmp_ylim[0]
+    #ax_isl[0].text(diff*0.5+tmp_xlim[0],tmp_ylim[1]*0.85,'(a) Experiment')
+    #ax_isl[1].text(diff*0.5+tmp_xlim[0],tmp_ylim[1]*0.85,'(b) Scaled profiles')
+
+    ax_isl[0].text(10,0.05,'(a) Experiment')
+    ax_isl[1].text(10,0.05,'(b) Scaled profiles')
+
+    tmp_xlim = ax_chiri[-1].get_xlim(); diff = tmp_xlim[1] - tmp_ylim[0]
+    ax_chiri[0].text(diff*0.1+tmp_xlim[0],3,'(c) Experiment')
+    ax_chiri[1].text(diff*0.1+tmp_xlim[0],3,'(d) Scaled profiles')
+    for i in ax_chiri:
+        i.text(0.8,2,'Vacuum')
+        i.text(0.5,0.1,'Vacuum + Plasma')
+        i.set_ylabel('Chirikov parameter')
+        i.grid(True)
+        i.axhline(1)
     for i in ax_harms: i.set_ylabel('Resonant harm amp (G/kA)')
+    for i in ax_isl: i.set_ylabel('Island width ($\psi_N$)')
+    ax_chiri[-1].set_xlabel('$\psi_N$')
     #ax_harms[1].set_ylabel('Resonant harm phase (rad)')
     for i in ax_harms:i.grid(True)
+    for i in ax_isl:i.grid(True)
     fig_harms.tight_layout(pad = 0.1)
+    fig_isl.tight_layout(pad = 0.1)
     for end in ['svg','eps','pdf']:fig_harms.savefig('harms_{}_{}.{}'.format(eta, const_rot, end))
+    for end in ['svg','eps','pdf']:fig_isl.savefig('widths_{}_{}.{}'.format(eta, const_rot, end))
     fig_harms.canvas.draw(); fig_harms.show()
-
+    fig_isl.canvas.draw(); fig_isl.show()
+    #fig_chiri.canvas.draw(); fig_chiri.show()
 1/0
 
 #fig, ax = pt.subplots(ncols = 4, nrows = 2, sharex = True, sharey = True); ax = ax.flatten()
