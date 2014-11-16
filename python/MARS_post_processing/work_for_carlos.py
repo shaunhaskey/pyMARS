@@ -179,6 +179,8 @@ base_dir = r'/home/srh112/NAMP_datafiles/mars/'
 for dir_tmp in dirs:
     file_names.append('{}/{}/{}_post_processing_PEST.pickle'.format(base_dir, dir_tmp, dir_tmp))
 
+file_names = ['/home/srh112/NAMP_datafiles/mars/shot158115_04780_scan/shot158115_04780_scan_post_processing_PEST.pickle']
+
 fig, ax = pt.subplots(nrows = 3, sharex = True) #ax = [ax]
 for file_name, label, marker in zip(file_names, labels, markers):
     results, phases, betaN_li = extract_useful(file_name, m = 10, probe_names = probe_names)
