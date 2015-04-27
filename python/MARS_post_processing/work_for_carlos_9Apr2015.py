@@ -14,7 +14,7 @@ phasing = 0
 n = 2
 phase_machine_ntor = 0
 s_surface = 0.94
-fixed_harmonic = 3
+fixed_harmonic = 4
 reference_dB_kink = 'plasma'
 reference_offset = [4,0]
 #reference_offset = [2,0]
@@ -26,11 +26,8 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_scan/shot158115_0
 file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_scan_bak/shot158115_04780_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_scan/shot158115_04780_scan_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot158103_03796_betaN_ramp_carlos_hicol/shot158103_03796_betaN_ramp_carlos_hicol_post_processing_PEST.pickle'
-
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_retest/shot158115_04780_betaN_ramp_retest_post_processing_PEST.pickle'
-
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_retest2/shot158115_04780_betaN_ramp_retest2_post_processing_PEST.pickle'
-
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_retestV2/shot158115_04780_betaN_ramp_retestV2_post_processing_PEST.pickle'
 
 
@@ -39,7 +36,7 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot158103_03796_betaN_ramp_carlos
 
 file_name = '/home/srh112/NAMP_datafiles/mars/shot161198_03550_betaN_ramp_carlos_hicol2/shot161198_03550_betaN_ramp_carlos_hicol2_post_processing_PEST.pickle'
 
-file_name = '/home/srh112/NAMP_datafiles/mars/shot161205_03215_betaN_ramp_carlos_lmode2/shot161205_03215_betaN_ramp_carlos_lmode2_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot161205_03215_betaN_ramp_carlos_lmode2/shot161205_03215_betaN_ramp_carlos_lmode2_post_processing_PEST.pickle'
 
 names = [' 66M', 'Inner_pol']
 names = [' 66M', ' MPID1A', ' MPID1B']
@@ -72,7 +69,6 @@ probe_max = {}
 probe_phase = {}
 probe_names = names
 a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_machine_ntor, fixed_harmonic = fixed_harmonic, reference_offset = reference_offset, reference_dB_kink = reference_dB_kink, sort_name = sort_name, try_many_phasings = False)
-
 dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'mean')
 dBkink = dBres_dBkink.dBkink_calculations(a)
 n_simuls = len(dBres.raw_data['res_m_vals'])
@@ -105,19 +101,13 @@ with file('{}_disp.txt'.format(file_name.split('/')[-1].rstrip('post_processing_
     filehandle.writelines(disp_txt)
 fig25.canvas.draw();fig25.show()
 
-NCURVES = 10
-np.random.seed(101)
-values = range(NCURVES)
-
-jet = cm = pt.get_cmap('jet') 
-#cNorm  = colors.Normalize(vmin=0, vmax=np.max(betaN_li))
-cNorm  = colors.Normalize(vmin=0, vmax=4)
-scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+cmap_cycle = gen_func.new_color_cycle(0,4)
 
 text_output = []
 
 field_list = ['plasma','vacuum','total']
 ul_list = ['upper','lower']
+extra_info = ['PMULT','BNLI']
 for ident, (name,marker,ax) in enumerate(zip(names,marker_list,ax_overall)):
     ax[0].set_title(name)
     probe_max[name] = {'vacuum':[],'plasma':[],'total':[]}
@@ -125,46 +115,52 @@ for ident, (name,marker,ax) in enumerate(zip(names,marker_list,ax_overall)):
 
     ind = a.project_dict['details']['pickup_coils']['probe'].index(name)
     probe = dBres_dBkink.magnetic_probe(a,name)
-    print ''
-    tmp = a.project_dict['details']['pickup_coils']
-    if ident==0: header = 'quant '
-    #for q in range(n_simuls):
-    for q in betaN_li_sort:# range(n_simuls):
-        print '###### {} #####'.format(name)
-        print 'R={:.3f}, Z={:.3f}m, l_probe={:.3f}m, inc={:.3f}rad, pol={}, betaN/li={Bnli}'.format(*[tmp[i][ind] for i in ['Rprobe', 'Zprobe', 'lprobe','tprobe','probe_type']], Bnli = betaN_li[q]) 
-        cur_line = '{} {:.4e} {:.3f} '.format(name, betaN_li[q], PMULT[q])
-        header += 'betaN/li PMULT '
-        for field in field_list:
-            for ul in ul_list:
-                print '{}_{}='.format(field, ul), probe.raw_data['{}_probe_{}'.format(field, ul)][q]
-                tmp_data = probe.raw_data['{}_probe_{}'.format(field, ul)][q]
-                cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
-                if q==0 and ident==0: 
-                    header += '{}_{}_real {}_{}_imag '.format(field, ul, field, ul)
-        if ident==0 and q==0: 
-            text_output.append(header.rstrip(' '))
-        print header
-        text_output.append(cur_line.rstrip(' '))
-    for q in betaN_li_sort:# range(n_simuls):
-    #for q in range(n_simuls):
-        #for the jet color scheme
-        colorVal = scalarMap.to_rgba(betaN_li[q])
-        pu, pl= [probe.raw_data['plasma_probe_upper'][q], probe.raw_data['plasma_probe_lower'][q]]
-        lab = name if q==0 else None
-        tmp_phases = np.linspace(0,360,100)
-        tmp_vals_abs = np.abs(pu + pl * np.exp(1j*np.deg2rad(tmp_phases)))
-        #ax[0].plot(tmp_phases, tmp_vals_abs,label=lab, color = clr_list[q], marker=marker)
-        ax[0].plot(tmp_phases, tmp_vals_abs,label=lab, color = colorVal, marker=marker)
-        tmp_vals_ang = np.angle(pu + pl * np.exp(1j*np.deg2rad(tmp_phases)))
-        tmp_vals2 = pu + pl * np.exp(1j*np.deg2rad(tmp_phases))
-        #ax2[ident].plot(np.real(tmp_vals2), np.imag(tmp_vals2), color=clr_list[q])
-        ax[2].plot(np.real(tmp_vals2), np.imag(tmp_vals2), color=colorVal)
-        #ax[2].plot(np.real(tmp_vals2[0]), np.imag(tmp_vals2[0]), marker = 'o', color=clr_list[q])
-        ax[2].plot(np.real(tmp_vals2[0]), np.imag(tmp_vals2[0]), marker = 'o', color=colorVal)
-        #ax[1].plot(tmp_phases, np.rad2deg(tmp_vals_ang)%360,label=lab,color = clr_list[q], marker=marker)
-        ax[1].plot(tmp_phases, np.rad2deg(tmp_vals_ang)%360,label=lab,color = colorVal, marker=marker)
-        probe_max[name]['plasma'].append(max(np.abs(tmp_vals_abs)))
-        probe_phase[name]['plasma'].append(tmp_phases[np.argmax(np.abs(tmp_vals_abs))])
+    header, b1 = probe.output_values_string(extra_info=extra_info, sort_by='BNLI')
+    if ident==0: 
+        text_output.append(header)
+    for tmp in b1: text_output.append(tmp)
+    probe_max[name]['plasma'],probe_phase[name]['plasma'] = probe.plot_probe_outputs_vs_phase(color_by='BNLI', ax_amp = ax[0], ax_phase = ax[1], ax_complex = ax[2],min_val = 0, max_val  = 4)
+
+    # print ''
+    # tmp = a.project_dict['details']['pickup_coils']
+    # if ident==0: header = 'quant '
+    # #for q in range(n_simuls):
+    # for q in betaN_li_sort:# range(n_simuls):
+    #     print '###### {} #####'.format(name)
+    #     print 'R={:.3f}, Z={:.3f}m, l_probe={:.3f}m, inc={:.3f}rad, pol={}, betaN/li={Bnli}'.format(*[tmp[i][ind] for i in ['Rprobe', 'Zprobe', 'lprobe','tprobe','probe_type']], Bnli = betaN_li[q]) 
+    #     cur_line = '{} {:.4e} {:.3f} '.format(name, betaN_li[q], PMULT[q])
+    #     header += 'betaN/li PMULT '
+    #     for field in field_list:
+    #         for ul in ul_list:
+    #             print '{}_{}='.format(field, ul), probe.raw_data['{}_probe_{}'.format(field, ul)][q]
+    #             tmp_data = probe.raw_data['{}_probe_{}'.format(field, ul)][q]
+    #             cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
+    #             if q==0 and ident==0: 
+    #                 header += '{}_{}_real {}_{}_imag '.format(field, ul, field, ul)
+    #     if ident==0 and q==0: 
+    #         text_output.append(header.rstrip(' '))
+    #     print header
+    #     text_output.append(cur_line.rstrip(' '))
+    # for q in betaN_li_sort:# range(n_simuls):
+    # #for q in range(n_simuls):
+    #     colorVal = cmap_cycle(betaN_li[q])
+    #     pu, pl= [probe.raw_data['plasma_probe_upper'][q], probe.raw_data['plasma_probe_lower'][q]]
+    #     lab = name if q==0 else None
+    #     tmp_phases = np.linspace(0,360,100)
+    #     tmp_vals_abs = np.abs(pu + pl * np.exp(1j*np.deg2rad(tmp_phases)))
+    #     #ax[0].plot(tmp_phases, tmp_vals_abs,label=lab, color = clr_list[q], marker=marker)
+    #     ax[0].plot(tmp_phases, tmp_vals_abs,label=lab, color = colorVal, marker=marker)
+    #     tmp_vals_ang = np.angle(pu + pl * np.exp(1j*np.deg2rad(tmp_phases)))
+    #     tmp_vals2 = pu + pl * np.exp(1j*np.deg2rad(tmp_phases))
+    #     #ax2[ident].plot(np.real(tmp_vals2), np.imag(tmp_vals2), color=clr_list[q])
+    #     ax[2].plot(np.real(tmp_vals2), np.imag(tmp_vals2), color=colorVal)
+    #     #ax[2].plot(np.real(tmp_vals2[0]), np.imag(tmp_vals2[0]), marker = 'o', color=clr_list[q])
+    #     ax[2].plot(np.real(tmp_vals2[0]), np.imag(tmp_vals2[0]), marker = 'o', color=colorVal)
+    #     #ax[1].plot(tmp_phases, np.rad2deg(tmp_vals_ang)%360,label=lab,color = clr_list[q], marker=marker)
+    #     ax[1].plot(tmp_phases, np.rad2deg(tmp_vals_ang)%360,label=lab,color = colorVal, marker=marker)
+    #     probe_max[name]['plasma'].append(max(np.abs(tmp_vals_abs)))
+    #     probe_phase[name]['plasma'].append(tmp_phases[np.argmax(np.abs(tmp_vals_abs))])
+
 leg = ax[1].legend(loc = 'best')
 leg.draw_frame(False)
 #ax[1].
@@ -205,7 +201,7 @@ for tmp_name in names:
     leg.draw_frame(False)
     z = np.array(probe_max[tmp_name]['plasma'])
     #ax20[1].plot(betaN_li[tmp_arg_sort], z[tmp_arg_sort],'-o', label = tmp_name)
-    ax20[1].plot(betaN_li_sort[tmp_arg_sort], z,'-o', label = tmp_name)
+    ax20[1].plot(betaN_li[tmp_arg_sort], z,'-o', label = tmp_name)
 fig20.suptitle(file_name,fontsize=10)
 fig20.canvas.draw();fig20.show()
 
@@ -215,33 +211,44 @@ m_list = [10,8]
 
 print ''
 for m in m_list:
-    min_loc = np.argmin(np.abs(np.array(dBres.raw_data['res_m_vals'][0])-m))
-    for q in betaN_li_sort:# range(n_simuls):
-    #for q in range(n_simuls):
-        print '###### {} #####'.format('res_metric')
-        pitch_res_title = 'Pitch Resonant : m = {}, q = {}, $\psi_N$ = {:.3f}, betaN/li={Bnli}'.format(dBres.raw_data['res_m_vals'][q][min_loc],  dBres.raw_data['res_q_vals'][q][min_loc], dBres.raw_data['res_s_vals'][q][min_loc]**2, Bnli = betaN_li[q])
-        print pitch_res_title
-        cur_line = 'm{}q{} {:.4e} {:.3f} '.format(int(dBres.raw_data['res_m_vals'][q][min_loc]),int(dBres.raw_data['res_q_vals'][q][min_loc]),betaN_li[q],PMULT[q])
+    header, b1 =  dBres.output_values_string(m, extra_info=extra_info, sort_by='BNLI')
+    for tmp in b1: text_output.append(tmp)
 
-        for field in field_list:
-            for ul in ul_list:
-                print '{}_{}='.format(field, ul), dBres.raw_data['{}_res_{}'.format(field, ul)][q][min_loc]
-                tmp_data = dBres.raw_data['{}_res_{}'.format(field, ul)][q][min_loc]
-                cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
-        text_output.append(cur_line.rstrip(' '))
+header, b1 =  dBkink.output_values_string(extra_info=extra_info, sort_by='BNLI')
+for tmp in b1: text_output.append(tmp)
 
-for i in range(len(text_output)):
-    text_output[i] = text_output[i] + '\n'
+    # min_loc = np.argmin(np.abs(np.array(dBres.raw_data['res_m_vals'][0])-m))
+    # for q in betaN_li_sort:# range(n_simuls):
+    # #for q in range(n_simuls):
+    #     print '###### {} #####'.format('res_metric')
+    #     pitch_res_title = 'Pitch Resonant : m = {}, q = {}, $\psi_N$ = {:.3f}, betaN/li={Bnli}'.format(dBres.raw_data['res_m_vals'][q][min_loc],  dBres.raw_data['res_q_vals'][q][min_loc], dBres.raw_data['res_s_vals'][q][min_loc]**2, Bnli = betaN_li[q])
+    #     print pitch_res_title
+    #     cur_line = 'm{}q{} {:.4e} {:.3f} '.format(int(dBres.raw_data['res_m_vals'][q][min_loc]),int(dBres.raw_data['res_q_vals'][q][min_loc]),betaN_li[q],PMULT[q])
+
+    #     for field in field_list:
+    #         for ul in ul_list:
+    #             print '{}_{}='.format(field, ul), dBres.raw_data['{}_res_{}'.format(field, ul)][q][min_loc]
+    #             tmp_data = dBres.raw_data['{}_res_{}'.format(field, ul)][q][min_loc]
+    #             cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
+    #     text_output.append(cur_line.rstrip(' '))
+
+#for i in range(len(text_output)):
+#    text_output[i] = text_output[i] + '\n'
+
+#Write the text output to a file
 with file('{}.txt'.format(file_name.split('/')[-1].rstrip('post_processing_PEST.pickle')),'w') as filehandle:
     filehandle.writelines(text_output)
 
 field = 'vacuum'
+field = 'total'
 
+#This is for plotting what happens with the vac metric
+fig, ax = pt.subplots()
 for q in range(n_simuls):
     u, l = dBres.raw_data['{}_res_{}'.format(field, 'upper')][q][min_loc], dBres.raw_data['{}_res_{}'.format(field, 'lower')][q][min_loc]
     lab = 'res vac' if q==0 else None
-    ax[2].plot(np.linspace(0,360,100), np.abs(u + l * np.exp(1j*np.linspace(0,2.*np.pi,100))), label = lab, color=clr_list[q], marker = 'x')
-
+    ax.plot(np.linspace(0,360,100), np.abs(u + l * np.exp(1j*np.linspace(0,2.*np.pi,100))), label = lab, color=clr_list[q], marker = 'x')
+fig.canvas.draw();fig.show()
 
 print ''
 for q in range(n_simuls):
@@ -252,6 +259,17 @@ for q in range(n_simuls):
     for field in ['plasma','vacuum','total']:
         for ul in ['upper','lower']:
             print '{}_{} ='.format(field, ul), dBkink.raw_data['{}_kink_harm_{}'.format(field, ul)][q]
+    field = 'plasma'
+
+print ''
+for q in range(n_simuls):
+    print '###### {} #####'.format('rfa_metric')
+    rfa_title = 'RFA : m = {}, $\psi_N$ = {:.3f}, betaN/li={Bnli}'.format(dBkink.raw_data['plasma_max_mode_list_upper'][q], s_surface, Bnli = betaN_li[q])
+    print rfa_title
+    #Print out and plot the rfa metric
+    for field in ['plasma','vacuum','total']:
+        for ul in ['upper','lower']:
+            print '{}_{} ='.format(field, ul), dBkink.raw_data['{}_kink_fixed_harm_{}'.format(field, ul)][q]
     field = 'plasma'
 
 for q in range(n_simuls):

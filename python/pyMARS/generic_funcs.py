@@ -1,6 +1,9 @@
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MaxNLocator
+import matplotlib.colors as colors
+import matplotlib.cm as cmx
+import matplotlib.pyplot as pt
 
 def setup_publication_image(fig, height_prop = 1./1.618, single_col = True, replacement_kwargs = None):
     cm_to_inch=0.393701
@@ -31,3 +34,14 @@ def create_cbar_ax(original_ax, pad = 3, loc = "right", prop = 5):
     divider = make_axes_locatable(original_ax)
     return divider.append_axes(loc, "{}%".format(prop), pad="{}%".format(pad))
 
+
+
+def new_color_cycle(min_val, max_val,cmap='jet',):
+    '''This creates a cycle through a colormap
+    SRH: 27Apr2015
+    '''
+    cmap = cmap
+    jet = cm = pt.get_cmap(cmap)
+    cNorm  = colors.Normalize(vmin=min_val, vmax=max_val)
+    scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+    return scalarMap.to_rgba
