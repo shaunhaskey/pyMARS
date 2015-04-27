@@ -32,7 +32,7 @@ try:
     rotation_end = float(parser.get('process_control', 'rotation_scan_end'))
     rotation_num = float(parser.get('process_control', 'rotation_scan_number'))
 except ConfigParser.NoOptionError, e:
-    print 'Couldnt find multiple_efits - setting it to 0', e
+    print 'Couldnt find rotation scan data - setting everything to 0', e
     rotation_scan = 0; rotation_start  = 0; rotation_end = 1; rotation_num = 0
 
 try:
@@ -41,12 +41,12 @@ try:
     resistivity_end = float(parser.get('process_control', 'resistivity_scan_end'))
     resistivity_num = float(parser.get('process_control', 'resistivity_scan_number'))
 except ConfigParser.NoOptionError, e:
-    print 'Couldnt find multiple_efits - setting it to 0', e
+    print 'Couldnt find resistiity scan data - setting everything to zero 0', e
     resistivity_scan = 0; resistivity_start = 0; resistivity_end = 0; resistivity_num = 0
 try:
     rotation_spacing = str(parser.get('process_control', 'rotation_spacing'))
 except ConfigParser.NoOptionError, e:
-    print 'Couldnt find multiple_efits - setting it to 0', e
+    print 'Couldnt find rotation spacing - setting it to lin', e
     rotation_spacing = 'lin'
 
 try:

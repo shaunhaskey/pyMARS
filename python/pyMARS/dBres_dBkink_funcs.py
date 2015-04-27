@@ -477,7 +477,7 @@ class post_processing_results():
         self.calc_ul = ul
         self.reference_dB_kink = reference_dB_kink
         self.reference_offset = [2,0] if reference_offset == None else reference_offset
-        plasma_params = ['Q95','QMAX','shot_time','BETAN', 'LI', 'R0EXP', 'B0EXP','v0a']
+        plasma_params = ['Q95','QMAX','shot_time','BETAN', 'LI', 'R0EXP', 'B0EXP','v0a','PMULT','QMULT']
         self.raw_data = {}
         for i in plasma_params:self.raw_data[i] = data_from_dict(i, self.project_dict)
         self.raw_data['BNLI']=np.array(self.raw_data['BETAN'])/np.array(self.raw_data['LI'])
