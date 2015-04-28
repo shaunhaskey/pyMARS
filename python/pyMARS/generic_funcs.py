@@ -45,3 +45,17 @@ def new_color_cycle(min_val, max_val,cmap='jet',):
     cNorm  = colors.Normalize(vmin=min_val, vmax=max_val)
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
     return scalarMap.to_rgba
+
+def make_figure_share_xy_row(nrows, ncols):
+    fig = pt.figure()
+    ax_overall = []
+    #fig, ax = pt.subplots(nrows = 3, ncols = ncols, sharex = True)
+    for j in range(ncols):
+        ax_tmp = []
+        for i in range(nrows):
+            if j==0:
+                ax_tmp.append(fig.add_subplot(nrows,ncols,i*ncols + j + 1))
+            else:
+                ax_tmp.append(fig.add_subplot(nrows,ncols,i*ncols + j + 1, sharex = ax_overall[0][i], sharey = ax_overall[0][i]))
+        ax_overall.append(ax_tmp)
+    return fig, ax_overall
