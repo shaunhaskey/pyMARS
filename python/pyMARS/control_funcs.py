@@ -510,7 +510,7 @@ def setup_mars_func(project_dict, upper_and_lower = 0, MARS_template_name = 'RUN
 
 ###################################################################
 #step 6
-def run_mars_function(project_dict,job_num_filename, MARS_execution_script,rm_files = '', rm_files2 = '', cluster_job =1, upper_and_lower = 0):
+def run_mars_function(project_dict,job_num_filename, MARS_execution_script,rm_files = '', rm_files2 = '', cluster_job =1, upper_and_lower = 0, mem_requirement = 15):
     id_string = 'MAR' + str(int(num.random.rand(1)*100)) #to identify which jobs have been submitted to venus
     for i in project_dict['sims'].keys():
         pyMARS_funcs.generate_job_file(project_dict['sims'][i], MARS_execution_script,id_string = id_string, rm_files = rm_files, rm_files2 = rm_files2, upper_and_lower=upper_and_lower)
@@ -521,7 +521,7 @@ def run_mars_function(project_dict,job_num_filename, MARS_execution_script,rm_fi
     if cluster_job == 0:
         project_dict['sims'] = batch_launcher.single_launch_mars(project_dict['sims'])
     else:
-        project_dict['sims'] = batch_launcher.batch_launch_mars(project_dict['sims'], job_num_filename, id_string = id_string)
+        project_dict['sims'] = batch_launcher.batch_launch_mars(project_dict['sims'], job_num_filename, id_string = id_string, mem_requirement = mem_requirement)
     return project_dict
 
 

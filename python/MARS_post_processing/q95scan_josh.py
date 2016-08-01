@@ -9,6 +9,7 @@ import scipy.interpolate as interp
 import time
 
 project_name = '/u/haskeysr/mars/shot153585_03795_q95_scan_josh_q95_scan_n3/shot153585_03795_q95_scan_josh_q95_scan_n3_post_processing_PEST.pickle'
+project_name = "/u/haskeysr/mars/shot158115_04702_n2_q95_scan/shot158115_04702_n2_q95_scan_post_processing_PEST.pickle"
 pickle_file = open(project_name,'r')
 project_dict = pickle.load(pickle_file)
 pickle_file.close()
@@ -20,7 +21,10 @@ results = {}
 Z = np.linspace(-0.5,0.5,150)
 R = Z * 0 + 0.98
 #for i in [1,2]:
-for i in project_dict['sims'].keys():
+tmp_a = project_dict['sims'].keys()
+
+#for i in project_dict['sims'].keys():
+for i in tmp_a[:3]:
     results[i] = {}
     n = np.abs(project_dict['sims'][i]['MARS_settings']['<<RNTOR>>'])
     I0EXP = RZfuncs.I0EXP_calc_real(n, project_dict['details']['I-coils']['I_coil_current'])
@@ -38,11 +42,14 @@ for i in project_dict['sims'].keys():
     print '{}, {:.3f}s'.format(i, time.time() - start_time)
 
 pickle.dump(results, file('output_josh_n3_raw.pickle','w'))
+results = pickle.load(file('output_josh_n3_raw.pickle','r'))
 
 for type in ['plasma','vacuum']:
     q95 = []
     tmp = np.zeros((len(Z),len(project_dict['sims'].keys())), dtype = float)
     for j, key in enumerate(project_dict['sims'].keys()):
+
+    #for j, key in enumerate(range(1,26)):
         tmp[:,j] = np.real(results[key]['{}_{}'.format(type, 'upper')] + results[key]['{}_{}'.format(type, 'lower')])
         q95.append(project_dict['sims'][key]['Q95'])
     results[type] = +tmp
@@ -60,6 +67,7 @@ fig, ax = pt.subplots()
 #X, Y = np.meshgrid(Z,results['Q95'])
 X, Y = np.meshgrid(results['Q95'],results['Z'])
 mult = 1232.42963413606/1.9556788
+mult = 1
 im = ax.pcolormesh(X, Y, mult*(results['plasma']-results['vacuum']), cmap = 'RdBu')
 cbar = pt.colorbar(im, ax = ax)
 cbar.set_label('Re(Bz) G/kA')

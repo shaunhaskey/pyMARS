@@ -10,5 +10,8 @@
 *.svg
 *.job
 *.log
+*.txt
+*.nc
+*.pickle
 '*#'
 \#*\#

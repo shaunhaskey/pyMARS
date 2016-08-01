@@ -6,8 +6,10 @@ import subprocess as sub
 def launch_job(job_name):
     os.system('qsub ' + job_name)
 
-def launch_job_mars(job_name):
-    os.system('qsub -l mem_free=15G,h_vmem=15G ' + job_name)
+def launch_job_mars(job_name, mem_requirement = 15):
+    cmd = 'qsub -l mem_free={}G,h_vmem={}G {}'.format(mem_requirement, mem_requirement, job_name)
+    print cmd
+    os.system(cmd)
 
 def check_job_number_file(file_name):
     file_name = open(file_name,'r')
@@ -77,7 +79,7 @@ def single_launch_chease(master_dict,PEST=0):
     return master_dict
 
     
-def batch_launch_mars(master_dict, job_num_filename, id_string = 'MARS'):
+def batch_launch_mars(master_dict, job_num_filename, id_string = 'MARS', mem_requirement=15):
     start_time = time.time()
     submitted_jobs = 0;startup = 1;startup_runs = 0
     total_jobs = len(master_dict.keys())
@@ -88,7 +90,7 @@ def batch_launch_mars(master_dict, job_num_filename, id_string = 'MARS'):
         print i
         if startup==1:
             os.chdir(master_dict[i]['dir_dict']['mars_dir'])
-            launch_job_mars('mars_venus.job')
+            launch_job_mars('mars_venus.job', mem_requirement = mem_requirement)
             time.sleep(10)
             submitted_serials.append(i)
             master_dict[i]['mars_vac_run'] = 1

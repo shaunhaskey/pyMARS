@@ -621,7 +621,7 @@ def return_q_profile(mk,file_name='PROFEQ_PEST', n=2):
 
 
 
-def pest_plot(directory, fig_name,title):
+def pest_plot(directory, fig_name,title, m1=-29,m2=29):
     os.chdir(directory)
     print directory
     Nchi = 513
@@ -694,16 +694,17 @@ def pest_plot(directory, fig_name,title):
     BnPEST  = griddata(R_Z_EQAC,BnEQAC.flatten(),R_Z_PEST,method='linear')
     BnPEST.resize(BnEQAC.shape)
     BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST 
+    
 
-    mk = np.arange(-29,29+1,dtype=int)
+    mk = np.arange(m1,m2+1,dtype=int)
     mk.resize(1,len(mk))
 
     expmchi = np.exp(np.dot(-chi.transpose(),mk)*1j)
     BMnPEST = np.dot(BnPEST,expmchi)*(chi[0,1]-chi[0,0])/2./np.pi
 
 
-    mm = np.arange(-29,29+1,dtype=int)
-    mm2 = np.arange(-29,29+1,dtype=int)
+    mm = np.arange(m1,m2+1,dtype=int)
+    mm2 = np.arange(m1,m2+1,dtype=int)
 
     II = mm - mk[0,0] + 1 - 1
     II.resize(len(II),1)
