@@ -32,7 +32,7 @@ try:
     rotation_end = float(parser.get('process_control', 'rotation_scan_end'))
     rotation_num = float(parser.get('process_control', 'rotation_scan_number'))
 except ConfigParser.NoOptionError, e:
-    print 'Couldnt find rotation scan data - setting everything to 0', e
+    print 'Couldnt find rotation scan settings, setting them to defaults', e
     rotation_scan = 0; rotation_start  = 0; rotation_end = 1; rotation_num = 0
 
 try:
@@ -41,18 +41,18 @@ try:
     resistivity_end = float(parser.get('process_control', 'resistivity_scan_end'))
     resistivity_num = float(parser.get('process_control', 'resistivity_scan_number'))
 except ConfigParser.NoOptionError, e:
-    print 'Couldnt find resistiity scan data - setting everything to zero 0', e
+    print 'Couldnt find resistivity scan settings, setting them to defaults', e
     resistivity_scan = 0; resistivity_start = 0; resistivity_end = 0; resistivity_num = 0
 try:
     rotation_spacing = str(parser.get('process_control', 'rotation_spacing'))
 except ConfigParser.NoOptionError, e:
-    print 'Couldnt find rotation spacing - setting it to lin', e
+    print 'Couldnt find rotation spacing, setting to lin', e
     rotation_spacing = 'lin'
 
 try:
     resistivity_spacing = str(parser.get('process_control', 'resistivity_spacing'))
 except ConfigParser.NoOptionError, e:
-    print 'Couldnt find multiple_efits - setting it to 0', e
+    print 'Couldnt find restivity spacing, setting to lin', e
     resistivity_spacing = 'lin'
 if resistivity_scan:
     if resistivity_spacing=='log':
@@ -116,6 +116,12 @@ CHEASE_simultaneous_jobs = int(parser.get('cluster_details', 'CHEASE_simultaneou
 MARS_simultaneous_jobs = int(parser.get('cluster_details', 'MARS_simultaneous_jobs'))
 post_proc_simultaneous_jobs = int(parser.get('cluster_details', 'post_proc_simultaneous_jobs'))
 CORSICA_workers = int(parser.get('cluster_details', 'CORSICA_workers'))
+try:
+    MARS_memory = int(parser.get('cluster_details', 'MARS_memory'))
+    print('MARS memory requirement: {}GB'.format(MARS_memory))
+except ConfigParser.NoOptionError, e:
+    print 'MARS memory requirement not specified, going with 15GB'
+    MARS_memory = 15
 
 #RMZM stuff
 RMZM_python = int(parser.get('RMZM_python_details', 'RMZM_python'))
@@ -156,11 +162,14 @@ single_runthrough = int(parser.get('corsica_settings', 'single_runthrough'))
 p_mult_min = float(parser.get('corsica_settings', 'p_mult_min'))
 p_mult_max = float(parser.get('corsica_settings', 'p_mult_max'))
 p_mult_number = int(parser.get('corsica_settings', 'p_mult_number'))
-p_mult_increment = (p_mult_max-p_mult_min)/(p_mult_number-1)
+if p_mult_number==1:
+    p_mult_increment = 0
+else:
+    p_mult_increment = (p_mult_max-p_mult_min)/(p_mult_number-1)
+
 q_mult_min = float(parser.get('corsica_settings', 'q_mult_min'))
 q_mult_max = float(parser.get('corsica_settings', 'q_mult_max'))
 q_mult_number = int(parser.get('corsica_settings', 'q_mult_number'))
-
 if q_mult_number==1:
     q_mult_increment = 0
 else:
@@ -180,6 +189,12 @@ corsica_settings = {'<<pmin>>':'%3f'%(p_mult_min),
                      '<<qstep>>':'%.3f'%(q_mult_increment),
                      '<<npmult>>':'%d'%(p_mult_number),
                      '<<nqmult>>':'%d'%(q_mult_number)}
+n_eqs = p_mult_number * q_mult_number
+print 'p_mult_number:{}, q_mult_number:{}, n_eqs:{}, CORSICA_workers:{}'.format(p_mult_number, q_mult_number, n_eqs, CORSICA_workers)
+if n_eqs < CORSICA_workers:
+    print("Reducing number of CORSICA workers from {} to {} so they all have something to do".format(CORSICA_workers, n_eqs))
+    CORSICA_workers = n_eqs
+
 
 for i,j in parser.items('corsica_settings2'):
     corsica_settings[i] = j
@@ -196,12 +211,15 @@ MARS_settings = {}
 FEEDI_string =  pyMARS_funcs.construct_FEEDI(MARS_phasing)
 print FEEDI_string
 MARS_settings['<<FEEDI>>'] = FEEDI_string
+new_mars_settings = {}
 for i,j in parser.items('MARS_settings2'):
     print i, j
     try:
         MARS_settings[i] = int(j)
+        new_mars_settings[i] = int(j)
     except ValueError:
         MARS_settings[i] = float(j)
+        new_mars_settings[i] = float(j)
 
 print MARS_settings
 
@@ -483,6 +501,16 @@ if start_from_step <=4 and end_at_step>=4:
     overall_start = time.time()
     if start_from_step == 4:
         project_dict = pyMARS_funcs.read_data(project_dir + project_name+'_post_chease.pickle')
+        #Need to apply new MARS settings from MARS_settings2 here:
+    for i in project_dict['sims'].keys():
+        print i
+        for tmp_key in new_mars_settings.keys():
+            print project_dict['sims'][i]['MARS_settings'][tmp_key],
+            project_dict['sims'][i]['MARS_settings'][tmp_key] = new_mars_settings[tmp_key]
+            print project_dict['sims'][i]['MARS_settings'][tmp_key]
+    for tmp_key in new_mars_settings.keys():
+        project_dict['details']['MARS_settings'][tmp_key] = new_mars_settings[tmp_key]
+
     RMZM_name = 'RMZM_F' #This is here so that you can choose between pest and this?
 
     project_dict = cont_funcs.check_chease_run(project_dict, RMZM_name)
@@ -502,7 +530,6 @@ if start_from_step <=5 and end_at_step>=5:
     if start_from_step == 5:
         project_dict = pyMARS_funcs.read_data(project_dir + project_name+'_post_RMZM.pickle')
 
-
     project_dict = cont_funcs.setup_mars_func(project_dict, upper_and_lower = upper_and_lower, MARS_template_name = MARS_template_name, multiple_efits = multiple_efits, rot_scan_list=rot_scan_list,res_scan_list=res_scan_list)
 
     #Save the data structure so that it can be read by the next step
@@ -521,7 +548,7 @@ if start_from_step <=6 and end_at_step>=6:
     job_num_filename = project_dict['details']['base_dir']+'MARS_simul_jobs.txt'
     with file(job_num_filename,'w') as file_handle: file_handle.write('%d\n'%(MARS_simultaneous_jobs))
 
-    project_dict = cont_funcs.run_mars_function(project_dict, job_num_filename, MARS_execution_script,rm_files = MARS_rm_files, rm_files2 = MARS_rm_files2, cluster_job = cluster_job, upper_and_lower = upper_and_lower)
+    project_dict = cont_funcs.run_mars_function(project_dict, job_num_filename, MARS_execution_script,rm_files = MARS_rm_files, rm_files2 = MARS_rm_files2, cluster_job = cluster_job, upper_and_lower = upper_and_lower, mem_requirement = MARS_memory)
 
     pyMARS_funcs.dump_data(project_dict, project_dict['details']['base_dir']+ project_name+'_post_mars_run.pickle')
 

@@ -213,6 +213,8 @@ class data():
 
         #Extract all the magnetic field stuff
         self.BM1, self.BM2, self.BM3, self.Mm = ReadBPLASMA(file_name, self.BNORM, self.Ns, self.s, spline_B23=self.spline_B23)
+        self.M1 = np.min(self.Mm)
+        self.M2 = np.max(self.Mm)
         self.B1,self.B2,self.B3,self.Bn,self.BMn = GetB123(self.BM1, self.BM2, self.BM3, self.R, self.Mm, self.chi, self.dRdchi, self.dZdchi)
         self.Br,self.Bz,self.Bphi = MacGetBphysC(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3)
         self.Brho,self.Bchi,self.Bphi2 = MacGetBphysT(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3,self.B0EXP)
@@ -261,13 +263,14 @@ class data():
         if no_ax: fig.canvas.draw(); fig.show()
 
     
-    def plot_Bn(self, plot_quantity, axis = None, start_surface = 0, end_surface = 300, skip = 1,cmap='spectral', wall_grid = 23, plot_coils_switch=0, plot_boundaries = 0):
+    def plot_Bn(self, plot_quantity, axis = None, start_surface = 0, end_surface = 300, skip = 1,cmap='spectral', wall_grid = None, plot_coils_switch=0, plot_boundaries = 0, plot_kwargs = None):
         #print self.R.shape, self.Z.shape, self.Bn.shape
         import matplotlib.pyplot as pt
+        if plot_kwargs == None: plot_kwargs = {}
         grid_R = self.R*self.R0EXP
         grid_Z = self.Z*self.R0EXP
         print 'sh_mod', np.max(grid_R), np.min(grid_R), np.max(grid_Z), np.min(grid_Z)
-        color_plot = axis.pcolormesh(grid_R[start_surface:end_surface:skip,:], grid_Z[start_surface:end_surface:skip,:], plot_quantity[start_surface:end_surface:skip,:],cmap = cmap)
+        color_plot = axis.pcolormesh(grid_R[start_surface:end_surface:skip,:], grid_Z[start_surface:end_surface:skip,:], plot_quantity[start_surface:end_surface:skip,:],cmap = cmap, **plot_kwargs)
         #self.phase_plot = ax2.pcolor(grid_R[start_surface:end_surface:skip,:], grid_Z[start_surface:end_surface:skip,:], np.angle(plot_quantity[start_surface:end_surface:skip,:],deg=True),cmap = cmap)
         
         def plot_coils(ax1, grid_R, grid_Z, plot_list = range(0,13)):
@@ -309,7 +312,9 @@ class data():
 
         if plot_boundaries ==1:
             #plot_coils(axis)
-            plot_surface_lines(axis, grid_R, grid_Z, self.Ns1 + wall_grid -1,'b-')
+            plot_surface_lines(axis, grid_R, grid_Z, self.Ns1 + self.NW,'b-')
+            if wall_grid!=None:
+                plot_surface_lines(axis, grid_R, grid_Z, self.Ns1 + wall_grid -1,'b-')
             plot_surface_lines(axis, grid_R, grid_Z, self.Ns1 -1,'b--')
 
 
@@ -323,6 +328,8 @@ class data():
     def get_PEST(self, facn = 3.1416/2):
         #os.chdir(self.directory) 
         #os.system('ln -f -s ../../cheaserun_PEST/RMZM_F RMZM_F_PEST')
+
+        #why the hard coded 21 here?
         II=np.arange(1,self.Ns1+21,dtype=int)-1
         BnEQAC = copy.deepcopy(self.Bn[II,:])
         R_EQAC = copy.deepcopy(self.R[II,:])
@@ -368,11 +375,10 @@ class data():
         BnPEST.resize(BnEQAC.shape)
         BnPEST = BnPEST*np.sqrt(G22_PEST)*R_PEST
 
-
-        mk = np.arange(-29,29+1,dtype=int)
+        mk = np.arange(self.M1,self.M2+1,dtype=int)
         mk.resize(1,len(mk))
 
-        #Fourier transform the data
+        #Fourier transform the data - this was to deal with an issue with numpy - probably solved now, need to double check
         for i in range(1000):
             tmp1 = -self.chi.transpose()
             tmp = np.dot(tmp1, mk)*1j
@@ -388,8 +394,8 @@ class data():
             if n_nans==0:
                 if i!=0: print ' number of attempts to remove nans from BnPEST:',i
                 break
-        mm = np.arange(-29,29+1,dtype=int)
-        mm2 = np.arange(-29,29+1,dtype=int)
+        mm = np.arange(self.M1,self.M2+1,dtype=int)
+        mm2 = np.arange(self.M1,self.M2+1,dtype=int)
 
         II = mm - mk[0,0] + 1 - 1
         II.resize(len(II),1)
@@ -539,7 +545,7 @@ class data():
         ax_tmp[0].set_title('SURFMN, n=%d'%(n,))
         ax_tmp[0].plot(self.mq,self.sq,'wo')
         ax_tmp[0].plot(self.q_profile*n,self.q_profile_s,'w--') 
-        ax_tmp[0].set_xlim([-29,29])
+        ax_tmp[0].set_xlim([self.M1,self.M2])
         ax_tmp[0].set_ylabel(r'$\sqrt{\psi_N}$',fontsize=14)
         image1.set_clim([0,np.max(np.abs(self.SURFMN_zdat))])
         image1.set_clim([0, 1.5])
@@ -787,7 +793,7 @@ class data():
             color_ax3.set_clim([lower_limit*180./np.pi,upper_limit*180./np.pi])
             pt.colorbar(color_ax3,ax=ax3)
             ax3.set_ylim([0,1])#[min(ss.flatten()),max(ss.flatten())])
-            ax3.set_xlim([-29,29])
+            ax3.set_xlim([self.M1,self.M2])
             ax3.plot(self.mq,self.sq,'bo')
             ax3.plot(self.q_profile*n,self.q_profile_s,'b--') 
 
@@ -800,7 +806,7 @@ class data():
         ax.set_title(title)
         ax.set_xlim([min(mk.flatten()),max(mk.flatten())])
         ax.set_ylim([0,1])#[min(ss.flatten()),max(ss.flatten())])
-        ax.set_xlim([-29,29])
+        ax.set_xlim([self.M1,self.M2])
         #pt.colorbar(color_ax, ax=ax)
         pt.colorbar(mappable = color_ax, ax=ax)
 
@@ -1022,6 +1028,7 @@ class data():
 
     def plot_BnPEST(self, ax, n=2, inc_contours = 1, contour_levels = None, phase = 0, increase_grid_BnPEST = 0, min_phase = -130, max_ss = 1.0, interp_points = 100, gauss_filter = [0,0.5], cmap = 'hot', n_contours = 5, phase_ref=None, rmax = 3, phase_ref_array = None, sqrt_flux = True):
         ss_plas_edge = np.argmin(np.abs(self.ss-max_ss))
+        print ss_plas_edge
         if phase_ref!=None:
             #tmp_phase_ref = (np.angle(self.BnPEST[:ss_plas_edge,:], deg = True) - np.angle(phase_ref[:ss_plas_edge,:], deg = True))%(360)
             #tmp_plot_quantity = np.abs((np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose())
@@ -1036,6 +1043,7 @@ class data():
             tmp_plot_quantity = np.angle(self.BnPEST[:ss_plas_edge,:], deg = True)
             tmp_plot_quantity[tmp_plot_quantity<min_phase] += 360
         else:
+            print 'Final option 1'
             tmp_plot_quantity = np.abs((np.abs(self.BnPEST[:ss_plas_edge,:]).transpose()/(self.A[:ss_plas_edge]/(4*np.pi**2))).transpose())
         s_ax = self.ss.flatten()[:ss_plas_edge]
         if not sqrt_flux:s_ax=s_ax**2
@@ -1069,7 +1077,9 @@ class data():
         else:
             #color_ax = ax.pcolor(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap=cmap, rasterized=True)
             print 'hello world'
-            color_ax = ax.pcolormesh(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap=cmap, rasterized=True, shading='gouraud')
+            #color_ax = ax.pcolormesh(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap=cmap, rasterized=True, shading='gouraud')
+            print tmp_plot_mk.shape, tmp_plot_ss.shape, tmp_plot_quantity.shape
+            color_ax = ax.pcolormesh(tmp_plot_mk,tmp_plot_ss, tmp_plot_quantity, cmap=cmap, rasterized=True,)
         self.tmp_plot_quantity = tmp_plot_quantity
         if inc_contours:
             tmp_contour_plot = np.abs(tmp_plot_quantity_complex) if phase_ref else tmp_plot_quantity

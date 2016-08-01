@@ -11,5 +11,7 @@
 *.job
 *.log
 *.txt
+*.nc
+*.pickle
 '*#'
 \#*\#
