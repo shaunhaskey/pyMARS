@@ -161,7 +161,7 @@ class generic_calculation():
             if yaxis_log: ax.set_yscale('log')
         return interp_data
 
-    def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None, multiplier = 1, plot_dots = False):
+    def plot_2D(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, plot_kwargs = None, amplitude = True, med_filt_value = 1, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None, multiplier = 1, plot_dots = False, plot_dots_kwargs = None, return_data = False):
         '''Plot  a calculation versus a particular attribute
 
         SRH : 12Mar2014
@@ -172,6 +172,7 @@ class generic_calculation():
         if no_ax: fig,ax = pt.subplots()
         if plot_kwargs == None: plot_kwargs = {}
         if contour_kwargs == None: contour_kwargs = {}
+        if plot_dots_kwargs == None: plot_dots_kwargs = {}
         comp_func = np.abs if amplitude else np.angle
         
         offset = 0 if amplitude else -np.deg2rad(phasing)/2
@@ -190,19 +191,21 @@ class generic_calculation():
             col = xvals_set.index(x)
             output_matrix[row, col] = +current_data[list_index]
         x_mesh, y_mesh = np.meshgrid(xvals_set, yvals_set)
-        tmp = scipy_filt.median_filter(comp_func(output_matrix) + offset, med_filt_value) * multiplier
-        if comp_func == np.angle:tmp = (tmp + np.pi)%(2.*np.pi) - np.pi
-        not_nan = np.isfinite(tmp)
-        color_ax = ax.pcolormesh(x_mesh, y_mesh, tmp, cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
-        if n_contours != 0: color_ax2 = ax.contour(x_mesh, y_mesh, tmp, np.linspace(clim[0],clim[1], n_contours), **contour_kwargs)
+        z_mesh = scipy_filt.median_filter(comp_func(output_matrix) + offset, med_filt_value) * multiplier
+        if comp_func == np.angle:z_mesh = (z_mesh + np.pi)%(2.*np.pi) - np.pi
+        not_nan = np.isfinite(z_mesh)
+        color_ax = ax.pcolormesh(x_mesh, y_mesh, z_mesh, cmap=cmap_res, rasterized= 'True', shading = 'gouraud')
+        if n_contours != 0: color_ax2 = ax.contour(x_mesh, y_mesh, z_mesh, np.linspace(clim[0],clim[1], n_contours), **contour_kwargs)
         print color_ax.get_clim()
-        if plot_dots: ax.plot(x_mesh, y_mesh, '.')
+        if plot_dots: ax.plot(x_mesh, y_mesh, '.', **plot_dots_kwargs)
         if clim!=None: color_ax.set_clim(clim)
         if xaxis_log: ax.set_xscale('log')
         if yaxis_log: ax.set_yscale('log')
         if no_ax: fig.canvas.draw();fig.show()
-        return color_ax
-
+        if return_data:
+            return color_ax, (x_mesh, y_mesh, z_mesh)
+        else:
+            return color_ax
 
     def plot_2D_irregular(self, phasing, xaxis, yaxis, field = 'plasma',  ax = None, amplitude = True, cmap_res = 'jet', clim = None, yaxis_log = True, xaxis_log = True, n_contours = 0, contour_kwargs = None, n_x = 1000, n_y = 1000, pt_datapts = True):
         '''Plot  a calculation versus a particular attribute
@@ -354,16 +357,19 @@ class dBres_calculations(generic_calculation):
         ul_list = ['upper','lower']
         header = 'quant ' + ' '.join(extra_info) + ' '
         sort_order = np.argsort(np.array(self.parent.raw_data[sort_by]))
-        min_loc = np.argmin(np.abs(np.array(self.raw_data['res_m_vals'][0])-m_num))
+        #min_loc = np.argmin(np.abs(np.array(self.raw_data['res_m_vals'][0])-m_num))
         for ind, q in enumerate(sort_order):
-            cur_line = 'm{}q{} '.format(int(self.raw_data['res_m_vals'][q][min_loc]),int(self.raw_data['res_q_vals'][q][min_loc])) + ' '.join(['{:.4e}'.format(self.parent.raw_data[i][q]) for i in extra_info]) + ' '
-            for field in field_list:
-                for ul in ul_list:
-                    #print '{}_{}='.format(field, ul), probe.raw_data['{}_probe_{}'.format(field, ul)][q]
-                    tmp_data = self.raw_data['{}_res_{}'.format(field, ul)][q][min_loc]
-                    cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
-                    if ind==0: header += '{}_{}_real {}_{}_imag '.format(field, ul, field, ul)
-            text_output.append(cur_line.rstrip(' ')+'\n')
+            min_vals = np.abs(np.array(self.raw_data['res_m_vals'][q])-m_num)
+            min_loc = np.argmin(min_vals)
+            if np.min(min_vals)<1.e-4:
+                cur_line = 'm{}q{} '.format(int(self.raw_data['res_m_vals'][q][min_loc]),int(self.raw_data['res_q_vals'][q][min_loc])) + ' '.join(['{:.4e}'.format(self.parent.raw_data[i][q]) for i in extra_info]) + ' '
+                for field in field_list:
+                    for ul in ul_list:
+                        #print '{}_{}='.format(field, ul), probe.raw_data['{}_probe_{}'.format(field, ul)][q]
+                        tmp_data = self.raw_data['{}_res_{}'.format(field, ul)][q][min_loc]
+                        cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
+                        if ind==0: header += '{}_{}_real {}_{}_imag '.format(field, ul, field, ul)
+                text_output.append(cur_line.rstrip(' ')+'\n')
         return header.rstrip(' ')+'\n', text_output
 
     def plot_res_outputs_vs_phase(self, m_num, color_by='BNLI', ax = None, min_val = None, max_val  = None,marker = '.', field = 'total'):
@@ -377,8 +383,8 @@ class dBres_calculations(generic_calculation):
         if max_val == None: max_val = np.max(self.parent.raw_data[color_by])
         cmap_cycle = gen_funcs.new_color_cycle(min_val,max_val)
         sort_order = np.argsort(np.array(self.parent.raw_data[color_by]))
-        min_loc = np.argmin(np.abs(np.array(self.raw_data['res_m_vals'][0])-m_num))
         for ind, q in enumerate(sort_order):
+            min_loc = np.argmin(np.abs(np.array(self.raw_data['res_m_vals'][q])-m_num))
             colorVal = cmap_cycle(self.parent.raw_data[color_by][q])
             u, l = self.raw_data['{}_res_{}'.format(field, 'upper')][q][min_loc], self.raw_data['{}_res_{}'.format(field, 'lower')][q][min_loc]
             tmp_phases = np.linspace(0,360,100)
@@ -543,8 +549,10 @@ class dBkink_calculations(generic_calculation):
 
         SRH: 27Apr2015
         '''
+        print min_val, max_val
         if min_val == None: min_val = np.min(self.parent.raw_data[color_by])
         if max_val == None: max_val = np.max(self.parent.raw_data[color_by])
+        print min_val, max_val
         cmap_cycle = gen_funcs.new_color_cycle(min_val,max_val)
         sort_order = np.argsort(np.array(self.parent.raw_data[color_by]))
         for ind, q in enumerate(sort_order):
@@ -949,7 +957,12 @@ class post_processing_results():
         SRH : 24Mar2014
         '''
         if I == None:
-            I = np.array([1.,-1.,0.,1,-1.,0.]) if self.n==2 else np.array([1.,-1.,1.,-1,-1.,-1.])
+            if self.n==2:
+                I = np.array([1.,-1.,0.,1,-1.,0.])
+            elif self.n==3:
+                I = np.array([1.,-1.,1.,-1,-1.,-1.])
+            else:
+                raise(ValueError("Not currently setup for n!=2 or 3"))
         N = len(I)
         I0EXP = results_class.I0EXP_calc_real(self.n,I)
         facn = 1.0 #WHAT IS THIS WEIRD CORRECTION FACTOR?

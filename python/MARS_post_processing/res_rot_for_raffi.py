@@ -33,9 +33,9 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kp
 file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res/shot_142614_rote_res_scan_20x20_kpar1_med_rote_wide_res_post_processing_PEST.pickle'
 
 
-file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_res_rot/shot158115_04780_res_rot_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04702_n1_res_rot/shot158115_04702_n1_res_rot_post_processing_PEST.pickle'
-file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04702_n2_res_rot/shot158115_04702_n2_res_rot_post_processing_PEST.pickle'
+file_name = '/home/shaskey/NAMP_datafiles/mars/shot158115_04780_res_rot/shot158115_04780_res_rot_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04702_n1_res_rot/shot158115_04702_n1_res_rot_post_processing_PEST.pickle'
+#file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04702_n2_res_rot/shot158115_04702_n2_res_rot_post_processing_PEST.pickle'
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_res_scan_25x20_kpar1_med_rote/shot_142614_rote_res_scan_25x20_kpar1_med_rote_post_processing_PEST.pickle'
 
 #file_name = '/home/srh112/NAMP_datafiles/mars/shot_142614_rote_scan_100_kpar1/shot_142614_rote_scan_100_kpar1_post_processing_PEST.pickle'
@@ -243,7 +243,7 @@ for phasing_val in range(0,360,60):
     ax[-1].set_xlabel('rotation vrot/valfven')
     ax[0].set_title('n={}, ul phasing={}deg, resistity~={}Ohm-m'.format(tmp_probe.parent.n, phasing_val, res_val))
     for i in ax: i.legend(loc = 'best')
-    for i in ax: i.
+    #for i in ax: i.
     fig.canvas.draw(); fig.show()
 
 

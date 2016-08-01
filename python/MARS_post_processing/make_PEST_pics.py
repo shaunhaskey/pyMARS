@@ -41,7 +41,7 @@ if single:
     dir_loc ='/home/srh112/NAMP_datafiles/mars/146382_thetac_003/qmult1.000/exp1.000/marsrun/RUNrfa.p'
     dir_loc ='/home/srh112/NAMP_datafiles/mars/146382_thetac_006/qmult1.000/exp1.000/marsrun/RUNrfa.p'
     dir_loc ='/home/srh112/NAMP_datafiles/mars/146382_thetac_010/qmult1.000/exp1.000/marsrun/RUNrfa.p'
-    dir_loc ='/home/srh112/NAMP_datafiles/mars/146382_thetac_020/qmult1.000/exp1.000/marsrun/RUNrfa.p'
+    dir_loc ='/home/shaskey/NAMP_datafiles/mars/146382_thetac_020/qmult1.000/exp1.000/marsrun/RUNrfa.p'
     d = data(dir_loc, I0EXP=I0EXP)
     d.get_PEST(facn = facn)
     fig,ax = pt.subplots()
@@ -52,7 +52,16 @@ if single:
     ax.set_xlabel('m')
     ax.set_ylabel(r'$\sqrt{\psi_N}$', fontsize = 14)
     cbar.ax.set_ylabel('G/kA')
-    fig.canvas.draw(); fig.show()
+    print d.BnPEST.shape
+    print d.ss.flatten().shape
+    print d.mk.flatten().shape
+    print d.q_temp.shape
+    print d.s_temp.shape
+    print ss_plas_edge
+    ss_plas_edge = np.argmin(np.abs(d.ss-1))
+    fig.canvas.draw()
+    fig.show()
+
 1/0
 
 #d = data(,I0EXP=I0EXP)

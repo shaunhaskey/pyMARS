@@ -1084,6 +1084,8 @@ class data():
         qn, sq, q, s, mq = return_q_profile(self.mk,file_name=file_name, n=n)
         if not sqrt_flux: s = s**2
         if not sqrt_flux: sq = sq**2
+        self.q_temp = q
+        self.s_temp = s
         ax.plot(q*n,s,'w--') 
         ax.plot(mq,sq,'w+',markersize = 15)
         return color_ax

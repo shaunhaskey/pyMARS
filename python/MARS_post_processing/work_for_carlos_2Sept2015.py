@@ -12,31 +12,15 @@ HOME = os.environ['HOME']
 #Output displacement metric
 #Check l-mode
 #Ideal cases
+
 phasing = 0; n = 2; phase_machine_ntor = 0; s_surface = 0.94; fixed_harmonic_offset = 3
 fixed_harmonic = 11
 reference_dB_kink = 'plasma'; reference_offset = [4,0]
 sort_name = 'betaN_li'
-file_name = HOME + '/NAMP_datafiles/mars/shot158115_04780_scan/shot158115_04780_scan_post_processing_PEST.pickle'
-file_name = HOME + '/NAMP_datafiles/mars/shot158115_04780_scan_bak/shot158115_04780_scan_post_processing_PEST.pickle'
-#file_name = HOME + '/NAMP_datafiles/mars/shot158115_04780_scan/shot158115_04780_scan_post_processing_PEST.pickle'
-#file_name = HOME + '/NAMP_datafiles/mars/shot158103_03796_betaN_ramp_carlos_hicol/shot158103_03796_betaN_ramp_carlos_hicol_post_processing_PEST.pickle'
-#file_name = HOME + '/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_retest/shot158115_04780_betaN_ramp_retest_post_processing_PEST.pickle'
-#file_name = HOME + '/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_retest2/shot158115_04780_betaN_ramp_retest2_post_processing_PEST.pickle'
-#file_name = HOME + '/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_retestV2/shot158115_04780_betaN_ramp_retestV2_post_processing_PEST.pickle'
-
-#These are the the set of simulations
-file_name = HOME + '/NAMP_datafiles/mars/shot158103_03796_betaN_ramp_carlos_2/shot158103_03796_betaN_ramp_carlos_2_post_processing_PEST.pickle'
-file_name = HOME + '/NAMP_datafiles/mars/shot161198_03550_betaN_ramp_carlos_hicol2/shot161198_03550_betaN_ramp_carlos_hicol2_post_processing_PEST.pickle'
-#file_name = HOME + '/NAMP_datafiles/mars/shot161205_03215_betaN_ramp_carlos_lmode2/shot161205_03215_betaN_ramp_carlos_lmode2_post_processing_PEST.pickle'
-file_name = HOME + '/NAMP_datafiles/mars/shot158117_03885_betaN_ramp_carlos_q95/shot158117_03885_betaN_ramp_carlos_q95_post_processing_PEST.pickle'
-file_name = HOME + '/NAMP_datafiles/mars/shot159346_02120_betaN_ramp_carlos_q95/shot159346_02120_betaN_ramp_carlos_q95_post_processing_PEST.pickle'
-file_name = HOME + '/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_retest_carlos_prl_case/shot158115_04780_betaN_ramp_retest_carlos_prl_case_post_processing_PEST.pickle'
-
-file_name = HOME + '/NAMP_datafiles/mars/shot158115_04780_betaN_ramp_retest_carlos_prl_caseV2/shot158115_04780_betaN_ramp_retest_carlos_prl_caseV2_post_processing_PEST.pickle'
-
-file_name = HOME + '/NAMP_datafiles/mars/shot158103_03796_betaN_ramp_carlos_2_thetac0-005/shot158103_03796_betaN_ramp_carlos_2_thetac0-005_post_processing_PEST.pickle'
-file_name = HOME + '/NAMP_datafiles/mars/shot158103_03796_betaN_ramp_carlos_2_thetac0-009/shot158103_03796_betaN_ramp_carlos_2_thetac0-009_post_processing_PEST.pickle'
-file_name = HOME + '/NAMP_datafiles/mars/shot158103_03796_betaN_ramp_carlos_2/shot158103_03796_betaN_ramp_carlos_2_post_processing_PEST.pickle'
+sort_name = 'Q95'
+#file_name = HOME + '/NAMP_datafiles/mars/shot158103_03796_betaN_ramp_carlos_2/shot158103_03796_betaN_ramp_carlos_2_post_processing_PEST.pickle'
+file_name = HOME + '/NAMP_datafiles/mars/shot158103_03796_q95_scan_carlos_thetac0-003/shot158103_03796_q95_scan_carlos_thetac0-003_post_processing_PEST.pickle'
+file_name = HOME + '/NAMP_datafiles/mars/shot158103_03796_q95_scan_carlos_thetac0-003_100/shot158103_03796_q95_scan_carlos_thetac0-003_100_post_processing_PEST.pickle'
 
 #Names of the probes that we are interested in
 names = [' 66M', 'Inner_pol']
@@ -46,7 +30,7 @@ names = ['66M', 'MPID1A',]
 #Generate figure for the probe plots
 fig, ax_overall = gen_func.make_figure_share_xy_row(3, len(names))
 print file_name
-min_val = 0; max_val = 4
+min_val = 3; max_val = 7
 
 probe_max = {}; probe_phase = {}; probe_names = names
 
@@ -54,22 +38,26 @@ a = dBres_dBkink.post_processing_results(file_name, s_surface, phasing, phase_ma
 dBres = dBres_dBkink.dBres_calculations(a, mean_sum = 'mean')
 dBkink = dBres_dBkink.dBkink_calculations(a, fixed_harmonic = fixed_harmonic)
 
-
 n_simuls = len(dBres.raw_data['res_m_vals'])
 betaN_li = np.array(dBres.parent.raw_data['BETAN'])/ np.array(dBres.parent.raw_data['LI'])
+q95 = np.array(dBres.parent.raw_data['Q95'])
 betaN_li_sort = np.argsort(betaN_li)
-PMULT = np.array(dBres.parent.raw_data['PMULT'])
+q95_sort = np.argsort(q95)
+#PMULT = np.array(dBres.parent.raw_data['PMULT'])
 #QMULT = np.array(dBres.parent.raw_data['QMULT'])
 grad = np.max(betaN_li) - np.min(betaN_li)
 off = np.min(betaN_li)
-clr_list = ['{:.2f}'.format(0.9/grad * (betaN_li[i] - off)) for i in range(n_simuls)]
+grad = np.max(q95) - np.min(q95)
+off = np.min(q95)
+clr_list = ['{:.2f}'.format(0.9/grad * (q95[i] - off)) for i in range(n_simuls)]
 
 
 #Get the outputs for the probes, and plot the data
 text_output = []
 field_list = ['plasma','vacuum','total']
 ul_list = ['upper','lower']
-extra_info = ['PMULT','BNLI']
+extra_info = ['PMULT','BNLI','Q95','QMAX']
+sort_by = 'Q95'
 for ident, (name,ax) in enumerate(zip(names,ax_overall)):
     ax[0].set_title(name)
     probe_max[name] = {'vacuum':[],'plasma':[],'total':[]}
@@ -77,11 +65,11 @@ for ident, (name,ax) in enumerate(zip(names,ax_overall)):
 
     ind = a.project_dict['details']['pickup_coils']['probe'].index(name)
     probe = dBres_dBkink.magnetic_probe(a,name)
-    header, b1 = probe.output_values_string(extra_info=extra_info, sort_by='BNLI')
+    header, b1 = probe.output_values_string(extra_info=extra_info, sort_by=sort_by)
     if ident==0: 
         text_output.append(header)
     for tmp in b1: text_output.append(tmp)
-    probe_max[name]['plasma'],probe_phase[name]['plasma'] = probe.plot_probe_outputs_vs_phase(color_by='BNLI', ax_amp = ax[0], ax_phase = ax[1], ax_complex = ax[2],min_val = min_val, max_val  = max_val)
+    probe_max[name]['plasma'],probe_phase[name]['plasma'] = probe.plot_probe_outputs_vs_phase(color_by='Q95', ax_amp = ax[0], ax_phase = ax[1], ax_complex = ax[2],min_val = min_val, max_val  = max_val)
 
 #cleaning up the plots
 leg = ax[1].legend(loc = 'best')
@@ -115,11 +103,13 @@ fig.canvas.draw();fig.show()
 #Get the text output for the res metric values
 m_list = [10,8]
 for m in m_list:
-    header, b1 =  dBres.output_values_string(m, extra_info=extra_info, sort_by='BNLI')
+    print 'BLAH', m
+    header, b1 =  dBres.output_values_string(m, extra_info=extra_info, sort_by=sort_by)
+    #print b1
     for tmp in b1: text_output.append(tmp)
 
 #Text output for the RFA metric with fixed harmonic
-header, b1 =  dBkink.output_values_string(extra_info=extra_info, sort_by='BNLI', fixed_harm = True)
+header, b1 =  dBkink.output_values_string(extra_info=extra_info, sort_by=sort_by, fixed_harm = True)
 for tmp in b1: text_output.append(tmp)
 
 #Write the text output to a file
@@ -133,16 +123,18 @@ for tmp_name in names:
     z = np.array(probe_phase[tmp_name]['plasma'])
     z[z>200]-=360
     tmp_arg_sort = np.argsort(betaN_li)
+    tmp_arg_sort = np.argsort(q95)
     #ax20[0].plot(betaN_li[tmp_arg_sort], z[tmp_arg_sort],'-o', label = tmp_name)
-    ax20[0].plot(betaN_li[tmp_arg_sort], z,'-o', label = tmp_name)
+    #ax20[0].plot(betaN_li[tmp_arg_sort], z,'-o', label = tmp_name)
+    ax20[0].plot(q95[tmp_arg_sort], z,'-o', label = tmp_name)
     leg = ax20[0].legend(loc = 'best')
     leg.draw_frame(False)
     z = np.array(probe_max[tmp_name]['plasma'])
     #ax20[1].plot(betaN_li[tmp_arg_sort], z[tmp_arg_sort],'-o', label = tmp_name)
-    ax20[1].plot(betaN_li[tmp_arg_sort], z,'-o', label = tmp_name)
+    #ax20[1].plot(betaN_li[tmp_arg_sort], z,'-o', label = tmp_name)
+    ax20[1].plot(q95[tmp_arg_sort], z,'-o', label = tmp_name)
 fig20.suptitle(file_name,fontsize=10)
 fig20.canvas.draw();fig20.show()
-
 
 fig_met, ax_met = pt.subplots(ncols = 3, sharex = True)
 #min_val = None; max_val = None
