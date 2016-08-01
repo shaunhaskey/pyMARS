@@ -24,6 +24,9 @@ file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_scan/shot158115_0
 file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_scan_high_res_low_rot/shot158115_04780_scan_high_res_low_rot_post_processing_PEST.pickle'
 file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_scan_ideal/shot158115_04780_scan_ideal_post_processing_PEST.pickle'
 
+
+file_name = '/home/srh112/NAMP_datafiles/mars/shot158115_04780_scan/shot158115_04780_scan_post_processing_PEST.pickle'
+
 def extract_useful(file_name, m = 10, probe_names = None):
     print file_name
     reference_dB_kink = 'plasma'

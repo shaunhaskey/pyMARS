@@ -288,7 +288,7 @@ class dBres_calculations(generic_calculation):
                 for field in ['total', 'vacuum']:
                     for coil in locs:
                         self.raw_data['{}_res_{}'.format(field, coil)][i] = self.raw_data['{}_res_{}'.format(field, coil)][i][valid]
-            
+
     def single_phasing(self,curr_phase, field = 'plasma'):
         '''Find the dB_res values using a single phasing
         curr_phase is in degrees
@@ -339,6 +339,51 @@ class dBres_calculations(generic_calculation):
             output_data.append(tmp)
         return output_data
 
+    def output_values_string(self, m_num, extra_info=None, sort_by='BNLI'):
+        '''This method outputs a block of text that contains the complex numbers for the various components of the field - was originally developed to generate an output for Carlos
+
+        m_num: what resonant m we are interested in
+        extra_info: list of extra data to be output - i.e BETAN, Q95 etc...
+        sort_by: sort the outputs by an attribute
+
+        SRH: 27Apr2015
+        '''
+        text_output = []
+        if extra_info == None: extra_info = []
+        field_list = ['plasma','vacuum','total']
+        ul_list = ['upper','lower']
+        header = 'quant ' + ' '.join(extra_info) + ' '
+        sort_order = np.argsort(np.array(self.parent.raw_data[sort_by]))
+        min_loc = np.argmin(np.abs(np.array(self.raw_data['res_m_vals'][0])-m_num))
+        for ind, q in enumerate(sort_order):
+            cur_line = 'm{}q{} '.format(int(self.raw_data['res_m_vals'][q][min_loc]),int(self.raw_data['res_q_vals'][q][min_loc])) + ' '.join(['{:.4e}'.format(self.parent.raw_data[i][q]) for i in extra_info]) + ' '
+            for field in field_list:
+                for ul in ul_list:
+                    #print '{}_{}='.format(field, ul), probe.raw_data['{}_probe_{}'.format(field, ul)][q]
+                    tmp_data = self.raw_data['{}_res_{}'.format(field, ul)][q][min_loc]
+                    cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
+                    if ind==0: header += '{}_{}_real {}_{}_imag '.format(field, ul, field, ul)
+            text_output.append(cur_line.rstrip(' ')+'\n')
+        return header.rstrip(' ')+'\n', text_output
+
+    def plot_res_outputs_vs_phase(self, m_num, color_by='BNLI', ax = None, min_val = None, max_val  = None,marker = '.', field = 'total'):
+        '''Plots the metric output as a function of phase for a series
+        of line plots with the colors set by the amplitude of color_by
+        within the ranges of min_val and max_val
+
+        SRH: 27Apr2015
+        '''
+        if min_val == None: min_val = np.min(self.parent.raw_data[color_by])
+        if max_val == None: max_val = np.max(self.parent.raw_data[color_by])
+        cmap_cycle = gen_funcs.new_color_cycle(min_val,max_val)
+        sort_order = np.argsort(np.array(self.parent.raw_data[color_by]))
+        min_loc = np.argmin(np.abs(np.array(self.raw_data['res_m_vals'][0])-m_num))
+        for ind, q in enumerate(sort_order):
+            colorVal = cmap_cycle(self.parent.raw_data[color_by][q])
+            u, l = self.raw_data['{}_res_{}'.format(field, 'upper')][q][min_loc], self.raw_data['{}_res_{}'.format(field, 'lower')][q][min_loc]
+            tmp_phases = np.linspace(0,360,100)
+            ax.plot(tmp_phases, np.abs(u + l * np.exp(1j*np.deg2rad(tmp_phases))), color=colorVal, marker = marker)
+
 
 class magnetic_probe(generic_calculation):
     def __init__(self, parent, probe,):
@@ -365,8 +410,66 @@ class magnetic_probe(generic_calculation):
                 self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)].append(tot - vac)
             self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)] = np.array(self.raw_data['plasma_{}_{}'.format(self.calc_type, coil)])
 
+    def output_values_string(self, extra_info=None, sort_by='BNLI'):
+        '''This method outputs a block of text that contains the complex numbers for the various components of the field - was originally developed to generate an output for Carlos
+
+        extra_info: list of extra data to be output - i.e BETAN, Q95 etc...
+        sort_by: sort the outputs by an attribute
+
+        SRH: 27Apr2015
+        '''
+        text_output = []
+        if extra_info == None: extra_info = []
+        field_list = ['plasma','vacuum','total']
+        ul_list = ['upper','lower']
+        header = 'quant ' + ' '.join(extra_info) + ' '
+        sort_order = np.argsort(np.array(self.parent.raw_data[sort_by]))
+        for ind, q in enumerate(sort_order):
+            cur_line = '{} '.format(self.probe) + ' '.join(['{:.4e}'.format(self.parent.raw_data[i][q]) for i in extra_info]) + ' '
+            for field in field_list:
+                for ul in ul_list:
+                    #print '{}_{}='.format(field, ul), probe.raw_data['{}_probe_{}'.format(field, ul)][q]
+                    tmp_data = self.raw_data['{}_probe_{}'.format(field, ul)][q]
+                    cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
+                    if ind==0: header += '{}_{}_real {}_{}_imag '.format(field, ul, field, ul)
+            text_output.append(cur_line.rstrip(' ')+'\n')
+        return header.rstrip(' ')+'\n', text_output
+
+    def plot_probe_outputs_vs_phase(self, color_by='BNLI', ax_amp = None, ax_phase = None, ax_complex = None,min_val = None, max_val  = None,marker = '.'):
+        '''Plots the probe output as a function of phase
+
+        SRH: 27Apr2015
+        '''
+        if min_val == None: min_val = np.min(self.parent.raw_data[color_by])
+        if max_val == None: max_val = np.max(self.parent.raw_data[color_by])
+        cmap_cycle = gen_funcs.new_color_cycle(min_val,max_val)
+        sort_order = np.argsort(np.array(self.parent.raw_data[color_by]))
+        probe_max = []
+        probe_phase = []
+        for ind, q in enumerate(sort_order):
+            colorVal = cmap_cycle(self.parent.raw_data[color_by][q])
+            pu, pl= [self.raw_data['plasma_probe_upper'][q], self.raw_data['plasma_probe_lower'][q]]
+            lab = self.probe if q==0 else None
+            tmp_phases = np.linspace(0,360,100)
+            tmp_vals_abs = np.abs(pu + pl * np.exp(1j*np.deg2rad(tmp_phases)))
+            ax_amp.plot(tmp_phases, tmp_vals_abs,label=lab, color = colorVal, marker=marker)
+            tmp_vals_ang = np.angle(pu + pl * np.exp(1j*np.deg2rad(tmp_phases)))
+            tmp_vals2 = pu + pl * np.exp(1j*np.deg2rad(tmp_phases))
+            ax_complex.plot(np.real(tmp_vals2), np.imag(tmp_vals2), color=colorVal)
+            ax_complex.plot(np.real(tmp_vals2[0]), np.imag(tmp_vals2[0]), marker = marker, color=colorVal)
+            ax_phase.plot(tmp_phases, np.rad2deg(tmp_vals_ang)%360,label=lab,color = colorVal, marker=marker)
+            probe_max.append(max(np.abs(tmp_vals_abs)))
+            probe_phase.append(tmp_phases[np.argmax(np.abs(tmp_vals_abs))])
+        return probe_max, probe_phase
+
+    def print_probe_details(self,):
+        tmp = self.parent.project_dict['details']['pickup_coils']
+        ind = tmp['probe'].index(self.probe)
+        print 'R={:.3f}, Z={:.3f}m, l_probe={:.3f}m, inc={:.3f}rad, pol={}'.format(*[tmp[i][ind] for i in ['Rprobe', 'Zprobe', 'lprobe','tprobe','probe_type']]) 
+
+
 class dBkink_calculations(generic_calculation):
-    def __init__(self, parent,):
+    def __init__(self, parent,fixed_offset=3,fixed_harmonic=11):
         '''This class does all the dBkink calculations
         SRH : 12Mar2014
         '''
@@ -398,7 +501,63 @@ class dBkink_calculations(generic_calculation):
         for field in ['total', 'vacuum', 'plasma']:
             for coil in locs:
                 self.raw_data['{}_kink_harm_{}'.format(field, coil)], self.raw_data['{}_mode_list_{}'.format(field, coil)], self.raw_data['{}_max_mode_list_{}'.format(field, coil)] = calculate_db_kink2(self.raw_data['mk'], self.raw_data['q_val'], self.parent.n, self.raw_data['reference'], self.raw_data['{}_kink_{}'.format(field,coil)], reference_offset = self.parent.reference_offset)
+                self.raw_data['{}_kink_fixed_offset_{}'.format(field, coil)], self.raw_data['{}_mode_list_fixed_offset_{}'.format(field, coil)] = calculate_db_kink_fixed(self.raw_data['mk'], self.raw_data['q_val'], self.parent.n, self.raw_data['{}_kink_{}'.format(field,coil)], fixed_offset)
+                self.raw_data['{}_kink_fixed_harm_{}'.format(field, coil)], self.raw_data['{}_mode_list_fixed_harm_{}'.format(field, coil)] = calculate_db_kink_fixed(self.raw_data['mk'], self.raw_data['q_val'], self.parent.n, self.raw_data['{}_kink_{}'.format(field,coil)], fixed_harmonic, offset=False)
                 #self.raw_data['{}_kink_harm_{}'.format(field, coil)] = calculate_db_kink2(self.raw_data['mk'], self.raw_data['q_val'], self.n, self.raw_data['reference'], self.raw_data['{}_kink_{}'.format(field,coil)], reference_offset = self.reference_offset)
+
+    def output_values_string(self, extra_info=None, sort_by='BNLI', fixed_harm = False):
+        '''This method outputs a block of text that contains the complex numbers for the various components of the field - was originally developed to generate an output for Carlos
+
+        extra_info: list of extra data to be output - i.e BETAN, Q95 etc...
+        sort_by: sort the outputs by an attribute
+
+        fixed_harm : whether or not to use a fixed harmonic for RFA metric output data
+        SRH: 27Apr2015
+        '''
+        text_output = []
+        if extra_info == None: extra_info = []
+        field_list = ['plasma','vacuum','total']
+        ul_list = ['upper','lower']
+        header = 'quant ' + ' '.join(extra_info) + ' '
+        sort_order = np.argsort(np.array(self.parent.raw_data[sort_by]))
+        for ind, q in enumerate(sort_order):
+            if fixed_harm:
+                val_txt = '{}_kink_fixed_harm_{}'
+                name_txt = 'm{}s{} '.format(self.raw_data['plasma_mode_list_fixed_harm_upper'][q], self.parent.s_surface)
+            else:
+                val_txt = '{}_kink_harm_{}'
+                name_txt = 'm{}s{} '.format(self.raw_data['plasma_mode_list_upper'][q], self.parent.s_surface)
+            cur_line = name_txt + ' '.join(['{:.4e}'.format(self.parent.raw_data[i][q]) for i in extra_info]) + ' '
+            for field in field_list:
+                for ul in ul_list:
+                    #print '{}_{}='.format(field, ul), probe.raw_data['{}_probe_{}'.format(field, ul)][q]
+                    #tmp_data = self.raw_data['{}_kink_fixed_harm_{}'.format(field, ul)][q]
+                    tmp_data = self.raw_data[val_txt.format(field, ul)][q]
+                    cur_line += '{:.6e} {:.6e} '.format(float(np.real(tmp_data)), float(np.imag(tmp_data)))
+                    if ind==0: header += '{}_{}_real {}_{}_imag '.format(field, ul, field, ul)
+            text_output.append(cur_line.rstrip(' ')+'\n')
+        return header.rstrip(' ')+'\n', text_output
+
+    def plot_rfa_outputs_vs_phase(self, color_by='BNLI', ax = None, min_val = None, max_val  = None,marker = '.', field = 'total', fixed_harm=False):
+        '''Plots the metric output as a function of phase
+
+        SRH: 27Apr2015
+        '''
+        if min_val == None: min_val = np.min(self.parent.raw_data[color_by])
+        if max_val == None: max_val = np.max(self.parent.raw_data[color_by])
+        cmap_cycle = gen_funcs.new_color_cycle(min_val,max_val)
+        sort_order = np.argsort(np.array(self.parent.raw_data[color_by]))
+        for ind, q in enumerate(sort_order):
+            if fixed_harm:
+                val_txt = '{}_kink_fixed_harm_{}'
+            else:
+                val_txt = '{}_kink_harm_{}'
+            colorVal = cmap_cycle(self.parent.raw_data[color_by][q])
+            u, l = self.raw_data[val_txt.format(field, 'upper')][q], self.raw_data[val_txt.format(field, 'lower')][q]
+            #lab = 'rfa' if q==0 else None
+            tmp_phases = np.linspace(0,360,100)
+            ax.plot(tmp_phases, np.abs(u + l * np.exp(1j*np.deg2rad(tmp_phases))), color=colorVal, marker = marker)
+
 
 class x_point_displacement_calcs(generic_calculation):
     def __init__(self, parent, phasing):
@@ -468,6 +627,7 @@ class post_processing_results():
         SRH : 8Mar2014
         '''
         #Assign the various things to object attributes
+        self.fixed_harmonic = fixed_harmonic
         self.project_dict = pickle.load(file(file_name,'r'))
         self.s_surface = s_surface
         self.phase_machine_ntor = phase_machine_ntor
@@ -477,7 +637,7 @@ class post_processing_results():
         self.calc_ul = ul
         self.reference_dB_kink = reference_dB_kink
         self.reference_offset = [2,0] if reference_offset == None else reference_offset
-        plasma_params = ['Q95','QMAX','shot_time','BETAN', 'LI', 'R0EXP', 'B0EXP','v0a']
+        plasma_params = ['Q95','QMAX','shot_time','BETAN', 'LI', 'R0EXP', 'B0EXP','v0a','PMULT','QMULT']
         self.raw_data = {}
         for i in plasma_params:self.raw_data[i] = data_from_dict(i, self.project_dict)
         self.raw_data['BNLI']=np.array(self.raw_data['BETAN'])/np.array(self.raw_data['LI'])
@@ -1857,15 +2017,20 @@ def calculate_db_kink2(mk_list, q_val_list, n, reference, to_be_calculated, refe
     return answer, mode_list, max_loc_list
 
 
-def calculate_db_kink_fixed(mk_list, q_val_list, n, to_be_calculated, n_plus):
+def calculate_db_kink_fixed(mk_list, q_val_list, n, to_be_calculated, n_plus, offset = True):
     '''
     Calculate db_kink based on a fixed harmonic
     '''
-    answer = []
+    answer = []; mode_list = []
     for i in range(0,len(to_be_calculated)):
-        fixed_loc = np.min([np.argmin(np.abs(mk_list[i] - q_val_list[i]*n)) + n_plus, len(to_be_calculated[i])-1])
+        #The len part truncates it to the number of harmonics available incase with the offset it is larger than the available values
+        if offset:
+            fixed_loc = np.min([np.argmin(np.abs(mk_list[i] - q_val_list[i]*n)) + n_plus, len(to_be_calculated[i])-1])
+        else:
+            fixed_loc = np.argmin(np.abs(mk_list[i] - n_plus))
         answer.append(to_be_calculated[i][fixed_loc])
-    return answer
+        mode_list.append(mk_list[i][fixed_loc])
+    return answer, mode_list
 
 
 def dB_kink_phasing_dependence(q95_list_copy, lower_values_plasma, upper_values_plasma, lower_values_vac, upper_values_vac, lower_values_tot, upper_values_tot, lower_values_vac_fixed, upper_values_vac_fixed, phase_machine_ntor, upper_values_plas_fixed, lower_values_plas_fixed, n, n_phases = 360, phasing_array=None):
