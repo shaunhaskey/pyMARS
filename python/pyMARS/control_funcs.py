@@ -1,6 +1,7 @@
 #!/usr/bin/env Python
 import pyMARS.PythonMARS_funcs as pyMARS_funcs
 import time, pickle, copy, os
+import subprocess as sub
 import pyMARS.Batch_Launcher as batch_launcher
 import pyMARS.RZfuncs as RZfuncs
 import pyMARS.results_class
@@ -139,12 +140,33 @@ def corsica_run_setup(base_dir, efit_dir, template_file, input_data, settings, r
     except OSError:
         pass
     #os.system('rm corsica_finished')
-    corsica_job_string = "#!/bin/bash\n#$ -N corsica_SH\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\n"
-    corsica_job_string += "rm corsica_finished\n"
-    corsica_job_string += "/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt >caltrans_out.log\n"
-    corsica_job_string += "touch corsica_finished\n"
-    if rm_files != '': corsica_job_string += 'rm {}\n'.format(rm_files)
-    with file('corsica.job','w') as corsica_job_file:corsica_job_file.write(corsica_job_string)
+
+    # CHECK HOST: ADJUST JOB SUBMIT FORMAT (DBW 2/3/2016)
+    host = sub.check_output('echo $HOSTNAME',shell=True) 
+    host = host.splitlines()[0]
+    if 'venus' in host:
+        corsica_job_string = "#!/bin/bash\n#$ -N corsica_SH\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\n"
+        corsica_job_string += "rm corsica_finished\n"
+        corsica_job_string += "/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt >caltrans_out.log\n"
+        corsica_job_string += "touch corsica_finished\n"
+        if rm_files != '': corsica_job_string += 'rm {}\n'.format(rm_files)
+        with file('corsica.job','w') as corsica_job_file:corsica_job_file.write(corsica_job_string)
+    elif 'saturn' in host or 'iris' in host:
+        corsica_job_string = "#!/bin/bash\n#PBS -N corsica_SH\n#PBS -k oe\n#PBS -l nodes=1:ppn=1,walltime=1:00:00\n#PBS -V\n"
+        corsica_job_string += 'cd ' + running_dir + '\n'
+        corsica_job_string += "rm corsica_finished\n"
+        corsica_job_string += "/fusion/projects/codes/corsica/current/scripts/caltrans.sh -probname eq_vary_p_q < commands_test.txt >caltrans_out.log\n"
+        corsica_job_string += "touch corsica_finished\n"
+        if rm_files != '': corsica_job_string += 'rm {}\n'.format(rm_files)
+        with file('corsica.job','w') as corsica_job_file:corsica_job_file.write(corsica_job_string)
+    else:
+        corsica_job_string = "#!/bin/bash\n#$ -N corsica_SH\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\n"
+        corsica_job_string += "rm corsica_finished\n"
+        corsica_job_string += "/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt >caltrans_out.log\n"
+        corsica_job_string += "touch corsica_finished\n"
+        if rm_files != '': corsica_job_string += 'rm {}\n'.format(rm_files)
+        with file('corsica.job','w') as corsica_job_file:corsica_job_file.write(corsica_job_string)
+    
         
 def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1, rm_files = ''):
     script = 'sleep %d\n'%(sleep_time)
@@ -152,7 +174,7 @@ def run_corsica_file(base_dir, input_list, script_name, sleep_time = 1, rm_files
         running_dir = base_dir + input_data[0]
         script += 'cd ' + running_dir + '\n'
         script += 'pwd\n'
-        command = '/d/caltrans/vcaltrans/bin/caltrans -probname eq_vary_p_q < commands_test.txt > caltrans_out.log'
+        command = 'caltrans -probname eq_vary_p_q < commands_test.txt > caltrans_out.log' # removed path to caltrans (DBW 8/3/2016)
         script += 'sleep %d\n'%(sleep_time)
         script += command + '\n'
         script += 'sleep %d\n'%(sleep_time)
@@ -551,6 +573,9 @@ def post_processing(master_pickle, post_proc_workers, python_file, directory = '
     os.system('rm -r '+master_pickle['details']['base_dir']+directory) #remove temp directory contents
     os.system('mkdir '+master_pickle['details']['base_dir']+directory) #remove temp directory contents
 
+    host = sub.check_output('echo $HOSTNAME',shell=True) # check host (DBW 8/3/2016)
+    host = host.splitlines()[0]
+
     #setup the serial numbers for each worker
     for i in range(0,post_proc_workers):
         tmp_pickle = {}; tmp_pickle['details']=copy.deepcopy(master_pickle['details']); tmp_pickle['sims']={}
@@ -559,11 +584,14 @@ def post_processing(master_pickle, post_proc_workers, python_file, directory = '
 
         pickle_file_name = master_pickle['details']['base_dir']+directory+'/tmp_'+str(i)+'.pickle'
         pickle.dump(tmp_pickle, open(pickle_file_name,'w'))
-
-        job_string = '#!/bin/bash\n#$ -N '+ 'PostProc'+str(i)+'\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\nexport PATH=$PATH:/f/python/linux64/bin\nsource ~/.bashrc\n'
+        
+        if 'saturn' in host or 'iris' in host:
+            job_string = '#!/bin/bash\n#PBS -N '+ 'PostProc'+str(i)+'\n#PBS -k oe\n#PBS -l nodes=1:ppn=1,walltime=1:00:00\n'
+        else:
+            job_string = '#!/bin/bash\n#$ -N '+ 'PostProc'+str(i)+'\n#$ -q all.q\n#$ -o sge_output.dat\n#$ -e sge_error.dat\n#$ -cwd\nexport PATH=$PATH:/f/python/linux64/bin\nsource ~/.bashrc\n'
         log_file_name = master_pickle['details']['base_dir']+directory + '/log_test' + str(i) + '.log'
         #execute_command = python_file + ' ' + pickle_file_name + ' '  ' &> ' + log_file_name + '\n'
-        execute_command = '%s %s %d &> %s\n'%(python_file,pickle_file_name, upper_and_lower,log_file_name)
+        execute_command = '%s %s %d > %s\n'%(python_file,pickle_file_name, upper_and_lower,log_file_name)
         job_string += execute_command
 
         job_name = master_pickle['details']['base_dir'] + directory+'/step9_'+str(i)+'.job'

@@ -1,4 +1,4 @@
-#!/usr/bin/env Python
+#!/bin/env python2.7
 import pyMARS.results_class as results_class
 import pickle,sys
 import numpy as np

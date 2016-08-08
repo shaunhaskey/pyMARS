@@ -1,6 +1,7 @@
 import numpy as num
 import numpy as np
 import time, os, sys, string, re, csv, pickle
+import subprocess as sub
 import scipy.interpolate as interpolate
 from scipy.interpolate import griddata as scipy_griddata
 
@@ -78,9 +79,9 @@ def read_stab_results(file_location):
     stab_lines[line] = stab_lines[line]+ ' '
 
     while len(stab_lines[line]) >= 1:
-        end = stab_lines[line].find(' ')
-        var_names.append(stab_lines[line][0:end])
-        stab_lines[line] = stab_lines[line].lstrip(var_names[-1]).lstrip(' ')
+       end = stab_lines[line].find(' ')
+       var_names.append(stab_lines[line][0:end])
+       stab_lines[line] = stab_lines[line].lstrip(var_names[-1]).lstrip(' ')
 
     #extract equilibrium run values
     line += 1
@@ -242,7 +243,7 @@ def modify_input_file(filename, search_text, replacement):
     file = open(filename,'r')
     text_orig = file.read()
     file.close()
-    text_list = text_orig.splitlines()
+    text_list = text_orig.splitlines()[0]
     mod_txt = ''
     for i in range(0,text_orig.count('\n')):
         check = text_list[i].find(search_text)
@@ -354,12 +355,12 @@ def modify_datain(master,template_dir, replace_values,CHEASE_template = 'datain_
 #---------Chease : Extract NW from log_chease--------------
 def extract_NW(master):
     #os.chdir(master['dir_dict']['chease_dir'])
-    master['NW'] = int(round(float(extract_value(master['dir_dict']['chease_dir'] + '/log_chease','NW',' '))))
+    master['NW'] = int(round(float(extract_value(master['dir_dict']['chease_dir'] + '/log_chease',' NW',' '))))
     #print 'NW : ' + str(master['NW'])
     return master
 
 def extract_aspect(master):
-    master['NW'] = int(round(float(extract_value(master['dir_dict']['chease_dir'] + '/log_chease','NW',' '))))
+    master['NW'] = int(round(float(extract_value(master['dir_dict']['chease_dir'] + '/log_chease',' NW',' '))))
     with file(master['dir_dict']['chease_dir'] + '/log_chease','r') as filehandle:
         lines = filehandle.readlines()
     lines = ''.join(lines).replace('FORTRAN STOP\n','').split('\n')
@@ -433,10 +434,14 @@ def mars_link_files(directory, special_dir = '', link_PROFTI = False, link_PROFT
     start_directory = os.getcwd()
     #os.chdir(directory)
     #if special_dir == '':
-    os.system('ln -sf ../../../../efit/' + special_dir + r'/PROFDEN {}/PROFDEN'.format(directory))
-    os.system('ln -sf ../../../../efit/' + special_dir + '/PROFROT {}/PROFROT'.format(directory))
-    if link_PROFTI: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTI {}/PROFTI'.format(directory))
-    if link_PROFTE: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTE {}/PROFTE'.format(directory))
+    host = sub.check_output('echo $HOSTNAME',shell=True) # add host name to master dict (DBW 8/3/2016)
+    host = host.splitlines()[0]
+    if 'saturn' in host or 'iris' in host: ext = '.IN'
+    else: ext = ''
+    os.system('ln -sf ../../../../efit/' + special_dir + '/PROFDEN {}/PROFDEN.IN'.format(directory))
+    os.system('ln -sf ../../../../efit/' + special_dir + '/PROFROT {}/PROFROT.IN'.format(directory))
+    if link_PROFTI: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTI {}/PROFTI.IN'.format(directory))
+    if link_PROFTE: os.system('ln -sf ../../../../efit/' + special_dir + '/PROFTE {}/PROFTE.IN'.format(directory))
 
     #else:
     #os.system('ln -sf ../../../efit/' + special_dir + '/PROFDEN PROFDEN')
@@ -512,8 +517,8 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 #     else:
 #         os.chdir(master['dir_dict']['mars_upper_vacuum_dir'])
 
-    ne0 = np.loadtxt(file_loc_dir + '/PROFDEN',skiprows = 1)[0,1]
-    profrot = np.loadtxt(file_loc_dir + '/PROFROT',skiprows = 1)
+    ne0 = np.loadtxt(file_loc_dir + '/PROFDEN.IN',skiprows = 1)[0,1]
+    profrot = np.loadtxt(file_loc_dir + '/PROFROT.IN',skiprows = 1)
     vtor0 = profrot[0,1]
     vtor95 = profrot[np.argmin(np.abs(profrot[:,0] - 0.95)),1]
     #vtor0 = np.loadtxt(file_loc_dir + '/PROFROT',skiprows = 1)[0,1]
@@ -543,7 +548,7 @@ def mars_setup_alfven(master, input_frequency, upper_and_lower=0):
 
     #Resistivity data
     try:
-        Te0 = np.loadtxt(file_loc_dir + '/PROFTE',skiprows = 1)[0,1]
+        Te0 = np.loadtxt(file_loc_dir + '/PROFTE.IN',skiprows = 1)[0,1]
         #Make sure it is in eV
         if Te0<200: Te0*=1000
         te_success = 1
@@ -640,7 +645,7 @@ def mars_edit_run_file(directory, settings, template_file):
     for current in settings.keys():
         #print current, master[dict_key][current]
         RUN_text = RUN_text.replace(current,str(settings[current]))
-    with file(directory + '/RUN','w') as file_handle: file_handle.write(RUN_text)
+    with file(directory + '/RUN.IN','w') as file_handle: file_handle.write(RUN_text)
 
     
 def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
@@ -658,7 +663,7 @@ def mars_setup_run_file_new(master, template_file, upper_and_lower=0):
     if master[dict_key]['<<ETA>>'] == -1:master[dict_key]['<<ETA>>']=master['ETA']
     print master[dict_key]['<<ETA>>'], master['ETA']
 #master[dict_key]['<<FEEDI>>'] = master['FEEDI']
-    master[dict_key]['<<AL0>>'] = '( 0, ' + str(master['OMEGA_NORM']) + ')'
+    master[dict_key]['<<AL0>>'] = '( 1.0, ' + str(master['OMEGA_NORM']) + ')'  # changed default to (1.0, 0.0)
 
     if master['IFEED'][0]>= master['NW']:
         print "Possible error IFEED value is greater than or equal to NW :" + str(master['NW']) + ', IFEED' + str(master['IFEED'][0])
@@ -714,21 +719,46 @@ def generate_job_file(master,MARS_execution_script, id_string = 'MARS', rm_files
             execution_txt += 'rm ' + rm_files +'\n'
             
     execution_txt += 'cd '+ master['dir_dict']['chease_dir'] + '\n'
-    if rm_files2!='':execution_txt += 'rm ' + rm_files2 +'\n'
-
-    job_string = '#!/bin/bash\n'
-    job_string = job_string + '#$ -N ' + id_string + '_p%d_q%d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
-    job_string = job_string + '#$ -q all.q\n'
-    job_string = job_string + '#$ -o %s\n'%('sge_output.dat')
-    job_string = job_string + '#$ -e %s\n'%('sge_error.dat')
-    job_string = job_string + '#$ -cwd\n'
-    job_string = job_string + 'echo $PATH\n'
-    job_string += execution_txt
-    #job_string = job_string + 'runmarsf > log_runmars\n'
-    #job_string = job_string + 'rm ' + rm_files +'\n'
-    with file(master['dir_dict']['mars_dir'] + '/mars_venus.job','w') as file_handle: file_handle.write(job_string)
+    #if rm_files2!='':execution_txt += 'rm ' + rm_files2 +'\n' (DBW)
 
 
+    # CHECK HOST: ADJUST JOB SUBMIT FORMAT (DBW 8/2/2016)
+    host = sub.check_output('echo $HOSTNAME',shell=True) 
+    host = host.splitlines()[0]
+    if 'venus' in host:
+        job_string = '#!/bin/bash\n'
+        job_string = job_string + '#$ -N ' + id_string + '_p%d_q%d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
+        job_string = job_string + '#$ -q all.q\n'
+        job_string = job_string + '#$ -o %s\n'%('sge_output.dat')
+        job_string = job_string + '#$ -e %s\n'%('sge_error.dat')
+        job_string = job_string + '#$ -cwd\n'
+        job_string = job_string + 'echo $PATH\n'
+        job_string += execution_txt
+        #job_string = job_string + 'runmarsf > log_runmars\n'
+        #job_string = job_string + 'rm ' + rm_files +'\n'
+        with file(master['dir_dict']['mars_dir'] + '/mars_venus.job','w') as file_handle: file_handle.write(job_string)
+    elif 'saturn' in host or 'iris' in host :
+        job_string = '#!/bin/bash\n'
+        job_string = job_string + '#PBS -N ' + id_string + '_p%d_q%d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
+        job_string = job_string + '#PBS -k oe\n'
+        job_string = job_string + '#PBS -l nodes=1:ppn=1,walltime=1:00:00\n'
+        #job_string = job_string + 'export LD_LIBRARY_PATH=/opt/intel/compilers_and_libraries/linux/lib/intel64:$LD_LIBRARY_PATH\n'
+        job_string = job_string + 'module load mpich/ifort\n'
+        #job_string = job_string + 'echo $PATH\n'
+        #job_string = job_string + 'echo $LD_LIBRARY_PATH\n'
+        job_string += execution_txt
+        with file(master['dir_dict']['mars_dir'] + '/mars_' + host + '.job','w') as file_handle: file_handle.write(job_string)        
+    else:
+        job_string = '#!/bin/bash\n'
+        job_string = job_string + '#$ -N ' + id_string + '_p%d_q%d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
+        job_string = job_string + '#$ -q all.q\n'
+        job_string = job_string + '#$ -o %s\n'%('sge_output.dat')
+        job_string = job_string + '#$ -e %s\n'%('sge_error.dat')
+        job_string = job_string + '#$ -cwd\n'
+        job_string = job_string + 'echo $PATH\n'
+        job_string += execution_txt
+        with file(master['dir_dict']['mars_dir'] + '/mars_' + host + '.job','w') as file_handle: file_handle.write(job_string)        
+        
 #------------ Generate job file for Chease batch run ----------
 def generate_chease_job_file(master,CHEASE_execution_script, PEST=0, fxrun = 0, id_string = 'Chease_', rm_files = ''):
     if PEST==1:
@@ -738,26 +768,64 @@ def generate_chease_job_file(master,CHEASE_execution_script, PEST=0, fxrun = 0, 
         #os.chdir(master['dir_dict']['chease_dir'])
         working_dir = master['dir_dict']['chease_dir']
     if working_dir[-1]!='/':working_dir+='/'
-    job_string = '#!/bin/bash\n'
-    job_string = job_string + '#$ -N ' + id_string + 'p%.3d_q%.3d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
-    job_string = job_string + '#$ -q all.q\n'
-    job_string = job_string + '#$ -o %s\n'%('sge_output.dat')
-    job_string = job_string + '#$ -e %s\n'%('sge_error.dat')
-    job_string = job_string + '#$ -cwd\n'
-#    job_string = job_string + '#$ -M shaunhaskey@gmail.com\n'
-#    job_string = job_string + '#$ -m e\n'
-    job_string = job_string + 'echo $PATH\n'
-    job_string = job_string + CHEASE_execution_script + '\n'
-    if fxrun==1:
-        job_string += 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/c/source/PGI/pgi/linux86/8.0-2/lib\n'
 
-        job_string += '/u/reimerde/mars/MarsF20060714/FourierRF/FourierRF.x < fxin > fxrun_log.log\n'
-        #job_string += 'fxrun > fxrun_log.log\n'
-
-    job_string += 'rm '+ rm_files +'\n'
-    file_name = open(r'{}/chease.job'.format(working_dir),'w')
-    file_name.write(job_string)
-    file_name.close()
+    # CHECK HOST: ADLUST JOB SUBMIT FORMAT (DBW 8/2/2016)
+    host = sub.check_output('echo $HOSTNAME',shell=True) 
+    host = host.splitlines()[0]
+    if 'venus' in host:
+        job_string = '#!/bin/bash\n'
+        job_string = job_string + '#$ -N ' + id_string + 'p%.3d_q%.3d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
+        job_string = job_string + '#$ -q all.q\n'
+        job_string = job_string + '#$ -o %s\n'%('sge_output.dat')
+        job_string = job_string + '#$ -e %s\n'%('sge_error.dat')
+        job_string = job_string + '#$ -cwd\n'
+        #job_string = job_string + '#$ -M shaunhaskey@gmail.com\n'
+        #job_string = job_string + '#$ -m e\n'
+        job_string = job_string + 'echo $PATH\n'
+        job_string = job_string + CHEASE_execution_script + '\n'
+        if fxrun==1:
+            job_string += 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/c/source/PGI/pgi/linux86/8.0-2/lib\n'
+            job_string += '/u/reimerde/mars/MarsF20060714/FourierRF/FourierRF.x < fxin > fxrun_log.log\n'
+            #job_string += 'fxrun > fxrun_log.log\n'
+        job_string += 'rm '+ rm_files +'\n'
+        file_name = open(r'{}/chease.job'.format(working_dir),'w')
+        file_name.write(job_string)
+        file_name.close()
+    elif 'saturn' in host or 'iris' in host:
+        job_string = '#!/bin/bash\n'
+        job_string = job_string + '#PBS -N ' + id_string + 'p%.3d_q%.3d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
+        job_string = job_string + '#PBS -k oe\n'
+        job_string = job_string + '#PBS -l nodes=1:ppn=1,walltime=1:00:00\n'
+        job_string = job_string + '#PBS -d' + working_dir + '\n'
+        job_string = job_string + 'echo $PATH\n'
+        job_string = job_string + CHEASE_execution_script + '\n'
+        if fxrun==1:
+            job_string += 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/fusion/usc/opt/pgi/linux86/2013/lib\n'
+            job_string += '/fusion/projects/codes/mars/MARSQ/FourierRF/FourierRF.x < fxin > fxrun_log.log\n'
+            #job_string += 'fxrun > fxrun_log.log\n'
+        job_string += 'rm '+ rm_files +'\n'
+        file_name = open(r'{}/chease.job'.format(working_dir),'w')
+        file_name.write(job_string)
+        file_name.close()
+    else:
+        job_string = '#!/bin/bash\n'
+        job_string = job_string + '#$ -N ' + id_string + 'p%.3d_q%.3d\n'%(int(round(master['PMULT']*100)),int(round(master['QMULT']*100)))
+        job_string = job_string + '#$ -q all.q\n'
+        job_string = job_string + '#$ -o %s\n'%('sge_output.dat')
+        job_string = job_string + '#$ -e %s\n'%('sge_error.dat')
+        job_string = job_string + '#$ -cwd\n'
+        #job_string = job_string + '#$ -M shaunhaskey@gmail.com\n'
+        #job_string = job_string + '#$ -m e\n'
+        job_string = job_string + 'echo $PATH\n'
+        job_string = job_string + CHEASE_execution_script + '\n'
+        if fxrun==1:
+            job_string += 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/c/source/PGI/pgi/linux86/8.0-2/lib\n'
+            job_string += '/u/reimerde/mars/MarsF20060714/FourierRF/FourierRF.x < fxin > fxrun_log.log\n'
+            #job_string += 'fxrun > fxrun_log.log\n'
+        job_string += 'rm '+ rm_files +'\n'
+        file_name = open(r'{}/chease.job'.format(working_dir),'w')
+        file_name.write(job_string)
+        file_name.close()
 
 def pickup_interp_points(R_probe, Z_probe, l_probe, t_probe, type_probe, Navg):
     if type_probe == 1:

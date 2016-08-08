@@ -203,11 +203,11 @@ class data():
         #print 'R0EXP', self.R0EXP
         self.Nm2 = self.Nm0
         self.R, self.Z =  GetRZ(self.RM,self.ZM,self.Nm0,self.Nm2,self.chi,self.phi)
-        self.FEEDI = get_FEEDI(self.directory + '/FEEDI')
+        self.FEEDI = get_FEEDI(self.directory + '/FEEDI.OUT')
         self.BNORM = calc_BNORM(self.FEEDI, self.R0EXP, I0EXP = self.I0EXP)
         print ' ', self.directory
         print ' BNORM:{}, FEEDI:{}, R0EXP:{}, I0EXP:{} '.format(self.BNORM, self.FEEDI, self.R0EXP, self.I0EXP)
-        file_name = self.directory + '/BPLASMA'
+        file_name = self.directory + '/BPLASMA.OUT'
         #Extract geometry related stuff
         self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian = GetUnitVec(self.R, self.Z, self.s, self.chi)
 
@@ -218,12 +218,12 @@ class data():
         self.B1,self.B2,self.B3,self.Bn,self.BMn = GetB123(self.BM1, self.BM2, self.BM3, self.R, self.Mm, self.chi, self.dRdchi, self.dZdchi)
         self.Br,self.Bz,self.Bphi = MacGetBphysC(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3)
         self.Brho,self.Bchi,self.Bphi2 = MacGetBphysT(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3,self.B0EXP)
-        self.NW = int(round(float(pyMARS_funcs.extract_value(self.directory + '/../../cheaserun/log_chease','NW',' '))))
+        self.NW = int(round(float(pyMARS_funcs.extract_value(self.directory + '/../../cheaserun/log_chease',' NW',' '))))
 
     def get_VPLASMA(self, VNORM=1.0):
         #os.chdir(self.directory)
         self.VNORM = calc_VNORM(self.FEEDI, self.B0EXP, I0EXP = self.I0EXP)
-        self.VM1, self.VM2, self.VM3, self.DPSIDS, self.T = ReadVPLASMA(self.directory + '/VPLASMA',self.Ns, self.Ns1, self.s, VNORM=self.VNORM)
+        self.VM1, self.VM2, self.VM3, self.DPSIDS, self.T = ReadVPLASMA(self.directory + '/VPLASMA.OUT',self.Ns, self.Ns1, self.s, VNORM=self.VNORM)
         self.V1,self.V2,self.V3,self.Vn, self.V1m = GetV123(self.VM1,self.VM2,self.VM3,self.R, self.chi, self.dRds, self.dZds, self.dRdchi, self.dZdchi, self.jacobian, self.Mm, self.Nchi, self.s, self.Ns1, self.DPSIDS, self.T)
         self.Vr, self.Vz, self.Vphi = MacGetVphys(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.V1,self.V2,self.V3, self.Ns1)
 

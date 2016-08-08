@@ -1,10 +1,11 @@
-#!/usr/bin/env Python
+#!/bin/env python2.7
 
 import pyMARS.PythonMARS_funcs as pyMARS_funcs
 import pyMARS.control_funcs as cont_funcs
 import pyMARS.Batch_Launcher as batch_launch
 import pyMARS as pyMARS_mod
-import pickle, time, os,sys, copy
+import pickle, time, os, sys, copy
+import subprocess as sub
 import numpy as num
 import ConfigParser
 import numpy as num
@@ -278,12 +279,14 @@ print sys.argv[1]
 os.system('cp ' + sys.argv[1] + ' ' + proj_base_dir+tmp_filename)
 print 'script file copied across for record keeping'
 
+host = sub.check_output('echo $HOSTNAME',shell=True) # add host name to master dict (DBW 8/3/2016)
+host = host.splitlines()[0]
 
 project_dict['details'] = {'template_dir':template_directory, 'efit_master':efit_file_location,
                            'profile_master':profile_file_location,'CHEASE_settings':CHEASE_settings,
                            'CHEASE_settings_PEST':CHEASE_settings,'MARS_settings':MARS_settings,
                            'corsica_settings':corsica_settings,'ICOIL_FREQ':I_coil_frequency,
-                           'base_dir':proj_base_dir}
+                           'base_dir':proj_base_dir,'host':host}
 
 pickup_coils_details =  {'probe':probe,'probe_type':probe_type,'Rprobe':Rprobe, 
                          'Zprobe':Zprobe, 'tprobe':tprobe,'lprobe':lprobe}
@@ -294,12 +297,14 @@ project_dict['details']['I-coils'] = copy.deepcopy(I_coil_details)
 
 corsica_base_dir = project_dict['details']['base_dir']+ '/corsica/' #this is a temporary location for corsica files
 
+
+
 print '#####################################################################'
 print '##*****STEP 1 - Copy EFIT files + CORSICA(??) ********************###'
 # Need a neater way to deal with CORSICA + give it its own step?    #
 if start_from_step == 1:
     overall_start = time.time()
-    project_dict['sims']={}
+    project_dict['sims']={'host':host}
     project_dict['details'] = cont_funcs.generate_master_dir(project_dict['details'],project_dict)
 
     if multiple_efits == 1:
@@ -445,8 +450,7 @@ if start_from_step <=2 and end_at_step>=2:
     else:
         file_location = project_dict['details']['efit_dir']+'/stab_setup_results.dat'
         project_dict['sims'] = pyMARS_funcs.read_stab_results(file_location)
-
-
+  
     #Filter according to settings at top of file
     project_dict = cont_funcs.remove_certain_values(project_dict, q95_range, Bn_Div_Li_range, filter_WTOTN1, filter_WTOTN2, filter_WTOTN3, filter_WWTOTN1)
 
@@ -480,10 +484,11 @@ if start_from_step <=3 and end_at_step>=3:
     #Why does this step work within Ipython but not from bash on venus??
     #something to do with library linking - what is happening?
     #This is the step that launches the batch job
-    project_dict = cont_funcs.chease_setup_run(project_dict,job_num_filename, CHEASE_execution_script,PEST=0, fxrun = 1, rm_files = CHEASE_rm_files, cluster_job = cluster_job)
+    #Set fxrun = 0 for MARSQ update -DBW
+    project_dict = cont_funcs.chease_setup_run(project_dict,job_num_filename, CHEASE_execution_script,PEST=0, fxrun = 0, rm_files = CHEASE_rm_files, cluster_job = cluster_job)
 
     if include_chease_PEST_run ==1:
-        project_dict = cont_funcs.chease_setup_run(project_dict,job_num_filename, CHEASE_execution_script, CHEASE_template = CHEASE_template_name, PEST=1, fxrun = 1, rm_files = CHEASE_PEST_rm_files, cluster_job = cluster_job)
+        project_dict = cont_funcs.chease_setup_run(project_dict,job_num_filename, CHEASE_execution_script, CHEASE_template = CHEASE_template_name, PEST=1, fxrun = 0, rm_files = CHEASE_PEST_rm_files, cluster_job = cluster_job)
         #Does FourierX need to be run ON THE PEST JOB??? ask Matt or Yueqiang
 
     #Dump the data structure so it can be read by the next step if required
