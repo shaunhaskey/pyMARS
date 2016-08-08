@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 upper_and_lower = True
 
 # pickle file that has all the run information in it
-fname = '/u/haskeysr/mars/shot158103_00012_multi_efit_varyped_IAEA/shot158103_00012_multi_efit_varyped_IAEA_post_processing_PEST.pickle'
+fname = '/home/weisbergd/mars/test_runk/test_runk_post_processing_PEST.pickle'
 with file(fname,'r') as filehandle:
     project_dict = pickle.load(filehandle)
 
@@ -63,7 +63,7 @@ fig, ax = plt.subplots(ncols = 2)
 tmp.plot_BnPEST(ax[0])
 
 # Note this is called plot_Bn, but you actually pass it what you want it to plot.... bad historical naming...
-tmp.plot_Bn(np.abs(tmp.Bn),axis=ax[1],cmap='viridis',plot_coils_switch = True)
+tmp.plot_Bn(np.abs(tmp.Bn),axis=ax[1],cmap='plasma',plot_coils_switch = True)
 fig.canvas.draw();fig.show()
 
 # Example where we superpose the upper and lower fields with a phase shift between them

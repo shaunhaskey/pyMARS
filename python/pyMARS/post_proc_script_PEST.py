@@ -1,4 +1,4 @@
-#!/usr/bin/env Python
+#!/bin/env python2.7
 '''
 This does the post processing of the MARS-F runs to get dBkink and dBres information
 SH: 26Feb2013

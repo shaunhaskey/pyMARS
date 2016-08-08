@@ -218,7 +218,7 @@ class data():
         self.B1,self.B2,self.B3,self.Bn,self.BMn = GetB123(self.BM1, self.BM2, self.BM3, self.R, self.Mm, self.chi, self.dRdchi, self.dZdchi)
         self.Br,self.Bz,self.Bphi = MacGetBphysC(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3)
         self.Brho,self.Bchi,self.Bphi2 = MacGetBphysT(self.R,self.Z,self.dRds,self.dZds,self.dRdchi,self.dZdchi,self.jacobian,self.B1,self.B2,self.B3,self.B0EXP)
-        self.NW = int(round(float(pyMARS_funcs.extract_value(self.directory + '/../../cheaserun/log_chease','NW',' '))))
+        self.NW = int(round(float(pyMARS_funcs.extract_value(self.directory + '/../../cheaserun/log_chease',' NW',' '))))
 
     def get_VPLASMA(self, VNORM=1.0):
         #os.chdir(self.directory)

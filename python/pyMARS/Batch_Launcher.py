@@ -7,7 +7,14 @@ def launch_job(job_name):
     os.system('qsub ' + job_name)
 
 def launch_job_mars(job_name, mem_requirement = 15):
-    cmd = 'qsub -l mem_free={}G,h_vmem={}G {}'.format(mem_requirement, mem_requirement, job_name)
+    host = sub.check_output('echo $HOSTNAME',shell=True) # check host (DBW 8/3/2016)
+    host = host.splitlines()[0]
+    if 'venus' in host:
+        cmd = 'qsub -l mem_free={}G,h_vmem={}G {}'.format(mem_requirement, mem_requirement, job_name)
+    elif 'saturn' in host or 'iris' in host:
+        cmd = 'qsub -l pmem={}G,pvmem={}G {}'.format(mem_requirement, mem_requirement, job_name)
+    else:
+        cmd = 'qsub -l mem_free={}G,h_vmem={}G {}'.format(mem_requirement, mem_requirement, job_name)
     print cmd
     os.system(cmd)
 
@@ -84,13 +91,15 @@ def batch_launch_mars(master_dict, job_num_filename, id_string = 'MARS', mem_req
     submitted_jobs = 0;startup = 1;startup_runs = 0
     total_jobs = len(master_dict.keys())
     submitted_serials = []
+    host = sub.check_output('echo $HOSTNAME',shell=True) # check host name (DBW 8/4/2016)
+    host = host.splitlines()[0]
     for i in master_dict.keys():
         setpoint = check_job_number_file(job_num_filename)
         print 'setpoint :', setpoint
         print i
         if startup==1:
             os.chdir(master_dict[i]['dir_dict']['mars_dir'])
-            launch_job_mars('mars_venus.job', mem_requirement = mem_requirement)
+            launch_job_mars('mars_' + host + '.job', mem_requirement = mem_requirement)
             time.sleep(10)
             submitted_serials.append(i)
             master_dict[i]['mars_vac_run'] = 1
@@ -106,7 +115,7 @@ def batch_launch_mars(master_dict, job_num_filename, id_string = 'MARS', mem_req
             while running_jobs(id_string)>setpoint:
                 time.sleep(10)
             os.chdir(master_dict[i]['dir_dict']['mars_dir'])
-            launch_job_mars('mars_venus.job')
+            launch_job_mars('mars_' + host + '.job')
             time.sleep(10)
             submitted_jobs += 1
             submitted_serials.append(i)
@@ -124,9 +133,11 @@ def single_launch_mars(master_dict):
     finished_jobs = 0;
     total_jobs = len(master_dict.keys())
     submitted_serials = []
+    host = sub.check_output('echo $HOSTNAME',shell=True) # check host (DBW 8/4/2016) 
+    host = host.splitlines()[0]
     for i in master_dict.keys():
         os.chdir(master_dict[i]['dir_dict']['mars_dir'])
-        os.system('source mars_venus.job')
+        os.system('source mars_' + host + '.job')
         submitted_serials.append(i)
         master_dict[i]['mars_vac_run'] = 1
         master_dict[i]['mars_p_run'] = 1
